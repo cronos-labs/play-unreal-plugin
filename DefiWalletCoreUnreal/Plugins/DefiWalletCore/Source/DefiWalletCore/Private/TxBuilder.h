@@ -8,7 +8,7 @@
 
 #ifndef TxBuilder_hpp
 #define TxBuilder_hpp
-
+#include "lib.rs.h"
 #include <stdio.h>
 
 
