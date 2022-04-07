@@ -77,3 +77,10 @@ DerivedDataCache/*
 .DS_Store
 *.a
 *.dylib
+DefiWalletCoreUnreal/Plugins/DefiWalletCore/Source/DefiWalletCore/Private/nft.rs.h
+DefiWalletCoreUnreal/Plugins/DefiWalletCore/Source/DefiWalletCore/Private/lib.rs.h
+DefiWalletCoreUnreal/Plugins/DefiWalletCore/Source/DefiWalletCore/Private/cxx.h
+DefiWalletCoreUnreal/Plugins/DefiWalletCore/Source/DefiWalletCore/Private/contract.rs.h
+defi-wallet-core-rs
+*.log
+*.json

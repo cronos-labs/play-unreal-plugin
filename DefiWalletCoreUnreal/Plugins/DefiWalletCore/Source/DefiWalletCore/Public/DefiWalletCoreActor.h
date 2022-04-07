@@ -4,7 +4,91 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "lib.rs.h"
+#include "nft.rs.h"
 #include "DefiWalletCoreActor.generated.h"
+
+
+USTRUCT(BlueprintType)
+struct FCosmosNFTDenom
+{
+    GENERATED_BODY()
+    
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="DefiWalletCore")
+    FString ID;
+    
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="DefiWalletCore")
+    FString Name;
+    
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="DefiWalletCore")
+    FString Schema;
+    
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="DefiWalletCore")
+    FString Creator;
+};
+
+USTRUCT(BlueprintType)
+struct FCosmosNFTToken
+{
+    GENERATED_BODY()
+    
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="DefiWalletCore")
+    FString ID;
+    
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="DefiWalletCore")
+    FString Name;
+    
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="DefiWalletCore")
+    FString URI;
+    
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="DefiWalletCore")
+    FString Data;
+    
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="DefiWalletCore")
+    FString Owner;
+};
+
+USTRUCT(BlueprintType)
+struct FCosmosNFTCollection
+{
+    GENERATED_BODY()
+    
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="DefiWalletCore")
+    bool DenomOption;
+    
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="DefiWalletCore")
+    FCosmosNFTDenom DenomValue;
+    
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="DefiWalletCore")
+    TArray<FCosmosNFTToken> NFTs;
+    
+};
+
+USTRUCT(BlueprintType)
+struct FCosmosNFTIDCollection
+{
+    GENERATED_BODY()
+    
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="DefiWalletCore")
+    FString DenomID;
+    
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="DefiWalletCore")
+    TArray<FString> TokenIDs;
+    
+};
+
+
+USTRUCT(BlueprintType)
+struct FCosmosNFTOwner
+{
+    GENERATED_BODY()
+    
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="DefiWalletCore")
+    FString Address;
+    
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="DefiWalletCore")
+    TArray<FCosmosNFTIDCollection> IDCollections;
+    
+};
 
 
 
@@ -13,6 +97,7 @@ UCLASS()
 class DEFIWALLETCORE_API ADefiWalletCoreActor : public AActor {
     GENERATED_BODY()
 
+    // cosmos
     UFUNCTION(BlueprintCallable,
         meta = (DisplayName = "IntializeWallet", Keywords = "Wallet"),
         Category = "DefiWalletCore")
@@ -28,14 +113,61 @@ class DEFIWALLETCORE_API ADefiWalletCoreActor : public AActor {
         Category = "DefiWalletCore")
     void GetAddress(int32 index, FString& output, bool& success, FString& message);
     
-
-    
     UFUNCTION(BlueprintCallable,
         meta = (DisplayName = "GetBalance", Keywords = "Wallet"),
         Category = "DefiWalletCore")
     void GetBalance(FString address, FString denom, FString& output, bool& success, FString& message);
+    
+    // supply
+    UFUNCTION(BlueprintCallable,
+        meta = (DisplayName = "GetNFTSupply", Keywords = "Wallet"),
+        Category = "DefiWalletCore")
+    void GetNFTSupply(FString mygrpc, FString denomid, FString nftowner,int64& output, bool& success, FString& message);
+    
+    
+    // owner
+    UFUNCTION(BlueprintCallable,
+        meta = (DisplayName = "GetNFTOwner", Keywords = "Wallet"),
+        Category = "DefiWalletCore")
+    void GetNFTOwner(FString mygrpc, FString denomid, FString nftowner,FCosmosNFTOwner& output, bool& success, FString& message);
+    
+    // collection
+    UFUNCTION(BlueprintCallable,
+        meta = (DisplayName = "GetNFTCollection", Keywords = "Wallet"),
+        Category = "DefiWalletCore")
+    void GetNFTCollection(FString mygrpc, FString denomid, FCosmosNFTCollection& output, bool& success, FString& message);
+
+    // denom
+    UFUNCTION(BlueprintCallable,
+        meta = (DisplayName = "GetNFTDenom", Keywords = "Wallet"),
+        Category = "DefiWalletCore")
+    void GetNFTDenom(FString mygrpc, FString denomid, FCosmosNFTDenom& output, bool& success, FString& message);
+    
+    
+    // denom_by_name
+    UFUNCTION(BlueprintCallable,
+        meta = (DisplayName = "GetNFTDenomByName", Keywords = "Wallet"),
+        Category = "DefiWalletCore")
+    void GetNFTDenomByName(FString mygrpc, FString denomname, FCosmosNFTDenom& output, bool& success, FString& message);
+    
+        
+    // grpcurl : http://127.0.0.1:9090
+    // denoms
+    UFUNCTION(BlueprintCallable,
+        meta = (DisplayName = "GetNFTAllDenoms", Keywords = "Wallet"),
+        Category = "DefiWalletCore")
+    void GetNFTAllDenoms(FString mygrpc, TArray<FCosmosNFTDenom>& output, bool& success, FString& message);
+    
+    // nft
+    UFUNCTION(BlueprintCallable,
+        meta = (DisplayName = "GetNFTToken", Keywords = "Wallet"),
+        Category = "DefiWalletCore")
+    void GetNFTToken(FString mygrpc, FString denomid, FString tokenid,FCosmosNFTToken& output, bool& success, FString& message);
+   
+    
 
     
+    // ethereum
     UFUNCTION(BlueprintCallable,
         meta = (DisplayName = "GetEthAddress", Keywords = "Wallet"),
         Category = "DefiWalletCore")
