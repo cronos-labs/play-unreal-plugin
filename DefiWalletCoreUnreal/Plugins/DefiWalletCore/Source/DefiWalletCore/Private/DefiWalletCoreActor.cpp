@@ -9,13 +9,32 @@
 #include "lib.rs.h"
 using namespace std;
 using namespace org::defi_wallet_core;
+string to_hex(const unsigned char *data, int len);
+void from_hex(const string &s, unsigned char *data, int len);
+
+FCosmosNFTDenom convertDenom(::org::defi_wallet_core::Denom src) {
+  FCosmosNFTDenom ret;
+  ret.ID = UTF8_TO_TCHAR(src.id.c_str());
+  ret.Name = UTF8_TO_TCHAR(src.name.c_str());
+  ret.Schema = UTF8_TO_TCHAR(src.schema.c_str());
+  ret.Creator = UTF8_TO_TCHAR(src.creator.c_str());
+  return ret;
+}
+
+FCosmosNFTToken convertToken(::org::defi_wallet_core::BaseNft src) {
+  FCosmosNFTToken ret;
+  ret.ID = UTF8_TO_TCHAR(src.id.c_str());
+  ret.Name = UTF8_TO_TCHAR(src.name.c_str());
+  ret.URI = UTF8_TO_TCHAR(src.uri.c_str());
+  ret.Data = UTF8_TO_TCHAR(src.data.c_str());
+  ret.Owner = UTF8_TO_TCHAR(src.owner.c_str());
+  return ret;
+}
 
 // Sets default values
 ADefiWalletCoreActor::ADefiWalletCoreActor()
-    : myCosmosRpc("http://mynode:1317"),
-      myTendermintRpc("http://mynode:26657"),
-      myChainID("testnet-baseball-1"),
-      myCronosRpc("http://mynode:8545")
+    : myCosmosRpc("http://mynode:1317"), myTendermintRpc("http://mynode:26657"),
+      myChainID("testnet-baseball-1"), myCronosRpc("http://mynode:8545")
 
 {
   // Set this actor to call Tick() every frame.  You can turn this off to
@@ -41,6 +60,180 @@ void ADefiWalletCoreActor::Destroyed() {
   DestroyWallet();
 
   assert(NULL == _coreWallet);
+}
+
+void ADefiWalletCoreActor::GetNFTSupply(FString mygrpc, FString denomid,
+                                        FString nftowner, int64 &output,
+                                        bool &success, FString &message)
+
+{
+  try {
+    string mygrpcstring = TCHAR_TO_UTF8(*mygrpc);
+    rust::cxxbridge1::Box<GrpcClient> grpc_client =
+        new_grpc_client(mygrpcstring);
+
+    output = (int64)grpc_client->supply(TCHAR_TO_UTF8(*denomid),
+                                        TCHAR_TO_UTF8(*nftowner));
+
+    success = true;
+  } catch (const rust::cxxbridge1::Error &e) {
+    success = false;
+    message = FString::Printf(TEXT("DefiWalletCore GetNFTSupply Error: %s"),
+                              UTF8_TO_TCHAR(e.what()));
+  }
+}
+void ADefiWalletCoreActor::GetNFTOwner(FString mygrpc, FString denomid,
+                                       FString nftowner,
+                                       FCosmosNFTOwner &output, bool &success,
+                                       FString &message) {
+  try {
+    string mygrpcstring = TCHAR_TO_UTF8(*mygrpc);
+    rust::cxxbridge1::Box<GrpcClient> grpc_client =
+        new_grpc_client(mygrpcstring);
+    new_grpc_client(mygrpcstring);
+    ::org::defi_wallet_core::Owner owner =
+        grpc_client->owner(TCHAR_TO_UTF8(*denomid), TCHAR_TO_UTF8(*nftowner));
+
+    output.Address = UTF8_TO_TCHAR(owner.address.c_str());
+    output.IDCollections.Empty();
+    // prepare idcollections
+    for (::org::defi_wallet_core::IdCollection &idcollection :
+         owner.id_collections) {
+      FCosmosNFTIDCollection newone;
+      newone.DenomID = UTF8_TO_TCHAR(idcollection.denom_id.c_str());
+
+      // prepar tokenids
+      newone.TokenIDs.Empty();
+      for (rust::cxxbridge1::String &tokenid : idcollection.token_ids) {
+        newone.TokenIDs.Add(UTF8_TO_TCHAR(tokenid.c_str()));
+      }
+      assert(newone.TokenIDs.Num() == idcollection.token_ids.size());
+
+      output.IDCollections.Add(newone);
+    }
+    assert(output.IDCollections.Num() == owner.id_collections.size());
+    success = true;
+  } catch (const rust::cxxbridge1::Error &e) {
+    success = false;
+    message = FString::Printf(TEXT("DefiWalletCore GetNFTOwner Error: %s"),
+                              UTF8_TO_TCHAR(e.what()));
+  }
+}
+
+void ADefiWalletCoreActor::GetNFTCollection(FString mygrpc, FString denomid,
+                                            FCosmosNFTCollection &output,
+                                            bool &success, FString &message) {
+  try {
+    string mygrpcstring = TCHAR_TO_UTF8(*mygrpc);
+    rust::cxxbridge1::Box<GrpcClient> grpc_client =
+        new_grpc_client(mygrpcstring);
+    new_grpc_client(mygrpcstring);
+    ::org::defi_wallet_core::Collection collection =
+        grpc_client->collection(TCHAR_TO_UTF8(*denomid));
+
+    output.DenomOption = collection.denom_option;
+    output.DenomValue = convertDenom(collection.denom_value);
+
+    output.NFTs.Empty();
+    for (::org::defi_wallet_core::BaseNft &nft : collection.nfts) {
+      output.NFTs.Add(convertToken(nft));
+    }
+    assert(output.NFTs.Num() == collection.nfts.size());
+    success = true;
+  } catch (const rust::cxxbridge1::Error &e) {
+    success = false;
+    message = FString::Printf(TEXT("DefiWalletCore GetNFTCollection Error: %s"),
+                              UTF8_TO_TCHAR(e.what()));
+  }
+}
+
+void ADefiWalletCoreActor::GetNFTDenom(FString mygrpc, FString denomid,
+                                       FCosmosNFTDenom &output, bool &success,
+                                       FString &message) {
+  try {
+    string mygrpcstring = TCHAR_TO_UTF8(*mygrpc);
+    rust::cxxbridge1::Box<GrpcClient> grpc_client =
+        new_grpc_client(mygrpcstring);
+    new_grpc_client(mygrpcstring);
+
+    ::org::defi_wallet_core::Denom denom =
+        grpc_client->denom(TCHAR_TO_UTF8(*denomid));
+    output = convertDenom(denom);
+
+    success = true;
+  } catch (const rust::cxxbridge1::Error &e) {
+    success = false;
+    message = FString::Printf(TEXT("DefiWalletCore GetNFTDenom Error: %s"),
+                              UTF8_TO_TCHAR(e.what()));
+  }
+}
+
+void ADefiWalletCoreActor::GetNFTDenomByName(FString mygrpc, FString denomname,
+                                             FCosmosNFTDenom &output,
+                                             bool &success, FString &message) {
+  try {
+    string mygrpcstring = TCHAR_TO_UTF8(*mygrpc);
+    rust::cxxbridge1::Box<GrpcClient> grpc_client =
+        new_grpc_client(mygrpcstring);
+    new_grpc_client(mygrpcstring);
+    ::org::defi_wallet_core::Denom denom =
+        grpc_client->denom_by_name(TCHAR_TO_UTF8(*denomname));
+    output = convertDenom(denom);
+
+    success = true;
+  } catch (const rust::cxxbridge1::Error &e) {
+    success = false;
+    message =
+        FString::Printf(TEXT("DefiWalletCore GetNFTDenomByName Error: %s"),
+                        UTF8_TO_TCHAR(e.what()));
+  }
+}
+
+void ADefiWalletCoreActor::GetNFTAllDenoms(FString mygrpc,
+                                           TArray<FCosmosNFTDenom> &output,
+                                           bool &success, FString &message) {
+  try {
+    string mygrpcstring = TCHAR_TO_UTF8(*mygrpc);
+
+    rust::cxxbridge1::Box<GrpcClient> grpc_client =
+        new_grpc_client(mygrpcstring);
+
+    ::rust::Vec<::org::defi_wallet_core::Denom> denoms = grpc_client->denoms();
+    output.Empty();
+    for (::org::defi_wallet_core::Denom &denom : denoms) {
+      output.Add(convertDenom(denom));
+    }
+    assert(output.Num() == denoms.size());
+
+    success = true;
+  } catch (const rust::cxxbridge1::Error &e) {
+    success = false;
+    message = FString::Printf(TEXT("DefiWalletCore GetNFTAllDenoms Error: %s"),
+                              UTF8_TO_TCHAR(e.what()));
+  }
+}
+
+void ADefiWalletCoreActor::GetNFTToken(FString mygrpc, FString denomid,
+                                       FString tokenid, FCosmosNFTToken &output,
+                                       bool &success, FString &message) {
+  try {
+    string mygrpcstring = TCHAR_TO_UTF8(*mygrpc);
+    rust::cxxbridge1::Box<GrpcClient> grpc_client =
+        new_grpc_client(mygrpcstring);
+
+    ::org::defi_wallet_core::BaseNft nft =
+        grpc_client->nft(TCHAR_TO_UTF8(*denomid), TCHAR_TO_UTF8(*tokenid));
+    output.ID = UTF8_TO_TCHAR(nft.id.c_str());
+    output.Name = UTF8_TO_TCHAR(nft.name.c_str());
+    output.URI = UTF8_TO_TCHAR(nft.uri.c_str());
+    output.Data = UTF8_TO_TCHAR(nft.data.c_str());
+    output.Owner = UTF8_TO_TCHAR(nft.owner.c_str());
+    success = true;
+  } catch (const rust::cxxbridge1::Error &e) {
+    success = false;
+    message = FString::Printf(TEXT("DefiWalletCore GetNFTToken Error: %s"),
+                              UTF8_TO_TCHAR(e.what()));
+  }
 }
 
 void ADefiWalletCoreActor::SendAmount(int32 walletIndex, FString fromaddress,
@@ -92,12 +285,16 @@ void ADefiWalletCoreActor::SendAmount(int32 walletIndex, FString fromaddress,
 
     rust::cxxbridge1::Vec<uint8_t> signedtx = get_single_bank_send_signed_tx(
         tx_info, *privatekey, myto, myamount, myamountdenom);
-    rust::String broadcastResult = broadcast_tx(myservertendermint, signedtx);
+
+    ::org::defi_wallet_core::CosmosTransactionReceiptRaw broadcastResult =
+        broadcast_tx(myservertendermint, signedtx);
+    rust::cxxbridge1::String txhash = broadcastResult.tx_hash_hex;
+
     UE_LOG(LogTemp, Log, TEXT("DefiWalletCore BroadcastTX Result %s"),
-           UTF8_TO_TCHAR(broadcastResult.c_str()));
+           UTF8_TO_TCHAR(txhash.c_str()));
 
     success = true;
-    output = UTF8_TO_TCHAR(broadcastResult.c_str());
+    output = UTF8_TO_TCHAR(txhash.c_str());
   } catch (const rust::cxxbridge1::Error &e) {
     success = false;
     message = FString::Printf(TEXT("DefiWalletCore SendAmount Error: %s"),
@@ -278,7 +475,9 @@ void ADefiWalletCoreActor::SendEthAmount(int32 walletIndex, int32 chainid,
         build_eth_signed_tx(eth_tx_info, (uint64)chainid, false, *privatekey);
     ::org::defi_wallet_core::CronosTransactionReceiptRaw receipt =
         broadcast_eth_signed_raw_tx(signedtx, mycronosrpc);
-    rust::cxxbridge1::String txhash = receipt.transaction_hash;
+
+    std::string txhash = to_hex(receipt.transaction_hash.data(),
+                                receipt.transaction_hash.size());
 
     success = true;
     output = UTF8_TO_TCHAR(txhash.c_str());
@@ -328,12 +527,11 @@ TArray<uint8> ADefiWalletCoreActor::SignEthAmount(
 
     int size = signedtx.size();
     int i;
-    output.Init(0, size);  
+    output.Init(0, size);
     memcpy(output.GetData(), signedtx.data(), size);
     assert(output.size() == signedtx.size());
 
     success = true;
-
   } catch (const rust::cxxbridge1::Error &e) {
     success = false;
     message = FString::Printf(TEXT("DefiWalletCore SendAmount Error: %s"),
@@ -357,7 +555,7 @@ void ADefiWalletCoreActor::SignLogin(int32 walletIndex, FString document,
         new_logininfo(TCHAR_TO_UTF8(*document));
 
     char hdpath[100];
-    int coin_type = 60;  // eth cointype
+    int coin_type = 60; // eth cointype
     snprintf(hdpath, sizeof(hdpath), "m/44'/%d'/0'/0/%d", coin_type,
              walletIndex);
     rust::cxxbridge1::Box<PrivateKey> privatekey = _coreWallet->get_key(hdpath);
@@ -408,5 +606,20 @@ void ADefiWalletCoreActor::VerifyLogin(FString document,
     success = false;
     message = FString::Printf(TEXT("DefiWalletCore VerifyLogin Error: %s"),
                               UTF8_TO_TCHAR(e.what()));
+  }
+}
+
+string to_hex(const unsigned char *data, int len) {
+  string s;
+  for (int i = 0; i < len; i++) {
+    s += "0123456789abcdef"[data[i] >> 4];
+    s += "0123456789abcdef"[data[i] & 0xf];
+  }
+  return s;
+}
+// convert hex string to array
+void from_hex(const string &s, unsigned char *data, int len) {
+  for (int i = 0; i < len; i++) {
+    data[i] = (unsigned char)strtol(s.substr(i * 2, 2).c_str(), NULL, 16);
   }
 }
