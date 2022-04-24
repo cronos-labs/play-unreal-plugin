@@ -8,7 +8,7 @@
 
 #ifndef TxBuilder_hpp
 #define TxBuilder_hpp
-#include "lib.rs.h"
+#include "walletcore/include/defi-wallet-core-cpp/src/lib.rs.h"
 #include <stdio.h>
 
 
