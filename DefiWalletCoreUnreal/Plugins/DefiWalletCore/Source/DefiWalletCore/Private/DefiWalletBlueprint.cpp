@@ -4,8 +4,8 @@
 #include <sstream>
 
 #include "TxBuilder.h"
-#include "cxx.h"
-#include "lib.rs.h"
+#include "walletcore/include/defi-wallet-core-cpp/src/lib.rs.h"
+#include "walletcore/include/rust/cxx.h"
 using namespace std;
 using namespace org::defi_wallet_core;
 string to_hex(const unsigned char *data, int len);
@@ -16,8 +16,9 @@ void UDefiWalletBlueprint::BroadcastEthTxAsync(FWalletBroadcastDelegate Out,
   AsyncTask(ENamedThreads::AnyHiPriThreadNormalTask, [Out, usersignedtx,
                                                       rpc]() {
     rust::Vec<::std::uint8_t> signedtx;
-    copy(usersignedtx.begin(), usersignedtx.end(),
-         std::back_inserter(signedtx));
+    for (int i = 0; i < usersignedtx.Num(); i++) {
+      signedtx.push_back(usersignedtx[i]);
+    }
     assert(signedtx.size() == usersignedtx.size());
 
     string mycronosrpc = TCHAR_TO_UTF8(*rpc);
@@ -26,7 +27,7 @@ void UDefiWalletBlueprint::BroadcastEthTxAsync(FWalletBroadcastDelegate Out,
     FString result;
     try {
       ::org::defi_wallet_core::CronosTransactionReceiptRaw receipt =
-          broadcast_eth_signed_raw_tx(signedtx, mycronosrpc);
+          broadcast_eth_signed_raw_tx(signedtx, mycronosrpc, 1000);
 
       std::string txhash = to_hex(receipt.transaction_hash.data(),
                                   receipt.transaction_hash.size());

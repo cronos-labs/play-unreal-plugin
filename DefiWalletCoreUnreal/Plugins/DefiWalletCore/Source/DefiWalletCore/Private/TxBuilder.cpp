@@ -1,10 +1,10 @@
-
 #include "TxBuilder.h"
 
 #include <iostream>
 #include <sstream>
 
-#include "lib.rs.h"
+#include "walletcore/include/defi-wallet-core-cpp/src/lib.rs.h"
+
 using namespace std;
 using namespace org::defi_wallet_core;
 

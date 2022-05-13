@@ -9,6 +9,7 @@ public class DefiWalletCore : ModuleRules
 	public DefiWalletCore(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
+		CppStandard = CppStandardVersion.Cpp17;
 		
 		PublicIncludePaths.AddRange(
 			new string[] {
@@ -51,7 +52,15 @@ public class DefiWalletCore : ModuleRules
 				// ... add any modules that your module loads dynamically here ...
 			}
 			);
-            
-        PublicAdditionalLibraries.Add(Path.Combine(ModuleDirectory, "Private", "libdefi_wallet_core_cpp.a"));
+        
+        if (UnrealTargetPlatform.Win64 == Target.Platform) {
+            PublicAdditionalLibraries.Add(Path.Combine(ModuleDirectory, "Private/walletcore/lib/Win64", "defi_wallet_core_cpp.dll.lib"));
+            PublicAdditionalLibraries.Add(Path.Combine(ModuleDirectory, "Private/walletcore/lib/Win64", "cxxbridge1.lib"));
+        
+        }
+        else if (UnrealTargetPlatform.Mac == Target.Platform) {
+            PublicAdditionalLibraries.Add(Path.Combine(ModuleDirectory, "Private/walletcore/lib/Mac", "libdefi_wallet_core_cpp.dylib"));
+            PublicAdditionalLibraries.Add(Path.Combine(ModuleDirectory, "Private/walletcore/lib/Mac", "libcxxbridge1.a"));
+        }
 	}
 }
