@@ -1,5 +1,6 @@
 #pragma warning(disable:4583)
 #pragma warning(disable:4582)
+
 #include <algorithm>
 #include <array>
 #include <cassert>
@@ -785,76 +786,76 @@ namespace defi_wallet_core {
 struct U256 final {
   ::std::array<::std::uint64_t, 4> data;
 
-  // Convert to Decimal String
+  /// Convert to Decimal String
   ::rust::String to_string() const noexcept;
 
-  // Addition which saturates at the maximum value.
+  /// Addition which saturates at the maximum value.
   ::org::defi_wallet_core::U256 saturating_add(::org::defi_wallet_core::U256 other) const noexcept;
 
-  // Subtraction which saturates at zero.
+  /// Subtraction which saturates at zero.
   ::org::defi_wallet_core::U256 saturating_sub(::org::defi_wallet_core::U256 other) const noexcept;
 
-  // Multiplication which saturates at maximum value.
+  /// Multiplication which saturates at maximum value.
   ::org::defi_wallet_core::U256 saturating_mul(::org::defi_wallet_core::U256 other) const noexcept;
 
-  // Returns the addition along with a boolean indicating whether an arithmetic overflow
-  // would occur. If an overflow would have occurred then the wrapped value is returned.
+  /// Returns the addition along with a boolean indicating whether an arithmetic overflow
+  /// would occur. If an overflow would have occurred then the wrapped value is returned.
   ::org::defi_wallet_core::U256WithOverflow overflowing_add(::org::defi_wallet_core::U256 other) const noexcept;
 
-  // Returns the subtraction along with a boolean indicating whether an arithmetic overflow
-  // would occur. If an overflow would have occurred then the wrapped value is returned.
+  /// Returns the subtraction along with a boolean indicating whether an arithmetic overflow
+  /// would occur. If an overflow would have occurred then the wrapped value is returned.
   ::org::defi_wallet_core::U256WithOverflow overflowing_sub(::org::defi_wallet_core::U256 other) const noexcept;
 
-  // Returns the multiplication along with a boolean indicating whether an arithmetic overflow
-  // would occur. If an overflow would have occurred then the wrapped value is returned.
+  /// Returns the multiplication along with a boolean indicating whether an arithmetic overflow
+  /// would occur. If an overflow would have occurred then the wrapped value is returned.
   ::org::defi_wallet_core::U256WithOverflow overflowing_mul(::org::defi_wallet_core::U256 other) const noexcept;
 
-  // Returns the fast exponentiation by squaring along with a boolean indicating whether an
-  // arithmetic overflow would occur. If an overflow would have occurred then the wrapped
-  // value is returned.
+  /// Returns the fast exponentiation by squaring along with a boolean indicating whether an
+  /// arithmetic overflow would occur. If an overflow would have occurred then the wrapped
+  /// value is returned.
   ::org::defi_wallet_core::U256WithOverflow overflowing_pow(::org::defi_wallet_core::U256 other) const noexcept;
 
-  // Negates self in an overflowing fashion.
-  // Returns !self + 1 using wrapping operations to return the value that represents
-  // the negation of this unsigned value. Note that for positive unsigned values
-  // overflow always occurs, but negating 0 does not overflow.
+  /// Negates self in an overflowing fashion.
+  /// Returns !self + 1 using wrapping operations to return the value that represents
+  /// the negation of this unsigned value. Note that for positive unsigned values
+  /// overflow always occurs, but negating 0 does not overflow.
   ::org::defi_wallet_core::U256WithOverflow overflowing_neg() const noexcept;
 
-  // add, exception is rasided if overflow
+  /// add, exception is rasided if overflow
   ::org::defi_wallet_core::U256 add(::org::defi_wallet_core::U256 other) const;
 
-  // sub, exception is rasided if overflow
+  /// sub, exception is rasided if overflow
   ::org::defi_wallet_core::U256 sub(::org::defi_wallet_core::U256 other) const;
 
-  // mul, exception is rasided if overflow
+  /// mul, exception is rasided if overflow
   ::org::defi_wallet_core::U256 mul(::org::defi_wallet_core::U256 other) const;
 
-  // pow, exception is rasided if overflow
+  /// pow, exception is rasided if overflow
   ::org::defi_wallet_core::U256 pow(::org::defi_wallet_core::U256 other) const;
 
-  // Negates self in an overflowing fashion.
-  // Returns !self + 1 using wrapping operations to return the value that represents
-  // the negation of this unsigned value.
+  /// Negates self in an overflowing fashion.
+  /// Returns !self + 1 using wrapping operations to return the value that represents
+  /// the negation of this unsigned value.
   ::org::defi_wallet_core::U256 neg() const noexcept;
 
-  // Returns a pair `(self / other)`
+  /// Returns a pair `(self / other)`
   ::org::defi_wallet_core::U256 div(::org::defi_wallet_core::U256 other) const noexcept;
 
-  // Returns a pair `(self % other)`
+  /// Returns a pair `(self % other)`
   ::org::defi_wallet_core::U256 rem(::org::defi_wallet_core::U256 other) const noexcept;
 
-  // Write to the slice in big-endian format.
+  /// Write to the slice in big-endian format.
   void to_big_endian(::rust::Vec<::std::uint8_t> &bytes) const noexcept;
 
-  // Write to the slice in little-endian format.
+  /// Write to the slice in little-endian format.
   void to_little_endian(::rust::Vec<::std::uint8_t> &bytes) const noexcept;
 
-  // Format the output for the user which prefer to see values in ether (instead of wei)
-  // Divides the input by 1e18
+  /// Format the output for the user which prefer to see values in ether (instead of wei)
+  /// Divides the input by 1e18
   ::org::defi_wallet_core::U256 format_ether() const noexcept;
 
-  // Convert to common ethereum unit types: ether, gwei, or wei
-  // formatted in _ETH decimals_ (e.g. "1.50000...") wrapped as string
+  /// Convert to common ethereum unit types: ether, gwei, or wei
+  /// formatted in _ETH decimals_ (e.g. "1.50000...") wrapped as string
   ::rust::String format_units(::rust::String units) const;
 
   bool operator==(const U256 &) const noexcept;
@@ -946,7 +947,7 @@ bool U256WithOverflow::operator!=(const U256WithOverflow &rhs) const noexcept {
   return !(*this == rhs);
 }
 
-// Convert from a decimal string.
+  /// Convert from a decimal string.
 ::org::defi_wallet_core::U256 u256(::rust::String value) {
   ::rust::MaybeUninit<::org::defi_wallet_core::U256> return$;
   ::rust::repr::PtrLen error$ = org$defi_wallet_core$cxxbridge1$u256_from_dec_str(&value, &return$.value);
@@ -956,8 +957,8 @@ bool U256WithOverflow::operator!=(const U256WithOverflow &rhs) const noexcept {
   return ::std::move(return$.value);
 }
 
-// Converts a string slice in a given base to an integer. Only supports radixes of 10
-// and 16.
+  /// Converts a string slice in a given base to an integer. Only supports radixes of 10
+  /// and 16.
 ::org::defi_wallet_core::U256 u256(::rust::String txt, ::std::uint32_t radix) {
   ::rust::MaybeUninit<::org::defi_wallet_core::U256> return$;
   ::rust::repr::PtrLen error$ = org$defi_wallet_core$cxxbridge1$u256_from_str_radix(&txt, radix, &return$.value);
@@ -967,7 +968,7 @@ bool U256WithOverflow::operator!=(const U256WithOverflow &rhs) const noexcept {
   return ::std::move(return$.value);
 }
 
-// The maximum value which can be inhabited by this type.
+  /// The maximum value which can be inhabited by this type.
 ::org::defi_wallet_core::U256 u256_max_value() noexcept {
   return org$defi_wallet_core$cxxbridge1$u256_max_value();
 }
@@ -1066,7 +1067,7 @@ void U256::to_little_endian(::rust::Vec<::std::uint8_t> &bytes) const noexcept {
   org$defi_wallet_core$cxxbridge1$U256$to_little_endian(*this, bytes);
 }
 
-// Converts the input to a U256 and converts from Ether to Wei.
+  /// Converts the input to a U256 and converts from Ether to Wei.
 ::org::defi_wallet_core::U256 parse_ether(::rust::String eth) {
   ::rust::MaybeUninit<::org::defi_wallet_core::U256> return$;
   ::rust::repr::PtrLen error$ = org$defi_wallet_core$cxxbridge1$parse_ether(&eth, &return$.value);
@@ -1076,7 +1077,7 @@ void U256::to_little_endian(::rust::Vec<::std::uint8_t> &bytes) const noexcept {
   return ::std::move(return$.value);
 }
 
-// Multiplies the provided amount with 10^{units} provided.
+  /// Multiplies the provided amount with 10^{units} provided.
 ::org::defi_wallet_core::U256 parse_units(::rust::String amount, ::rust::String units) {
   ::rust::MaybeUninit<::org::defi_wallet_core::U256> return$;
   ::rust::repr::PtrLen error$ = org$defi_wallet_core$cxxbridge1$parse_units(&amount, &units, &return$.value);
