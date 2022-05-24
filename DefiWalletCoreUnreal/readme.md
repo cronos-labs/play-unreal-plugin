@@ -21,7 +21,7 @@ compile is supported unreal build system (c#)
 export MACOSX_DEPLOYMENT_TARGET=10.15
 cargo build ..
 ```
-- check depolyment target
+- check deployment target
 ```
 otool -l libdefi_wallet_core_cpp.dylib > out
 vi out
