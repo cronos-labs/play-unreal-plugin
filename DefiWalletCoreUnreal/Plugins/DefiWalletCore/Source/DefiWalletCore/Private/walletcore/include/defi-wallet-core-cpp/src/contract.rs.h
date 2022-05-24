@@ -729,38 +729,149 @@ struct Erc20 final {
   ::std::uint64_t inner_polling_interval_ms;
   ::std::uint64_t chain_id;
 
-  // Returns the decimal amount of tokens owned by `account_address`.
+  /// Returns the decimal amount of tokens owned by `account_address`.
   ::org::defi_wallet_core::U256 balance_of(::rust::String account_address) const;
 
-  // Returns the name of the token
+  /// Returns the name of the token
+  /// ```
+  /// Erc20 erc20 = new_erc20("0xf0307093f23311FE6776a7742dB619EB3df62969",
+  ///    "https://cronos-testnet-3.crypto.org:8545", 383);
+  /// String name = erc20.name();
+  /// assert(name == "USDC");
+  /// ```
   ::rust::String name() const;
 
-  // Returns the symbol of the token
+  /// Returns the symbol of the token
+  /// ```
+  /// Erc20 erc20 = new_erc20("0xf0307093f23311FE6776a7742dB619EB3df62969",
+  ///    "https://cronos-testnet-3.crypto.org:8545", 383);
+  /// String symbol = erc20.symbol();
+  /// assert(symbol == "USDC");
+  /// ```
   ::rust::String symbol() const;
 
-  // Returns the number of decimals the token uses
+  /// Returns the number of decimals the token uses
+  /// ```
+  /// Erc20 erc20 = new_erc20("0xf0307093f23311FE6776a7742dB619EB3df62969",
+  ///    "https://cronos-testnet-3.crypto.org:8545", 383)
+  ///  .legacy();
+  /// uint8_t decimals = erc20.decimals();
+  /// assert(decimals == 6);
+  /// ```
   ::std::uint8_t decimals() const;
 
-  // Makes a legacy transaction instead of an EIP-1559 one
+  /// Makes a legacy transaction instead of an EIP-1559 one
+  /// ```
+  /// Erc20 erc20 = new_erc20("0xf0307093f23311FE6776a7742dB619EB3df62969",
+  ///    "https://cronos-testnet-3.crypto.org:8545", 383);
+  /// erc20 = erc20.legacy();
+  /// ```
   ::org::defi_wallet_core::Erc20 legacy() noexcept;
 
-  // Sets the default polling interval for event filters and pending transactions
+  /// Sets the default polling interval for event filters and pending transactions
+  /// ```
+  /// Erc20 erc20 = new_erc20("0xf0307093f23311FE6776a7742dB619EB3df62969",
+  ///    "https://cronos-testnet-3.crypto.org:8545", 383);
+  /// erc20 = erc20.interval(3000);
+  /// ```
   ::org::defi_wallet_core::Erc20 interval(::std::uint64_t polling_interval_ms) noexcept;
 
-  // Moves `amount` tokens from the caller’s account to `to_address`.
+  /// Moves `amount` tokens from the caller’s account to `to_address`.
+  /// # Transfer 100 tokens (devnet)
+  /// ```
+  /// String mycronosrpc = getEnv("MYCRONOSRPC");
+  /// char hdpath[100];
+  /// int cointype = 60;
+  /// int chainid = 777;
+  /// snprintf(hdpath, sizeof(hdpath), "m/44'/%d'/0'/0/0", cointype);
+  ///
+  /// String signer1_mnemonics = getEnv("SIGNER1_MNEMONIC");
+  /// Box<Wallet> signer1_wallet = createWallet(signer1_mnemonics);
+  /// String signer1_address = signer1_wallet->get_eth_address(0);
+  /// Box<PrivateKey> signer1_privatekey = signer1_wallet->get_key(hdpath);
+  ///
+  /// String signer2_mnemonics = getEnv("SIGNER2_MNEMONIC");
+  /// Box<Wallet> signer2_wallet = createWallet(signer2_mnemonics);
+  /// String signer2_address = signer2_wallet->get_eth_address(0);
+  /// Box<PrivateKey> signer2_privatekey = signer2_wallet->get_key(hdpath);
+  ///
+  /// Erc20 erc20 = new_erc20("0x5003c1fcc043D2d81fF970266bf3fa6e8C5a1F3A",
+  ///                         mycronosrpc, chainid)
+  ///                 .legacy();
+  /// erc20.transfer(signer2_address, "100", *privatekey);
+  /// ```
   ::org::defi_wallet_core::CronosTransactionReceiptRaw transfer(::rust::String to_address, ::rust::String amount, const ::org::defi_wallet_core::PrivateKey &private_key) const;
 
-  // Moves `amount` tokens from `from_address` to `to_address` using the allowance mechanism.
+  /// Moves `amount` tokens from `from_address` to `to_address` using the allowance mechanism.
+  /// # Transfer from signer1 to validator1 using the allowance mechanism (devnet)
+  /// ```
+  /// String mycronosrpc = getEnv("MYCRONOSRPC");
+  /// char hdpath[100];
+  /// int cointype = 60;
+  /// int chainid = 777;
+  /// snprintf(hdpath, sizeof(hdpath), "m/44'/%d'/0'/0/0", cointype);
+  ///
+  /// String signer1_mnemonics = getEnv("SIGNER1_MNEMONIC");
+  /// Box<Wallet> signer1_wallet = createWallet(signer1_mnemonics);
+  /// String signer1_address = signer1_wallet->get_eth_address(0);
+  /// Box<PrivateKey> signer1_privatekey = signer1_wallet->get_key(hdpath);
+  ///
+  /// String signer2_mnemonics = getEnv("SIGNER2_MNEMONIC");
+  /// Box<Wallet> signer2_wallet = createWallet(signer2_mnemonics);
+  /// String signer2_address = signer2_wallet->get_eth_address(0);
+  /// Box<PrivateKey> signer2_privatekey = signer2_wallet->get_key(hdpath);
+  ///
+  /// Erc20 erc20 = new_erc20("0x5003c1fcc043D2d81fF970266bf3fa6e8C5a1F3A",
+  ///                         mycronosrpc, chainid)
+  ///                 .legacy();
+  /// erc20.transfer_from(signer1_address, validator1_address, "100",
+  ///                 *signer2_privatekey);
+  /// ```
   ::org::defi_wallet_core::CronosTransactionReceiptRaw transfer_from(::rust::String from_address, ::rust::String to_address, ::rust::String amount, const ::org::defi_wallet_core::PrivateKey &private_key) const;
 
-  // Allows `approved_address` to withdraw from your account multiple times, up to the
-  // `amount` amount.
+  /// Allows `approved_address` to withdraw from your account multiple times, up to the
+  /// `amount` amount.
+  /// ## approves 1000 allowance (devnet)
+  /// ```
+  /// String mycronosrpc = getEnv("MYCRONOSRPC");
+  /// char hdpath[100];
+  /// int cointype = 60;
+  /// int chainid = 777;
+  /// snprintf(hdpath, sizeof(hdpath), "m/44'/%d'/0'/0/0", cointype);
+  ///
+  /// String signer1_mnemonics = getEnv("SIGNER1_MNEMONIC");
+  /// Box<Wallet> signer1_wallet = createWallet(signer1_mnemonics);
+  /// String signer1_address = signer1_wallet->get_eth_address(0);
+  /// Box<PrivateKey> signer1_privatekey = signer1_wallet->get_key(hdpath);
+  ///
+  /// String signer2_mnemonics = getEnv("SIGNER2_MNEMONIC");
+  /// Box<Wallet> signer2_wallet = createWallet(signer2_mnemonics);
+  /// String signer2_address = signer2_wallet->get_eth_address(0);
+  /// Box<PrivateKey> signer2_privatekey = signer2_wallet->get_key(hdpath);
+  ///
+  /// Erc20 erc20 = new_erc20("0x5003c1fcc043D2d81fF970266bf3fa6e8C5a1F3A",
+  ///                         mycronosrpc, chainid)
+  ///                 .legacy();
+  /// erc20.interval(3000).approve(signer2_address, "1000", *signer1_privatekey);
+  /// ```
   ::org::defi_wallet_core::CronosTransactionReceiptRaw approve(::rust::String approved_address, ::rust::String amount, const ::org::defi_wallet_core::PrivateKey &private_key) const;
 
-  // Returns the amount which `spender` is still allowed to withdraw from `owner`.
+  /// Returns the amount which `spender` is still allowed to withdraw from `owner`.
+  /// ```
+  /// Erc20 erc20 = new_erc20("0x5003c1fcc043D2d81fF970266bf3fa6e8C5a1F3A",
+  ///                         mycronosrpc, chainid)
+  ///                 .legacy();
+  /// erc20.allowance(owner, spender);
+  /// ```
   ::rust::String allowance(::rust::String owner, ::rust::String spender) const;
 
-  // Returns the amount of tokens in existence.
+  /// Returns the amount of tokens in existence.
+  /// ```
+  /// Erc20 erc20 = new_erc20("0xf0307093f23311FE6776a7742dB619EB3df62969",
+  ///                         "https://cronos-testnet-3.crypto.org:8545", 383)
+  ///                 .legacy();
+  /// U256 total_supply = erc20.total_supply();
+  /// ```
   ::org::defi_wallet_core::U256 total_supply() const;
 
   using IsRelocatable = ::std::true_type;
@@ -776,67 +887,67 @@ struct Erc721 final {
   ::std::uint64_t inner_polling_interval_ms;
   ::std::uint64_t chain_id;
 
-  // Returns the number of tokens in owner's `account_address`.
+  /// Returns the number of tokens in owner's `account_address`.
   ::org::defi_wallet_core::U256 balance_of(::rust::String account_address) const;
 
-  // Returns the owner of the `token_id` token.
+  /// Returns the owner of the `token_id` token.
   ::rust::String owner_of(::rust::String token_id) const;
 
-  // Get the descriptive name for a collection of NFTs in this contract
+  /// Get the descriptive name for a collection of NFTs in this contract
   ::rust::String name() const;
 
-  // Get the abbreviated name for NFTs in this contract
+  /// Get the abbreviated name for NFTs in this contract
   ::rust::String symbol() const;
 
-  // Get the distinct Uniform Resource Identifier (URI) for a given asset
+  /// Get the distinct Uniform Resource Identifier (URI) for a given asset
   ::rust::String token_uri(::rust::String token_id) const;
 
-  // Makes a legacy transaction instead of an EIP-1559 one
+  /// Makes a legacy transaction instead of an EIP-1559 one
   ::org::defi_wallet_core::Erc721 legacy() noexcept;
 
-  // Sets the default polling interval for event filters and pending transactions
+  /// Sets the default polling interval for event filters and pending transactions
   ::org::defi_wallet_core::Erc721 interval(::std::uint64_t polling_interval_ms) noexcept;
 
-  // Transfers `token_id` token from `from_address` to `to_address`.
+  /// Transfers `token_id` token from `from_address` to `to_address`.
   ::org::defi_wallet_core::CronosTransactionReceiptRaw transfer_from(::rust::String from_address, ::rust::String to_address, ::rust::String token_id, const ::org::defi_wallet_core::PrivateKey &private_key) const;
 
-  // Safely transfers `token_id` token from `from_address` to `to_address`.
+  /// Safely transfers `token_id` token from `from_address` to `to_address`.
   ::org::defi_wallet_core::CronosTransactionReceiptRaw safe_transfer_from(::rust::String from_address, ::rust::String to_address, ::rust::String token_id, const ::org::defi_wallet_core::PrivateKey &private_key) const;
 
-  // Safely transfers `token_id` token from `from_address` to `to_address` with
-  // `additional_data`.
+  /// Safely transfers `token_id` token from `from_address` to `to_address` with
+  /// `additional_data`.
   ::org::defi_wallet_core::CronosTransactionReceiptRaw safe_transfer_from_with_data(::rust::String from_address, ::rust::String to_address, ::rust::String token_id, ::rust::Vec<::std::uint8_t> additional_data, const ::org::defi_wallet_core::PrivateKey &private_key) const;
 
-  // Gives permission to `approved_address` to transfer `token_id` token to another account.
-  // The approval is cleared when the token is transferred. Only a single account can be
-  // approved at a time, so approving the zero address clears previous approvals.
+  /// Gives permission to `approved_address` to transfer `token_id` token to another account.
+  /// The approval is cleared when the token is transferred. Only a single account can be
+  /// approved at a time, so approving the zero address clears previous approvals.
   ::org::defi_wallet_core::CronosTransactionReceiptRaw approve(::rust::String approved_address, ::rust::String token_id, const ::org::defi_wallet_core::PrivateKey &private_key) const;
 
-  // Enable or disable approval for a third party `approved_address` to manage all of
-  // sender's assets
+  /// Enable or disable approval for a third party `approved_address` to manage all of
+  /// sender's assets
   ::org::defi_wallet_core::CronosTransactionReceiptRaw set_approval_for_all(::rust::String approved_address, bool approved, const ::org::defi_wallet_core::PrivateKey &private_key) const;
 
-  // Get the approved address for a single NFT by `token_id`
+  /// Get the approved address for a single NFT by `token_id`
   ::rust::String get_approved(::rust::String token_id) const;
 
-  // Query if an address is an authorized `approved_address` for `owner`
+  /// Query if an address is an authorized `approved_address` for `owner`
   bool is_approved_for_all(::rust::String owner, ::rust::String approved_address) const;
 
-  // Returns the total amount of tokens stored by the contract.
-  //
-  // From IERC721Enumerable, an optional extension of the standard ERC721
+  /// Returns the total amount of tokens stored by the contract.
+  ///
+  /// From IERC721Enumerable, an optional extension of the standard ERC721
   ::org::defi_wallet_core::U256 total_supply() const;
 
-  // Returns a token ID at a given index of all the tokens stored by the contract. Use along
-  // with totalSupply to enumerate all tokens.
-  //
-  // From IERC721Enumerable, an optional extension of the standard ERC721
+  /// Returns a token ID at a given index of all the tokens stored by the contract. Use along
+  /// with totalSupply to enumerate all tokens.
+  ///
+  /// From IERC721Enumerable, an optional extension of the standard ERC721
   ::rust::String token_by_index(::rust::String index) const;
 
-  // Returns a token ID owned by owner at a given index of its token list. Use along with
-  // balanceOf to enumerate all of owner's tokens.
-  //
-  // From IERC721Enumerable, an optional extension of the standard ERC721
+  /// Returns a token ID owned by owner at a given index of its token list. Use along with
+  /// balanceOf to enumerate all of owner's tokens.
+  ///
+  /// From IERC721Enumerable, an optional extension of the standard ERC721
   ::rust::String token_of_owner_by_index(::rust::String owner, ::rust::String index) const;
 
   using IsRelocatable = ::std::true_type;
@@ -852,47 +963,51 @@ struct Erc1155 final {
   ::std::uint64_t inner_polling_interval_ms;
   ::std::uint64_t chain_id;
 
-  // Returns the amount of tokens of `token_id` owned by `account_address`.
+  /// Returns the amount of tokens of `token_id` owned by `account_address`.
   ::org::defi_wallet_core::U256 balance_of(::rust::String account_address, ::rust::String token_id) const;
 
-  // Batched version of balance_of.
-  // Get the balance of multiple account/token pairs
+  /// Batched version of balance_of.
+  /// Get the balance of multiple account/token pairs
   ::rust::Vec<::rust::String> balance_of_batch(::rust::Vec<::rust::String> account_addresses, ::rust::Vec<::rust::String> token_ids) const;
 
-  // Get distinct Uniform Resource Identifier (URI) for a given token
+  /// Get distinct Uniform Resource Identifier (URI) for a given token
   ::rust::String uri(::rust::String token_id) const;
 
-  // Makes a legacy transaction instead of an EIP-1559 one
+  /// Makes a legacy transaction instead of an EIP-1559 one
   ::org::defi_wallet_core::Erc1155 legacy() noexcept;
 
-  // Sets the default polling interval for event filters and pending transactions
+  /// Sets the default polling interval for event filters and pending transactions
   ::org::defi_wallet_core::Erc1155 interval(::std::uint64_t polling_interval_ms) noexcept;
 
-  // Transfers `amount` tokens of `token_id` from `from_address` to `to_address` with
-  // `additional_data`.
+  /// Transfers `amount` tokens of `token_id` from `from_address` to `to_address` with
+  /// `additional_data`.
   ::org::defi_wallet_core::CronosTransactionReceiptRaw safe_transfer_from(::rust::String from_address, ::rust::String to_address, ::rust::String token_id, ::rust::String amount, ::rust::Vec<::std::uint8_t> additional_data, const ::org::defi_wallet_core::PrivateKey &private_key) const;
 
-  // Batched version of safeTransferFrom.
+  /// Batched version of safeTransferFrom.
   ::org::defi_wallet_core::CronosTransactionReceiptRaw safe_batch_transfer_from(::rust::String from_address, ::rust::String to_address, ::rust::Vec<::rust::String> token_ids, ::rust::Vec<::rust::String> amounts, ::rust::Vec<::std::uint8_t> additional_data, const ::org::defi_wallet_core::PrivateKey &private_key) const;
 
-  // Enable or disable approval for a third party `approved_address` to manage all of
-  // sender's assets
+  /// Enable or disable approval for a third party `approved_address` to manage all of
+  /// sender's assets
   ::org::defi_wallet_core::CronosTransactionReceiptRaw set_approval_for_all(::rust::String approved_address, bool approved, const ::org::defi_wallet_core::PrivateKey &private_key) const;
 
-  // Query if an address is an authorized `approved_address` for `owner`
+  /// Query if an address is an authorized `approved_address` for `owner`
   bool is_approved_for_all(::rust::String owner, ::rust::String approved_address) const;
 
   using IsRelocatable = ::std::true_type;
 };
 #endif // CXXBRIDGE1_STRUCT_org$defi_wallet_core$Erc1155
 
-// Construct an Erc20 struct
+  /// Construct an Erc20 struct
+  /// ```
+  /// Erc20 erc20 = new_erc20("0xf0307093f23311FE6776a7742dB619EB3df62969",
+  ///    "https://cronos-testnet-3.crypto.org:8545", 383);
+  /// ```
 ::org::defi_wallet_core::Erc20 new_erc20(::rust::String address, ::rust::String web3api_url, ::std::uint64_t chian_id) noexcept;
 
-// Construct an Erc721 struct
+  /// Construct an Erc721 struct
 ::org::defi_wallet_core::Erc721 new_erc721(::rust::String address, ::rust::String web3api_url, ::std::uint64_t chian_id) noexcept;
 
-// Construct an Erc1155 struct
+  /// Construct an Erc1155 struct
 ::org::defi_wallet_core::Erc1155 new_erc1155(::rust::String address, ::rust::String web3api_url, ::std::uint64_t chian_id) noexcept;
 } // namespace defi_wallet_core
 } // namespace org

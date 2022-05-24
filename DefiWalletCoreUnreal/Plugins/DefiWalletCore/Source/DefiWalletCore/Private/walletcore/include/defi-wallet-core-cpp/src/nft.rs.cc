@@ -1057,25 +1057,25 @@ struct Collection final {
 #ifndef CXXBRIDGE1_STRUCT_org$defi_wallet_core$GrpcClient
 #define CXXBRIDGE1_STRUCT_org$defi_wallet_core$GrpcClient
 struct GrpcClient final : public ::rust::Opaque {
-  // Supply queries the total supply of a given denom or owner
+  /// Supply queries the total supply of a given denom or owner
   ::std::uint64_t supply(::rust::String denom_id, ::rust::String owner) const;
 
-  // Owner queries the NFTs of the specified owner
+  /// Owner queries the NFTs of the specified owner
   ::org::defi_wallet_core::Owner owner(::rust::String denom_id, ::rust::String owner) const;
 
-  // Collection queries the NFTs of the specified denom
+  /// Collection queries the NFTs of the specified denom
   ::org::defi_wallet_core::Collection collection(::rust::String denom_id) const;
 
-  // Denom queries the definition of a given denom
+  /// Denom queries the definition of a given denom
   ::org::defi_wallet_core::Denom denom(::rust::String denom_id) const;
 
-  // DenomByName queries the definition of a given denom by name
+  /// DenomByName queries the definition of a given denom by name
   ::org::defi_wallet_core::Denom denom_by_name(::rust::String denom_name) const;
 
-  // Denoms queries all the denoms
+  /// Denoms queries all the denoms
   ::rust::Vec<::org::defi_wallet_core::Denom> denoms() const;
 
-  // NFT queries the NFT for the given denom and token ID
+  /// NFT queries the NFT for the given denom and token ID
   ::org::defi_wallet_core::BaseNft nft(::rust::String denom_id, ::rust::String token_id) const;
 
   ~GrpcClient() = delete;
@@ -1135,8 +1135,8 @@ void org$defi_wallet_core$cxxbridge1$Denom$to_string(const ::org::defi_wallet_co
 void org$defi_wallet_core$cxxbridge1$BaseNft$to_string(const ::org::defi_wallet_core::BaseNft &self, ::rust::String *return$) noexcept;
 } // extern "C"
 
-// creates the signed transaction
-// for `MsgIssueDenom` from the Chainmain nft module
+  /// creates the signed transaction
+  /// for `MsgIssueDenom` from the Chainmain nft module
 ::rust::Vec<::std::uint8_t> get_nft_issue_denom_signed_tx(::org::defi_wallet_core::CosmosSDKTxInfoRaw tx_info, const ::org::defi_wallet_core::PrivateKey &private_key, ::rust::String id, ::rust::String name, ::rust::String schema) {
   ::rust::ManuallyDrop<::org::defi_wallet_core::CosmosSDKTxInfoRaw> tx_info$(::std::move(tx_info));
   ::rust::MaybeUninit<::rust::Vec<::std::uint8_t>> return$;
@@ -1147,8 +1147,8 @@ void org$defi_wallet_core$cxxbridge1$BaseNft$to_string(const ::org::defi_wallet_
   return ::std::move(return$.value);
 }
 
-// creates the signed transaction
-// for `MsgMintNft` from the Chainmain nft module
+  /// creates the signed transaction
+  /// for `MsgMintNft` from the Chainmain nft module
 ::rust::Vec<::std::uint8_t> get_nft_mint_signed_tx(::org::defi_wallet_core::CosmosSDKTxInfoRaw tx_info, const ::org::defi_wallet_core::PrivateKey &private_key, ::rust::String id, ::rust::String denom_id, ::rust::String name, ::rust::String uri, ::rust::String data, ::rust::String recipient) {
   ::rust::ManuallyDrop<::org::defi_wallet_core::CosmosSDKTxInfoRaw> tx_info$(::std::move(tx_info));
   ::rust::MaybeUninit<::rust::Vec<::std::uint8_t>> return$;
@@ -1159,8 +1159,8 @@ void org$defi_wallet_core$cxxbridge1$BaseNft$to_string(const ::org::defi_wallet_
   return ::std::move(return$.value);
 }
 
-// creates the signed transaction
-// for `MsgEditNft` from the Chainmain nft module
+  /// creates the signed transaction
+  /// for `MsgEditNft` from the Chainmain nft module
 ::rust::Vec<::std::uint8_t> get_nft_edit_signed_tx(::org::defi_wallet_core::CosmosSDKTxInfoRaw tx_info, const ::org::defi_wallet_core::PrivateKey &private_key, ::rust::String id, ::rust::String denom_id, ::rust::String name, ::rust::String uri, ::rust::String data) {
   ::rust::ManuallyDrop<::org::defi_wallet_core::CosmosSDKTxInfoRaw> tx_info$(::std::move(tx_info));
   ::rust::MaybeUninit<::rust::Vec<::std::uint8_t>> return$;
@@ -1171,8 +1171,8 @@ void org$defi_wallet_core$cxxbridge1$BaseNft$to_string(const ::org::defi_wallet_
   return ::std::move(return$.value);
 }
 
-// creates the signed transaction
-// for `MsgTransferNft` from the Chainmain nft module
+  /// creates the signed transaction
+  /// for `MsgTransferNft` from the Chainmain nft module
 ::rust::Vec<::std::uint8_t> get_nft_transfer_signed_tx(::org::defi_wallet_core::CosmosSDKTxInfoRaw tx_info, const ::org::defi_wallet_core::PrivateKey &private_key, ::rust::String id, ::rust::String denom_id, ::rust::String recipient) {
   ::rust::ManuallyDrop<::org::defi_wallet_core::CosmosSDKTxInfoRaw> tx_info$(::std::move(tx_info));
   ::rust::MaybeUninit<::rust::Vec<::std::uint8_t>> return$;
@@ -1183,8 +1183,8 @@ void org$defi_wallet_core$cxxbridge1$BaseNft$to_string(const ::org::defi_wallet_
   return ::std::move(return$.value);
 }
 
-// creates the signed transaction
-// for `MsgBurnNft` from the Chainmain nft module
+  /// creates the signed transaction
+  /// for `MsgBurnNft` from the Chainmain nft module
 ::rust::Vec<::std::uint8_t> get_nft_burn_signed_tx(::org::defi_wallet_core::CosmosSDKTxInfoRaw tx_info, const ::org::defi_wallet_core::PrivateKey &private_key, ::rust::String id, ::rust::String denom_id) {
   ::rust::ManuallyDrop<::org::defi_wallet_core::CosmosSDKTxInfoRaw> tx_info$(::std::move(tx_info));
   ::rust::MaybeUninit<::rust::Vec<::std::uint8_t>> return$;
@@ -1203,7 +1203,7 @@ void org$defi_wallet_core$cxxbridge1$BaseNft$to_string(const ::org::defi_wallet_
   return org$defi_wallet_core$cxxbridge1$GrpcClient$operator$alignof();
 }
 
-// Create a new grpc client
+  /// Create a new grpc client
 ::rust::Box<::org::defi_wallet_core::GrpcClient> new_grpc_client(::rust::String grpc_url) {
   ::rust::MaybeUninit<::rust::Box<::org::defi_wallet_core::GrpcClient>> return$;
   ::rust::repr::PtrLen error$ = org$defi_wallet_core$cxxbridge1$new_grpc_client(&grpc_url, &return$.value);
