@@ -1,3 +1,4 @@
+# defi-wallet-core unreal engine plugin
 ## compile guide
 compile is supported unreal build system (c#)
 1. run copydll.sh or copydll.bat (important)
@@ -14,8 +15,20 @@ compile is supported unreal build system (c#)
 7. Click Generate Docs
 
 ##  mac
-xcode 13.2.1 
+- xcode 13.2.1 
+- for rust frameworks to support ue5
+```
+export MACOSX_DEPLOYMENT_TARGET=10.15
+cargo build ..
+```
+- check deployment target
+```
+otool -l libdefi_wallet_core_cpp.dylib > out
+vi out
+check LC_BUILD_VERSION/minos is 10.15
+```
 
 ## windows
 visual studo 2019 
+
 
