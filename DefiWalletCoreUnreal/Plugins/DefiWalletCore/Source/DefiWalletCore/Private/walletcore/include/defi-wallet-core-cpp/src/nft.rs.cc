@@ -2,6 +2,7 @@
 #pragma warning(disable:4582)
 
 #include "lib.rs.h"
+#include "../../nft.h"
 #include <algorithm>
 #include <array>
 #include <cassert>
@@ -988,6 +989,7 @@ namespace org {
     struct IdCollection;
     struct Owner;
     struct Collection;
+    using Pagination = ::org::defi_wallet_core::Pagination;
     struct GrpcClient;
   }
 }
@@ -1061,10 +1063,10 @@ struct GrpcClient final : public ::rust::Opaque {
   ::std::uint64_t supply(::rust::String denom_id, ::rust::String owner) const;
 
   /// Owner queries the NFTs of the specified owner
-  ::org::defi_wallet_core::Owner owner(::rust::String denom_id, ::rust::String owner) const;
+  ::org::defi_wallet_core::Owner owner(::rust::String denom_id, ::rust::String owner, const ::org::defi_wallet_core::Pagination &pagination) const;
 
   /// Collection queries the NFTs of the specified denom
-  ::org::defi_wallet_core::Collection collection(::rust::String denom_id) const;
+  ::org::defi_wallet_core::Collection collection(::rust::String denom_id, const ::org::defi_wallet_core::Pagination &pagination) const;
 
   /// Denom queries the definition of a given denom
   ::org::defi_wallet_core::Denom denom(::rust::String denom_id) const;
@@ -1073,7 +1075,7 @@ struct GrpcClient final : public ::rust::Opaque {
   ::org::defi_wallet_core::Denom denom_by_name(::rust::String denom_name) const;
 
   /// Denoms queries all the denoms
-  ::rust::Vec<::org::defi_wallet_core::Denom> denoms() const;
+  ::rust::Vec<::org::defi_wallet_core::Denom> denoms(const ::org::defi_wallet_core::Pagination &pagination) const;
 
   /// NFT queries the NFT for the given denom and token ID
   ::org::defi_wallet_core::BaseNft nft(::rust::String denom_id, ::rust::String token_id) const;
@@ -1098,6 +1100,36 @@ static_assert(
 namespace org {
 namespace defi_wallet_core {
 extern "C" {
+bool org$defi_wallet_core$cxxbridge1$Pagination$get_enable(const ::org::defi_wallet_core::Pagination &self) noexcept {
+  bool (::org::defi_wallet_core::Pagination::*get_enable$)() const = &::org::defi_wallet_core::Pagination::get_enable;
+  return (self.*get_enable$)();
+}
+
+void org$defi_wallet_core$cxxbridge1$Pagination$get_key(const ::org::defi_wallet_core::Pagination &self, ::rust::Vec<::std::uint8_t> *return$) noexcept {
+  ::rust::Vec<::std::uint8_t> (::org::defi_wallet_core::Pagination::*get_key$)() const = &::org::defi_wallet_core::Pagination::get_key;
+  new (return$) ::rust::Vec<::std::uint8_t>((self.*get_key$)());
+}
+
+::std::uint64_t org$defi_wallet_core$cxxbridge1$Pagination$get_offset(const ::org::defi_wallet_core::Pagination &self) noexcept {
+  ::std::uint64_t (::org::defi_wallet_core::Pagination::*get_offset$)() const = &::org::defi_wallet_core::Pagination::get_offset;
+  return (self.*get_offset$)();
+}
+
+::std::uint64_t org$defi_wallet_core$cxxbridge1$Pagination$get_limit(const ::org::defi_wallet_core::Pagination &self) noexcept {
+  ::std::uint64_t (::org::defi_wallet_core::Pagination::*get_limit$)() const = &::org::defi_wallet_core::Pagination::get_limit;
+  return (self.*get_limit$)();
+}
+
+bool org$defi_wallet_core$cxxbridge1$Pagination$get_count_total(const ::org::defi_wallet_core::Pagination &self) noexcept {
+  bool (::org::defi_wallet_core::Pagination::*get_count_total$)() const = &::org::defi_wallet_core::Pagination::get_count_total;
+  return (self.*get_count_total$)();
+}
+
+bool org$defi_wallet_core$cxxbridge1$Pagination$get_reverse(const ::org::defi_wallet_core::Pagination &self) noexcept {
+  bool (::org::defi_wallet_core::Pagination::*get_reverse$)() const = &::org::defi_wallet_core::Pagination::get_reverse;
+  return (self.*get_reverse$)();
+}
+
 ::rust::repr::PtrLen org$defi_wallet_core$cxxbridge1$get_nft_issue_denom_signed_tx(::org::defi_wallet_core::CosmosSDKTxInfoRaw *tx_info, const ::org::defi_wallet_core::PrivateKey &private_key, ::rust::String *id, ::rust::String *name, ::rust::String *schema, ::rust::Vec<::std::uint8_t> *return$) noexcept;
 
 ::rust::repr::PtrLen org$defi_wallet_core$cxxbridge1$get_nft_mint_signed_tx(::org::defi_wallet_core::CosmosSDKTxInfoRaw *tx_info, const ::org::defi_wallet_core::PrivateKey &private_key, ::rust::String *id, ::rust::String *denom_id, ::rust::String *name, ::rust::String *uri, ::rust::String *data, ::rust::String *recipient, ::rust::Vec<::std::uint8_t> *return$) noexcept;
@@ -1114,15 +1146,15 @@ extern "C" {
 
 ::rust::repr::PtrLen org$defi_wallet_core$cxxbridge1$GrpcClient$supply(const ::org::defi_wallet_core::GrpcClient &self, ::rust::String *denom_id, ::rust::String *owner, ::std::uint64_t *return$) noexcept;
 
-::rust::repr::PtrLen org$defi_wallet_core$cxxbridge1$GrpcClient$owner(const ::org::defi_wallet_core::GrpcClient &self, ::rust::String *denom_id, ::rust::String *owner, ::org::defi_wallet_core::Owner *return$) noexcept;
+::rust::repr::PtrLen org$defi_wallet_core$cxxbridge1$GrpcClient$owner(const ::org::defi_wallet_core::GrpcClient &self, ::rust::String *denom_id, ::rust::String *owner, const ::org::defi_wallet_core::Pagination &pagination, ::org::defi_wallet_core::Owner *return$) noexcept;
 
-::rust::repr::PtrLen org$defi_wallet_core$cxxbridge1$GrpcClient$collection(const ::org::defi_wallet_core::GrpcClient &self, ::rust::String *denom_id, ::org::defi_wallet_core::Collection *return$) noexcept;
+::rust::repr::PtrLen org$defi_wallet_core$cxxbridge1$GrpcClient$collection(const ::org::defi_wallet_core::GrpcClient &self, ::rust::String *denom_id, const ::org::defi_wallet_core::Pagination &pagination, ::org::defi_wallet_core::Collection *return$) noexcept;
 
 ::rust::repr::PtrLen org$defi_wallet_core$cxxbridge1$GrpcClient$denom(const ::org::defi_wallet_core::GrpcClient &self, ::rust::String *denom_id, ::org::defi_wallet_core::Denom *return$) noexcept;
 
 ::rust::repr::PtrLen org$defi_wallet_core$cxxbridge1$GrpcClient$denom_by_name(const ::org::defi_wallet_core::GrpcClient &self, ::rust::String *denom_name, ::org::defi_wallet_core::Denom *return$) noexcept;
 
-::rust::repr::PtrLen org$defi_wallet_core$cxxbridge1$GrpcClient$denoms(const ::org::defi_wallet_core::GrpcClient &self, ::rust::Vec<::org::defi_wallet_core::Denom> *return$) noexcept;
+::rust::repr::PtrLen org$defi_wallet_core$cxxbridge1$GrpcClient$denoms(const ::org::defi_wallet_core::GrpcClient &self, const ::org::defi_wallet_core::Pagination &pagination, ::rust::Vec<::org::defi_wallet_core::Denom> *return$) noexcept;
 
 ::rust::repr::PtrLen org$defi_wallet_core$cxxbridge1$GrpcClient$nft(const ::org::defi_wallet_core::GrpcClient &self, ::rust::String *denom_id, ::rust::String *token_id, ::org::defi_wallet_core::BaseNft *return$) noexcept;
 
@@ -1222,18 +1254,18 @@ void org$defi_wallet_core$cxxbridge1$BaseNft$to_string(const ::org::defi_wallet_
   return ::std::move(return$.value);
 }
 
-::org::defi_wallet_core::Owner GrpcClient::owner(::rust::String denom_id, ::rust::String owner) const {
+::org::defi_wallet_core::Owner GrpcClient::owner(::rust::String denom_id, ::rust::String owner, const ::org::defi_wallet_core::Pagination &pagination) const {
   ::rust::MaybeUninit<::org::defi_wallet_core::Owner> return$;
-  ::rust::repr::PtrLen error$ = org$defi_wallet_core$cxxbridge1$GrpcClient$owner(*this, &denom_id, &owner, &return$.value);
+  ::rust::repr::PtrLen error$ = org$defi_wallet_core$cxxbridge1$GrpcClient$owner(*this, &denom_id, &owner, pagination, &return$.value);
   if (error$.ptr) {
     throw ::rust::impl<::rust::Error>::error(error$);
   }
   return ::std::move(return$.value);
 }
 
-::org::defi_wallet_core::Collection GrpcClient::collection(::rust::String denom_id) const {
+::org::defi_wallet_core::Collection GrpcClient::collection(::rust::String denom_id, const ::org::defi_wallet_core::Pagination &pagination) const {
   ::rust::MaybeUninit<::org::defi_wallet_core::Collection> return$;
-  ::rust::repr::PtrLen error$ = org$defi_wallet_core$cxxbridge1$GrpcClient$collection(*this, &denom_id, &return$.value);
+  ::rust::repr::PtrLen error$ = org$defi_wallet_core$cxxbridge1$GrpcClient$collection(*this, &denom_id, pagination, &return$.value);
   if (error$.ptr) {
     throw ::rust::impl<::rust::Error>::error(error$);
   }
@@ -1258,9 +1290,9 @@ void org$defi_wallet_core$cxxbridge1$BaseNft$to_string(const ::org::defi_wallet_
   return ::std::move(return$.value);
 }
 
-::rust::Vec<::org::defi_wallet_core::Denom> GrpcClient::denoms() const {
+::rust::Vec<::org::defi_wallet_core::Denom> GrpcClient::denoms(const ::org::defi_wallet_core::Pagination &pagination) const {
   ::rust::MaybeUninit<::rust::Vec<::org::defi_wallet_core::Denom>> return$;
-  ::rust::repr::PtrLen error$ = org$defi_wallet_core$cxxbridge1$GrpcClient$denoms(*this, &return$.value);
+  ::rust::repr::PtrLen error$ = org$defi_wallet_core$cxxbridge1$GrpcClient$denoms(*this, pagination, &return$.value);
   if (error$.ptr) {
     throw ::rust::impl<::rust::Error>::error(error$);
   }

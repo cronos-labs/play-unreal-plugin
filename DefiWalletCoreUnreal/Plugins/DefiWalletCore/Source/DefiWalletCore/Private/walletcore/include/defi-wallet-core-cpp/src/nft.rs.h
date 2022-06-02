@@ -1,5 +1,6 @@
 #pragma once
 #include "lib.rs.h"
+#include "../../nft.h"
 #include <algorithm>
 #include <array>
 #include <cassert>
@@ -880,6 +881,7 @@ namespace org {
     struct IdCollection;
     struct Owner;
     struct Collection;
+    using Pagination = ::org::defi_wallet_core::Pagination;
     struct GrpcClient;
   }
 }
@@ -953,10 +955,10 @@ struct GrpcClient final : public ::rust::Opaque {
   ::std::uint64_t supply(::rust::String denom_id, ::rust::String owner) const;
 
   /// Owner queries the NFTs of the specified owner
-  ::org::defi_wallet_core::Owner owner(::rust::String denom_id, ::rust::String owner) const;
+  ::org::defi_wallet_core::Owner owner(::rust::String denom_id, ::rust::String owner, const ::org::defi_wallet_core::Pagination &pagination) const;
 
   /// Collection queries the NFTs of the specified denom
-  ::org::defi_wallet_core::Collection collection(::rust::String denom_id) const;
+  ::org::defi_wallet_core::Collection collection(::rust::String denom_id, const ::org::defi_wallet_core::Pagination &pagination) const;
 
   /// Denom queries the definition of a given denom
   ::org::defi_wallet_core::Denom denom(::rust::String denom_id) const;
@@ -965,7 +967,7 @@ struct GrpcClient final : public ::rust::Opaque {
   ::org::defi_wallet_core::Denom denom_by_name(::rust::String denom_name) const;
 
   /// Denoms queries all the denoms
-  ::rust::Vec<::org::defi_wallet_core::Denom> denoms() const;
+  ::rust::Vec<::org::defi_wallet_core::Denom> denoms(const ::org::defi_wallet_core::Pagination &pagination) const;
 
   /// NFT queries the NFT for the given denom and token ID
   ::org::defi_wallet_core::BaseNft nft(::rust::String denom_id, ::rust::String token_id) const;
