@@ -1,5 +1,3 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
-
 #include "DefiWalletCoreUnrealGameMode.h"
 #include "DefiWalletCoreUnrealCharacter.h"
 #include "UObject/ConstructorHelpers.h"
