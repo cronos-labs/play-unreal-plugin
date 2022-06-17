@@ -1,1 +1,0 @@
-copy .\Plugins\CronosPlayUnreal\Source\DefiWalletCore\Private\walletcore\lib\Win64\play_cpp_sdk.dll  .\Binaries\Win64

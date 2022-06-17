@@ -1,3 +1,0 @@
-[submodule "defi-wallet-core-rs"]
-	path = defi-wallet-core-rs
-	url = git@github.com:crypto-com/defi-wallet-core-rs.git
