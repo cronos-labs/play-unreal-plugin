@@ -1,3 +1,6 @@
+#pragma warning(disable:4583)
+#pragma warning(disable:4582)
+
 #include "../../walletconnectcallback.h"
 #include "../../walletconnectcallback.h"
 #include "../../pay.h"

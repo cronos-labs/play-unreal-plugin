@@ -53,8 +53,8 @@ public class DefiWalletCore : ModuleRules
 
         if (UnrealTargetPlatform.Win64 == Target.Platform)
         {
-            PublicAdditionalLibraries.Add(Path.Combine(ModuleDirectory, "Private/walletcore/lib/Win64", "defi_wallet_core_cpp.dll.lib"));
-            PublicAdditionalLibraries.Add(Path.Combine(ModuleDirectory, "Private/walletcore/lib/Win64", "cxxbridge1.lib"));
+            PublicAdditionalLibraries.Add(Path.Combine(ModuleDirectory, "Private/walletcore/lib/Win64", "play_cpp_sdk.dll.lib"));
+            PublicAdditionalLibraries.Add(Path.Combine(ModuleDirectory, "Private/walletcore/lib/Win64", "libcxxbridge1.a"));
 
         }
         else if (UnrealTargetPlatform.Mac == Target.Platform)
