@@ -1,11 +1,3 @@
-//
-//  TxBuilder.hpp
-//  WalletSample
-//
-//  Created by leejw51 on 2022/01/27.
-//  Copyright © 2022 Epic Games, Inc. All rights reserved.
-//
-
 #ifndef TxBuilder_hpp
 #define TxBuilder_hpp
 #include "walletcore/include/defi-wallet-core-cpp/src/lib.rs.h"

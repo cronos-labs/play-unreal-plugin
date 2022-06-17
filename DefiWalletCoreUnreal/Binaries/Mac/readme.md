@@ -1,1 +1,1 @@
-copy libdefi_wallet_core_cpp.dylib to here
+copy libplay_cpp_sdk.dylib to here

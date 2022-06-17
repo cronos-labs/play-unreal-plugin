@@ -5,14 +5,16 @@
 #include "PlayCppSdkBPLibrary.generated.h"
 
 UENUM(BlueprintType)
-enum class EQueryOption : uint8 {
+enum class EQueryOption : uint8
+{
   TE_ByContract UMETA(DisplayName = "ByContract"),
   TE_ByAddressAndContract UMETA(DisplayName = "ByAddressAndContract"),
   TE_ByAddress UMETA(DisplayName = "ByAddress"),
 };
 
 USTRUCT(BlueprintType)
-struct FRawTokenResult {
+struct FRawTokenResult
+{
   GENERATED_BODY()
   /// how many tokens are owned by the address
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayCppSdk")
@@ -38,7 +40,8 @@ struct FRawTokenResult {
 };
 
 USTRUCT(BlueprintType)
-struct FRawTxDetail {
+struct FRawTxDetail
+{
   GENERATED_BODY()
 
   /// Transaction hash
@@ -71,7 +74,8 @@ struct FRawTxDetail {
 };
 
 UCLASS()
-class UPlayCppSdkBPLibrary : public UBlueprintFunctionLibrary {
+class UPlayCppSdkBPLibrary : public UBlueprintFunctionLibrary
+{
   GENERATED_UCLASS_BODY()
 
 public:
