@@ -26,11 +26,19 @@ Currently, this is supported on Windows via [KantanDocGen Plugin](https://github
 1. Run getdoc.sh inside [Git shell](https://gitforwindows.org)
 2. Enable KantanDocGenPlugin in plugins 
 3. Open the plugin dialog: File -> KantanDocGen 
-4. Navigate in this dialog: Class Search -> Native Module -> Click + -> (project name)
+4. Navigate in this dialog: Class Search -> Native Module -> Click + -> **CronosPlayUnreal**
 5. Click on "Generate Docs"
+    - location: **CronosPlaySdk/Saved/KantanDocGen/**
+
 
 ### Windows
-Make sure you use Visual Studio 2019. 
+Make sure you use Visual Studio 2019 or later.(2022) 
+it's already coded, if any compiling errors occur, add these line to top of c++ file
+```c++
+#pragma warning(disable:4583)
+#pragma warning(disable:4582)
+```
+
 
 ###  macOS
 Make sure you use Xcode 13.2.1.
@@ -50,3 +58,21 @@ otool -l <resulting binary>.dylib
 The `LC_BUILD_VERSION/minos` should be 10.15.
 
 
+### How to compile
+1. install unreal engine 4.27
+2. git clone this repository
+3. open CronosPlaySdk/CronosPlaySdk.uproject 
+
+### How to install
+1. git clone this repository, and run `cd CronosPlaySdk` & copydll.sh or copydll.bat to copy dynamic libraries for ue4 editor
+2. mkdir `Plugins` folder in your project
+3. copy ./CronosPlaySdk/Plugins/CronosPlayUnreal `yourproject/Plugins/` , it's automatically detected in the project
+4. also copydll.sh or copydll.bat to the project folder, and run it to copy dynamic libraries for ue4 editor
+
+
+### How to start coding
+1. click `add blueprint` in ue4 menu
+2. inherit DefiWalletCoreActor or PlayCppSdkActor     
+3. drag & drop your class to the scene
+4. category is **CronosPlayUnreal**
+5. apis in `..Blueprint.h` is stateless, can be called any place in the blueprint
