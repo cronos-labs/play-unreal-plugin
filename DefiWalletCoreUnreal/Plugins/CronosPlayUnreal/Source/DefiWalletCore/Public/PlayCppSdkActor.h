@@ -23,7 +23,8 @@
 #include "PlayCppSdkActor.generated.h"
 
 UENUM(BlueprintType)
-enum class EWalletconnectSessionState : uint8 {
+enum class EWalletconnectSessionState : uint8
+{
   StateDisconnected UMETA(DisplayName = "Disconnected"),
   StateConnecting UMETA(DisplayName = "Connecting"),
   StateConnected UMETA(DisplayName = "Connected"),
@@ -31,7 +32,8 @@ enum class EWalletconnectSessionState : uint8 {
 };
 
 USTRUCT(BlueprintType)
-struct FWalletConnectSessionInfo {
+struct FWalletConnectSessionInfo
+{
   GENERATED_BODY()
 
   /// state
@@ -76,7 +78,8 @@ DECLARE_DYNAMIC_DELEGATE_OneParam(FWalletconnectSessionInfoDelegate,
                                   FWalletConnectSessionInfo, SessionInfo);
 
 USTRUCT(BlueprintType)
-struct FWalletConnectAddress {
+struct FWalletConnectAddress
+{
   GENERATED_USTRUCT_BODY()
 
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayCppSdk")
@@ -84,7 +87,8 @@ struct FWalletConnectAddress {
 };
 
 USTRUCT(BlueprintType)
-struct FWalletConnectEnsureSessionResult {
+struct FWalletConnectEnsureSessionResult
+{
   GENERATED_USTRUCT_BODY()
 
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayCppSdk")
@@ -95,7 +99,8 @@ struct FWalletConnectEnsureSessionResult {
 };
 
 USTRUCT(BlueprintType)
-struct FWalletSignTXLegayResult {
+struct FWalletSignTXLegayResult
+{
   GENERATED_USTRUCT_BODY()
 
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayCppSdk")
@@ -118,7 +123,8 @@ DECLARE_DYNAMIC_DELEGATE_TwoParams(FEnsureSessionBlockingDelegate,
                                    FString, Result); // 2nd parameter
 
 USTRUCT(BlueprintType)
-struct FWalletConnectTxLegacy {
+struct FWalletConnectTxLegacy
+{
   GENERATED_USTRUCT_BODY()
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayCppSdk")
   FString to;
@@ -135,7 +141,8 @@ struct FWalletConnectTxLegacy {
 };
 
 UCLASS()
-class DEFIWALLETCORE_API APlayCppSdkActor : public AActor {
+class DEFIWALLETCORE_API APlayCppSdkActor : public AActor
+{
   GENERATED_BODY()
 
 private:

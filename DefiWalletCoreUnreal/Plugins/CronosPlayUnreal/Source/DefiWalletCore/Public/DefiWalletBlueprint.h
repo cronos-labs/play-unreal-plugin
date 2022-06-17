@@ -11,7 +11,8 @@ DECLARE_DYNAMIC_DELEGATE_TwoParams(FWalletBroadcastDelegate, FString, TXHash,
  */
 UCLASS()
 class DEFIWALLETCORE_API UDefiWalletBlueprint
-    : public UBlueprintFunctionLibrary {
+    : public UBlueprintFunctionLibrary
+{
   GENERATED_BODY()
 public:
   /**

@@ -9,7 +9,8 @@
  Cosmos NFT Denom
  */
 USTRUCT(BlueprintType)
-struct FCosmosNFTDenom {
+struct FCosmosNFTDenom
+{
   GENERATED_BODY()
 
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DefiWalletCore")
@@ -29,7 +30,8 @@ struct FCosmosNFTDenom {
  * Cosmos NFT Token
  */
 USTRUCT(BlueprintType)
-struct FCosmosNFTToken {
+struct FCosmosNFTToken
+{
   GENERATED_BODY()
 
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DefiWalletCore")
@@ -52,7 +54,8 @@ struct FCosmosNFTToken {
  * Cosmos NFT Collection
  */
 USTRUCT(BlueprintType)
-struct FCosmosNFTCollection {
+struct FCosmosNFTCollection
+{
   GENERATED_BODY()
 
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DefiWalletCore")
@@ -69,7 +72,8 @@ struct FCosmosNFTCollection {
  * Cosmos ID Collection
  */
 USTRUCT(BlueprintType)
-struct FCosmosNFTIDCollection {
+struct FCosmosNFTIDCollection
+{
   GENERATED_BODY()
 
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DefiWalletCore")
@@ -83,7 +87,8 @@ struct FCosmosNFTIDCollection {
  * Cosmos NFT Owner
  */
 USTRUCT(BlueprintType)
-struct FCosmosNFTOwner {
+struct FCosmosNFTOwner
+{
   GENERATED_BODY()
 
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DefiWalletCore")
@@ -94,7 +99,8 @@ struct FCosmosNFTOwner {
 };
 
 UCLASS()
-class DEFIWALLETCORE_API ADefiWalletCoreActor : public AActor {
+class DEFIWALLETCORE_API ADefiWalletCoreActor : public AActor
+{
   GENERATED_BODY()
 public:
   /**

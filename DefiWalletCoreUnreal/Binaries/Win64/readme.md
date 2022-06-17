@@ -1,1 +1,1 @@
-copy defi_wallet_core_cpp.dll to here
+copy play_cpp_sdk.dll to here
