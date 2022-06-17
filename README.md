@@ -2,6 +2,14 @@
 Cronos Play Unreal SDK is a plugin for Unreal Engine that allows interacting with blockchain
 networks in a self-custodial way.
 
+## Security Warning
+
+No security audits of this project have ever been performed.
+
+The project is still in development and is *alpha* quality. 
+
+USE AT YOUR OWN RISK!
+
 ## Pre-requisites
 Unreal Engine 4.27 and 5.0 are supported, i.e. one of them should be installed via the Epic Games Launcher.
 
