@@ -1,3 +1,6 @@
+#pragma warning(disable:4583)
+#pragma warning(disable:4582)
+
 #include "lib.rs.h"
 #include "uint.rs.h"
 #include <algorithm>
