@@ -11,6 +11,49 @@
 #include "cronosplay/include/defi-wallet-core-cpp/src/lib.rs.h"
 #include "cronosplay/include/defi-wallet-core-cpp/src/nft.rs.h"
 #include "DefiWalletCoreActor.generated.h"
+/**
+ Cronos Transaction Receipt Raw
+ */
+USTRUCT(BlueprintType)
+struct FCronosTransactionReceiptRaw {
+  GENERATED_BODY()
+
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CronosPlayUnreal")
+  TArray<uint8> TransationHash;
+
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CronosPlayUnreal")
+  TArray<uint8> BlockHash;
+
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CronosPlayUnreal")
+  FString BlockNumber;
+
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CronosPlayUnreal")
+  FString CumulativeGasUsed;
+
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CronosPlayUnreal")
+  FString GasUsed;
+
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CronosPlayUnreal")
+  FString ContractAddress;
+
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CronosPlayUnreal")
+  TArray<FString> Logs;
+
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CronosPlayUnreal")
+  FString Status;
+
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CronosPlayUnreal")
+  TArray<uint8> Root;
+
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CronosPlayUnreal")
+  TArray<uint8> LogsBloom;
+
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CronosPlayUnreal")
+  FString TransactionType;
+
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CronosPlayUnreal")
+  FString EffectiveGasPrice;
+};
 
 /**
  Cosmos NFT Denom
@@ -307,7 +350,8 @@ public:
             Category = "CronosPlayUnreal")
   TArray<uint8> SignEthAmount(int32 walletIndex, FString fromaddress,
                               FString toaddress, FString amount,
-                              FString gasLimit, FString gasPrice, bool &success,
+                              FString gasLimit, FString gasPrice,
+                              TArray<uint8> txdata, bool &success,
                               FString &output_message);
 
   /**
@@ -327,7 +371,8 @@ public:
             Category = "CronosPlayUnreal")
   void SendEthAmount(int32 walletIndex, FString fromaddress, FString toaddress,
                      FString amount, FString gasLimit, FString gasPrice,
-                     FString &output, bool &success, FString &output_message);
+                     TArray<uint8> txdata, FString &output, bool &success,
+                     FString &output_message);
 
   /**
    * Sign eth login
@@ -519,6 +564,140 @@ public:
             Category = "CronosPlayUnreal")
   void Erc1155Uri(FString contractAddress, FString tokenID, FString &uri,
                   bool &success, FString &output_message);
+
+  /**
+   * erc20 Moves `amount` tokens from the caller’s account to `to_address`.
+   * @param contractAddress erc20 contract
+   * @param walletindex which index to use?
+   * @param toAddress to address
+   * @param amount amount
+   * @param result receipt
+   * @param success whether succeed or not
+   * @param message error message, "" if succeed
+   */
+  UFUNCTION(BlueprintCallable,
+            meta = (DisplayName = "Erc20Transfer", Keywords = "Wallet"),
+            Category = "CronosPlayUnreal")
+  void Erc20Transfer(FString contractAddress, int walletindex,
+                     FString toAddress, FString amount,
+                     FCronosTransactionReceiptRaw &result, bool &success,
+                     FString &output_message);
+
+  /**
+   * erc20 Moves `amount` tokens from `from_address` to `to_address` using the
+   * allowance mechanism.
+   * @param contractAddress erc20 contract
+   * @param walletindex which index to use?
+   * @param fromAddress  from address to move
+   * @param toAddress to address
+   * @param amount amount
+   * @param result receipt
+   * @param success whether succeed or not
+   * @param message error message, "" if succeed
+   */
+  UFUNCTION(BlueprintCallable,
+            meta = (DisplayName = "Erc20TransferFrom", Keywords = "Wallet"),
+            Category = "CronosPlayUnreal")
+  void Erc20TransferFrom(FString contractAddress, int walletindex,
+                         FString fromAddress, FString toAddress, FString amount,
+                         FCronosTransactionReceiptRaw &result, bool &success,
+                         FString &output_message);
+
+  /**
+   * erc20 Allows `approved_address` to withdraw from your account multiple
+   * times, up to the `amount` amount.
+   * @param contractAddress erc20 contract
+   * @param walletindex which index to use?
+   * @param approvedAddress  address to approve
+   * @param result receipt
+   *
+   */
+  UFUNCTION(BlueprintCallable,
+            meta = (DisplayName = "Erc20Approve", Keywords = "Wallet"),
+            Category = "CronosPlayUnreal")
+  void Erc20Approve(FString contractAddress, int walletindex,
+                    FString approvedAddress, FString amount,
+                    FCronosTransactionReceiptRaw &result, bool &success,
+                    FString &output_message);
+
+  /**
+   * erc721 Moves `amount` tokens from `from_address` to `to_address` using the
+   * allowance mechanism.
+   * @param contractAddress erc20 contract
+   * @param walletindex which index to use?
+   * @param fromAddress  from address to move
+   * @param toAddress to address
+   * @param tokenid token id
+   * @param result receipt
+   * @param success whether succeed or not
+   * @param message error message, "" if succeed
+   */
+  UFUNCTION(BlueprintCallable,
+            meta = (DisplayName = "Erc721TransferFrom", Keywords = "Wallet"),
+            Category = "CronosPlayUnreal")
+  void Erc721TransferFrom(FString contractAddress, int walletindex,
+                          FString fromAddress, FString toAddress,
+                          FString tokenid, FCronosTransactionReceiptRaw &result,
+                          bool &success, FString &output_message);
+
+  /**
+   * erc721 Allows `approved_address` to withdraw from your account multiple
+   * times, up to the `amount` amount.
+   * @param contractAddress erc20 contract
+   * @param walletindex which index to use?
+   * @param approvedAddress  address to approve
+   * @param tokenid token id
+   * @param result receipt
+   *
+   */
+  UFUNCTION(BlueprintCallable,
+            meta = (DisplayName = "Erc721Approve", Keywords = "Wallet"),
+            Category = "CronosPlayUnreal")
+  void Erc721Approve(FString contractAddress, int walletindex,
+                     FString approvedAddress, FString tokenid,
+                     FCronosTransactionReceiptRaw &result, bool &success,
+                     FString &output_message);
+
+  /**
+   * erc1155 Moves `amount` tokens from `from_address` to `to_address` using the
+   * allowance mechanism.
+   * @param contractAddress erc20 contract
+   * @param walletindex which index to use?
+   * @param fromAddress  from address to move
+   * @param toAddress to address
+   * @param tokenid token id
+   * @param additionaldata additional data
+   * @param result receipt
+   * @param success whether succeed or not
+   * @param message error message, "" if succeed
+   */
+  UFUNCTION(BlueprintCallable,
+            meta = (DisplayName = "Erc1155TransferFrom", Keywords = "Wallet"),
+            Category = "CronosPlayUnreal")
+  void Erc1155TransferFrom(FString contractAddress, int walletindex,
+                           FString fromAddress, FString toAddress,
+                           FString tokenid, FString amount,
+                           TArray<uint8> additionaldata,
+                           FCronosTransactionReceiptRaw &result, bool &success,
+                           FString &output_message);
+
+  /**
+   * erc1155 Allows `approved_address` to withdraw from your account multiple
+   * times, up to the `amount` amount.
+   * @param contractAddress erc20 contract
+   * @param walletindex which index to use?
+   * @param approvedAddress  address to approve
+   * @param approved approved or not
+   * @param result receipt
+   *
+   */
+  UFUNCTION(BlueprintCallable,
+            meta = (DisplayName = "Erc1155Approve", Keywords = "Wallet"),
+            Category = "CronosPlayUnreal")
+  void Erc1155Approve(FString contractAddress, int walletindex,
+                      FString approvedAddress, bool approved,
+                      FCronosTransactionReceiptRaw &result, bool &success,
+                      FString &output_message);
 
   /**
    * Cosmos rpc address
