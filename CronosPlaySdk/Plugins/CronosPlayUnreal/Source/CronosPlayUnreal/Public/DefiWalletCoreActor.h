@@ -11,6 +11,20 @@
 #include "cronosplay/include/defi-wallet-core-cpp/src/lib.rs.h"
 #include "cronosplay/include/defi-wallet-core-cpp/src/nft.rs.h"
 #include "DefiWalletCoreActor.generated.h"
+
+/*
+TODO: 
+for erc20,erc721,erc1155
+add opaque pointer for each api, and don't recreate in very call
+add like apis
+createErc20();
+createERc721();
+createErc1155();
+destroyErc20();
+destroyErc721();
+destroyErc1155();
+*/
+
 /**
  Cronos Transaction Receipt Raw
  */
