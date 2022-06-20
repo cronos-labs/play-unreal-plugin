@@ -4,7 +4,7 @@ networks in a self-custodial way.
 
 ## Security Warning
 
-No security audits of this project have ever been performed.
+No security audits of this project have ever been performed yet.
 
 The project is still in development and is *alpha* quality. 
 
