@@ -80,8 +80,9 @@ void ADefiWalletCoreActor::GetNFTSupply(FString mygrpc, FString denomid,
     success = true;
   } catch (const rust::cxxbridge1::Error &e) {
     success = false;
-    output_message = FString::Printf(
-        TEXT("CronosPlayUnreal GetNFTSupply Error: %s"), UTF8_TO_TCHAR(e.what()));
+    output_message =
+        FString::Printf(TEXT("CronosPlayUnreal GetNFTSupply Error: %s"),
+                        UTF8_TO_TCHAR(e.what()));
   }
 }
 void ADefiWalletCoreActor::GetNFTOwner(FString mygrpc, FString denomid,
@@ -118,8 +119,9 @@ void ADefiWalletCoreActor::GetNFTOwner(FString mygrpc, FString denomid,
     success = true;
   } catch (const rust::cxxbridge1::Error &e) {
     success = false;
-    output_message = FString::Printf(
-        TEXT("CronosPlayUnreal GetNFTOwner Error: %s"), UTF8_TO_TCHAR(e.what()));
+    output_message =
+        FString::Printf(TEXT("CronosPlayUnreal GetNFTOwner Error: %s"),
+                        UTF8_TO_TCHAR(e.what()));
   }
 }
 
@@ -169,8 +171,9 @@ void ADefiWalletCoreActor::GetNFTDenom(FString mygrpc, FString denomid,
     success = true;
   } catch (const rust::cxxbridge1::Error &e) {
     success = false;
-    output_message = FString::Printf(
-        TEXT("CronosPlayUnreal GetNFTDenom Error: %s"), UTF8_TO_TCHAR(e.what()));
+    output_message =
+        FString::Printf(TEXT("CronosPlayUnreal GetNFTDenom Error: %s"),
+                        UTF8_TO_TCHAR(e.what()));
   }
 }
 
@@ -242,8 +245,9 @@ void ADefiWalletCoreActor::GetNFTToken(FString mygrpc, FString denomid,
     success = true;
   } catch (const rust::cxxbridge1::Error &e) {
     success = false;
-    output_message = FString::Printf(
-        TEXT("CronosPlayUnreal GetNFTToken Error: %s"), UTF8_TO_TCHAR(e.what()));
+    output_message =
+        FString::Printf(TEXT("CronosPlayUnreal GetNFTToken Error: %s"),
+                        UTF8_TO_TCHAR(e.what()));
   }
 }
 
@@ -591,8 +595,8 @@ void ADefiWalletCoreActor::SignLogin(int32 walletIndex, FString document,
     success = true;
   } catch (const rust::cxxbridge1::Error &e) {
     success = false;
-    output_message = FString::Printf(TEXT("CronosPlayUnreal SignLogin Error: %s"),
-                                     UTF8_TO_TCHAR(e.what()));
+    output_message = FString::Printf(
+        TEXT("CronosPlayUnreal SignLogin Error: %s"), UTF8_TO_TCHAR(e.what()));
   }
 }
 
@@ -620,8 +624,9 @@ void ADefiWalletCoreActor::VerifyLogin(FString document,
     success = true;
   } catch (const rust::cxxbridge1::Error &e) {
     success = false;
-    output_message = FString::Printf(
-        TEXT("CronosPlayUnreal VerifyLogin Error: %s"), UTF8_TO_TCHAR(e.what()));
+    output_message =
+        FString::Printf(TEXT("CronosPlayUnreal VerifyLogin Error: %s"),
+                        UTF8_TO_TCHAR(e.what()));
   }
 }
 
@@ -657,8 +662,9 @@ void ADefiWalletCoreActor::Erc20Balance(FString contractAddress,
 
   } catch (const rust::cxxbridge1::Error &e) {
     success = false;
-    output_message = FString::Printf(
-        TEXT("CronosPlayUnreal Erc20Balance Error: %s"), UTF8_TO_TCHAR(e.what()));
+    output_message =
+        FString::Printf(TEXT("CronosPlayUnreal Erc20Balance Error: %s"),
+                        UTF8_TO_TCHAR(e.what()));
   }
 }
 
@@ -739,8 +745,9 @@ void ADefiWalletCoreActor::Erc721Symbol(FString contractAddress,
     success = true;
   } catch (const rust::cxxbridge1::Error &e) {
     success = false;
-    output_message = FString::Printf(
-        TEXT("CronosPlayUnreal Erc721Symbol Error: %s"), UTF8_TO_TCHAR(e.what()));
+    output_message =
+        FString::Printf(TEXT("CronosPlayUnreal Erc721Symbol Error: %s"),
+                        UTF8_TO_TCHAR(e.what()));
   }
 }
 
@@ -759,8 +766,8 @@ void ADefiWalletCoreActor::Erc721Uri(FString contractAddress, FString tokenID,
 
   } catch (const rust::cxxbridge1::Error &e) {
     success = false;
-    output_message = FString::Printf(TEXT("CronosPlayUnreal Erc721Uri Error: %s"),
-                                     UTF8_TO_TCHAR(e.what()));
+    output_message = FString::Printf(
+        TEXT("CronosPlayUnreal Erc721Uri Error: %s"), UTF8_TO_TCHAR(e.what()));
   }
 }
 
@@ -800,8 +807,9 @@ void ADefiWalletCoreActor::Erc721Owner(FString contractAddress, FString tokenID,
 
   } catch (const rust::cxxbridge1::Error &e) {
     success = false;
-    output_message = FString::Printf(
-        TEXT("CronosPlayUnreal Erc721Owner Error: %s"), UTF8_TO_TCHAR(e.what()));
+    output_message =
+        FString::Printf(TEXT("CronosPlayUnreal Erc721Owner Error: %s"),
+                        UTF8_TO_TCHAR(e.what()));
   }
 }
 
@@ -819,8 +827,8 @@ void ADefiWalletCoreActor::Erc20Name(FString contractAddress, FString &name,
 
   } catch (const rust::cxxbridge1::Error &e) {
     success = false;
-    output_message = FString::Printf(TEXT("CronosPlayUnreal Erc20Name Error: %s"),
-                                     UTF8_TO_TCHAR(e.what()));
+    output_message = FString::Printf(
+        TEXT("CronosPlayUnreal Erc20Name Error: %s"), UTF8_TO_TCHAR(e.what()));
   }
 }
 
@@ -837,8 +845,9 @@ void ADefiWalletCoreActor::Erc20Symbol(FString contractAddress, FString &symbol,
 
   } catch (const rust::cxxbridge1::Error &e) {
     success = false;
-    output_message = FString::Printf(
-        TEXT("CronosPlayUnreal Erc20Symbol Error: %s"), UTF8_TO_TCHAR(e.what()));
+    output_message =
+        FString::Printf(TEXT("CronosPlayUnreal Erc20Symbol Error: %s"),
+                        UTF8_TO_TCHAR(e.what()));
   }
 }
 

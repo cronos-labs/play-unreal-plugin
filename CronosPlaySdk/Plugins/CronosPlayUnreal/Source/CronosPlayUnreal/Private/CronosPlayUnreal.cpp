@@ -2,11 +2,9 @@
 
 #define LOCTEXT_NAMESPACE "FCronosPlayUnrealModule"
 
-void FCronosPlayUnrealModule::StartupModule() {
-}
+void FCronosPlayUnrealModule::StartupModule() {}
 
-void FCronosPlayUnrealModule::ShutdownModule() {
-}
+void FCronosPlayUnrealModule::ShutdownModule() {}
 
 #undef LOCTEXT_NAMESPACE
 
