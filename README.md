@@ -76,3 +76,6 @@ The `LC_BUILD_VERSION/minos` should be 10.15.
 3. drag & drop your class to the scene
 4. category is **CronosPlayUnreal**
 5. apis in `..Blueprint.h` is stateless, can be called any place in the blueprint
+
+### More information for Cronos Play
+If you are a game developer, please visit [Cronos Play](https://cronos.org/play) or fill this [Contact Form](https://airtable.com/shrFiQnLrcpeBp2lS) for more information.
