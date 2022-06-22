@@ -71,7 +71,7 @@ public class CronosPlayUnreal : ModuleRules
         }
         else if (Target.Platform == UnrealTargetPlatform.Mac)
         {
-            PublicDelayLoadDLLs.Add(Path.Combine(ModuleDirectory, "Private", "cronosplay","lib","Mac", "libplay_cpp_sdk.dylib"));
+        	PublicDelayLoadDLLs.Add(Path.Combine(ModuleDirectory, "Private", "cronosplay","lib","Mac", "libplay_cpp_sdk.dylib"));
             RuntimeDependencies.Add("$(PluginDir)/Source/CronosPlayUnreal/Private/cronosplay/lib/Mac/libplay_cpp_sdk.dylib");
         }
 		
