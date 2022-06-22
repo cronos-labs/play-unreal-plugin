@@ -62,5 +62,18 @@ public class CronosPlayUnreal : ModuleRules
             PublicAdditionalLibraries.Add(Path.Combine(ModuleDirectory, "Private/cronosplay/lib/Mac", "libplay_cpp_sdk.dylib"));
             PublicAdditionalLibraries.Add(Path.Combine(ModuleDirectory, "Private/cronosplay/lib/Mac", "libcxxbridge1.a"));
         }	
+
+		// load dll 
+        if (Target.Platform == UnrealTargetPlatform.Win64)
+        {
+            PublicDelayLoadDLLs.Add(Path.Combine(ModuleDirectory, "Private", "cronosplay","lib","Win64", "play_cpp_sdk.dll"));
+            RuntimeDependencies.Add("$(PluginDir)/Source/CronosPlayUnreal/Private/cronosplay/lib/Win64/play_cpp_sdk.dll");
+        }
+        else if (Target.Platform == UnrealTargetPlatform.Mac)
+        {
+            PublicDelayLoadDLLs.Add(Path.Combine(ModuleDirectory, "Private", "cronosplay","lib","Mac", "libplay_cpp_sdk.dylib"));
+            RuntimeDependencies.Add("$(PluginDir)/Source/CronosPlayUnreal/Private/cronosplay/lib/Mac/libplay_cpp_sdk.dylib");
+        }
+		
 	}
 }
