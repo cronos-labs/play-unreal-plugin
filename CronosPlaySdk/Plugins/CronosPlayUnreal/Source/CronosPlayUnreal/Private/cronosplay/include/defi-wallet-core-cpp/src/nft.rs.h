@@ -20,21 +20,17 @@ inline namespace cxxbridge1 {
 
 #ifndef CXXBRIDGE1_PANIC
 #define CXXBRIDGE1_PANIC
-template <typename Exception>
-void panic [[noreturn]] (const char *msg);
+template <typename Exception> void panic [[noreturn]] (const char *msg);
 #endif // CXXBRIDGE1_PANIC
 
 struct unsafe_bitcopy_t;
 
 namespace {
-template <typename T>
-class impl;
+template <typename T> class impl;
 } // namespace
 
-template <typename T>
-::std::size_t size_of();
-template <typename T>
-::std::size_t align_of();
+template <typename T>::std::size_t size_of();
+template <typename T>::std::size_t align_of();
 
 #ifndef CXXBRIDGE1_RUST_STRING
 #define CXXBRIDGE1_RUST_STRING
@@ -106,11 +102,9 @@ private:
 #ifndef CXXBRIDGE1_RUST_SLICE
 #define CXXBRIDGE1_RUST_SLICE
 namespace detail {
-template <bool>
-struct copy_assignable_if {};
+template <bool> struct copy_assignable_if {};
 
-template <>
-struct copy_assignable_if<false> {
+template <> struct copy_assignable_if<false> {
   copy_assignable_if() noexcept = default;
   copy_assignable_if(const copy_assignable_if &) noexcept = default;
   copy_assignable_if &operator=(const copy_assignable_if &) &noexcept = delete;
@@ -160,8 +154,7 @@ private:
   std::array<std::uintptr_t, 2> repr;
 };
 
-template <typename T>
-class Slice<T>::iterator final {
+template <typename T> class Slice<T>::iterator final {
 public:
   using iterator_category = std::random_access_iterator_tag;
   using value_type = T;
@@ -197,13 +190,11 @@ private:
   std::size_t stride;
 };
 
-template <typename T>
-Slice<T>::Slice() noexcept {
+template <typename T> Slice<T>::Slice() noexcept {
   sliceInit(this, reinterpret_cast<void *>(align_of<T>()), 0);
 }
 
-template <typename T>
-Slice<T>::Slice(T *s, std::size_t count) noexcept {
+template <typename T> Slice<T>::Slice(T *s, std::size_t count) noexcept {
   assert(s != nullptr || count == 0);
   sliceInit(this,
             s == nullptr && count == 0
@@ -212,49 +203,41 @@ Slice<T>::Slice(T *s, std::size_t count) noexcept {
             count);
 }
 
-template <typename T>
-T *Slice<T>::data() const noexcept {
+template <typename T> T *Slice<T>::data() const noexcept {
   return reinterpret_cast<T *>(slicePtr(this));
 }
 
-template <typename T>
-std::size_t Slice<T>::size() const noexcept {
+template <typename T> std::size_t Slice<T>::size() const noexcept {
   return sliceLen(this);
 }
 
-template <typename T>
-std::size_t Slice<T>::length() const noexcept {
+template <typename T> std::size_t Slice<T>::length() const noexcept {
   return this->size();
 }
 
-template <typename T>
-bool Slice<T>::empty() const noexcept {
+template <typename T> bool Slice<T>::empty() const noexcept {
   return this->size() == 0;
 }
 
-template <typename T>
-T &Slice<T>::operator[](std::size_t n) const noexcept {
+template <typename T> T &Slice<T>::operator[](std::size_t n) const noexcept {
   assert(n < this->size());
   auto ptr = static_cast<char *>(slicePtr(this)) + size_of<T>() * n;
   return *reinterpret_cast<T *>(ptr);
 }
 
-template <typename T>
-T &Slice<T>::at(std::size_t n) const {
+template <typename T> T &Slice<T>::at(std::size_t n) const {
   if (n >= this->size()) {
     panic<std::out_of_range>("rust::Slice index out of range");
   }
   return (*this)[n];
 }
 
-template <typename T>
-T &Slice<T>::front() const noexcept {
+template <typename T> T &Slice<T>::front() const noexcept {
   assert(!this->empty());
   return (*this)[0];
 }
 
-template <typename T>
-T &Slice<T>::back() const noexcept {
+template <typename T> T &Slice<T>::back() const noexcept {
   assert(!this->empty());
   return (*this)[this->size() - 1];
 }
@@ -387,16 +370,14 @@ typename Slice<T>::iterator Slice<T>::end() const noexcept {
   return it;
 }
 
-template <typename T>
-void Slice<T>::swap(Slice &rhs) noexcept {
+template <typename T> void Slice<T>::swap(Slice &rhs) noexcept {
   std::swap(*this, rhs);
 }
 #endif // CXXBRIDGE1_RUST_SLICE
 
 #ifndef CXXBRIDGE1_RUST_BOX
 #define CXXBRIDGE1_RUST_BOX
-template <typename T>
-class Box final {
+template <typename T> class Box final {
 public:
   using element_type = T;
   using const_pointer =
@@ -417,8 +398,7 @@ public:
   T *operator->() noexcept;
   T &operator*() noexcept;
 
-  template <typename... Fields>
-  static Box in_place(Fields &&...);
+  template <typename... Fields> static Box in_place(Fields &&...);
 
   void swap(Box &) noexcept;
 
@@ -439,11 +419,9 @@ private:
   T *ptr;
 };
 
-template <typename T>
-class Box<T>::uninit {};
+template <typename T> class Box<T>::uninit {};
 
-template <typename T>
-class Box<T>::allocation {
+template <typename T> class Box<T>::allocation {
   static T *alloc() noexcept;
   static void dealloc(T *) noexcept;
 
@@ -457,36 +435,31 @@ public:
   T *ptr;
 };
 
-template <typename T>
-Box<T>::Box(Box &&other) noexcept : ptr(other.ptr) {
+template <typename T> Box<T>::Box(Box &&other) noexcept : ptr(other.ptr) {
   other.ptr = nullptr;
 }
 
-template <typename T>
-Box<T>::Box(const T &val) {
+template <typename T> Box<T>::Box(const T &val) {
   allocation alloc;
   ::new (alloc.ptr) T(val);
   this->ptr = alloc.ptr;
   alloc.ptr = nullptr;
 }
 
-template <typename T>
-Box<T>::Box(T &&val) {
+template <typename T> Box<T>::Box(T &&val) {
   allocation alloc;
   ::new (alloc.ptr) T(std::move(val));
   this->ptr = alloc.ptr;
   alloc.ptr = nullptr;
 }
 
-template <typename T>
-Box<T>::~Box() noexcept {
+template <typename T> Box<T>::~Box() noexcept {
   if (this->ptr) {
     this->drop();
   }
 }
 
-template <typename T>
-Box<T> &Box<T>::operator=(Box &&other) &noexcept {
+template <typename T> Box<T> &Box<T>::operator=(Box &&other) &noexcept {
   if (this->ptr) {
     this->drop();
   }
@@ -495,25 +468,17 @@ Box<T> &Box<T>::operator=(Box &&other) &noexcept {
   return *this;
 }
 
-template <typename T>
-const T *Box<T>::operator->() const noexcept {
+template <typename T> const T *Box<T>::operator->() const noexcept {
   return this->ptr;
 }
 
-template <typename T>
-const T &Box<T>::operator*() const noexcept {
+template <typename T> const T &Box<T>::operator*() const noexcept {
   return *this->ptr;
 }
 
-template <typename T>
-T *Box<T>::operator->() noexcept {
-  return this->ptr;
-}
+template <typename T> T *Box<T>::operator->() noexcept { return this->ptr; }
 
-template <typename T>
-T &Box<T>::operator*() noexcept {
-  return *this->ptr;
-}
+template <typename T> T &Box<T>::operator*() noexcept { return *this->ptr; }
 
 template <typename T>
 template <typename... Fields>
@@ -525,28 +490,24 @@ Box<T> Box<T>::in_place(Fields &&...fields) {
   return from_raw(ptr);
 }
 
-template <typename T>
-void Box<T>::swap(Box &rhs) noexcept {
+template <typename T> void Box<T>::swap(Box &rhs) noexcept {
   using std::swap;
   swap(this->ptr, rhs.ptr);
 }
 
-template <typename T>
-Box<T> Box<T>::from_raw(T *raw) noexcept {
+template <typename T> Box<T> Box<T>::from_raw(T *raw) noexcept {
   Box box = uninit{};
   box.ptr = raw;
   return box;
 }
 
-template <typename T>
-T *Box<T>::into_raw() noexcept {
+template <typename T> T *Box<T>::into_raw() noexcept {
   T *raw = this->ptr;
   this->ptr = nullptr;
   return raw;
 }
 
-template <typename T>
-Box<T>::Box(uninit) noexcept {}
+template <typename T> Box<T>::Box(uninit) noexcept {}
 #endif // CXXBRIDGE1_RUST_BOX
 
 #ifndef CXXBRIDGE1_RUST_BITCOPY_T
@@ -558,8 +519,7 @@ struct unsafe_bitcopy_t final {
 
 #ifndef CXXBRIDGE1_RUST_VEC
 #define CXXBRIDGE1_RUST_VEC
-template <typename T>
-class Vec final {
+template <typename T> class Vec final {
 public:
   using value_type = T;
 
@@ -591,8 +551,7 @@ public:
   void reserve(std::size_t new_cap);
   void push_back(const T &value);
   void push_back(T &&value);
-  template <typename... Args>
-  void emplace_back(Args &&...args);
+  template <typename... Args> void emplace_back(Args &&...args);
   void truncate(std::size_t len);
   void clear();
 
@@ -620,38 +579,30 @@ private:
   std::array<std::uintptr_t, 3> repr;
 };
 
-template <typename T>
-Vec<T>::Vec(std::initializer_list<T> init) : Vec{} {
+template <typename T> Vec<T>::Vec(std::initializer_list<T> init) : Vec{} {
   this->reserve_total(init.size());
   std::move(init.begin(), init.end(), std::back_inserter(*this));
 }
 
-template <typename T>
-Vec<T>::Vec(const Vec &other) : Vec() {
+template <typename T> Vec<T>::Vec(const Vec &other) : Vec() {
   this->reserve_total(other.size());
   std::copy(other.begin(), other.end(), std::back_inserter(*this));
 }
 
-template <typename T>
-Vec<T>::Vec(Vec &&other) noexcept : repr(other.repr) {
+template <typename T> Vec<T>::Vec(Vec &&other) noexcept : repr(other.repr) {
   new (&other) Vec();
 }
 
-template <typename T>
-Vec<T>::~Vec() noexcept {
-  this->drop();
-}
+template <typename T> Vec<T>::~Vec() noexcept { this->drop(); }
 
-template <typename T>
-Vec<T> &Vec<T>::operator=(Vec &&other) &noexcept {
+template <typename T> Vec<T> &Vec<T>::operator=(Vec &&other) &noexcept {
   this->drop();
   this->repr = other.repr;
   new (&other) Vec();
   return *this;
 }
 
-template <typename T>
-Vec<T> &Vec<T>::operator=(const Vec &other) & {
+template <typename T> Vec<T> &Vec<T>::operator=(const Vec &other) & {
   if (this != &other) {
     this->drop();
     new (this) Vec(other);
@@ -659,13 +610,11 @@ Vec<T> &Vec<T>::operator=(const Vec &other) & {
   return *this;
 }
 
-template <typename T>
-bool Vec<T>::empty() const noexcept {
+template <typename T> bool Vec<T>::empty() const noexcept {
   return this->size() == 0;
 }
 
-template <typename T>
-T *Vec<T>::data() noexcept {
+template <typename T> T *Vec<T>::data() noexcept {
   return const_cast<T *>(const_cast<const Vec<T> *>(this)->data());
 }
 
@@ -676,65 +625,55 @@ const T &Vec<T>::operator[](std::size_t n) const noexcept {
   return *reinterpret_cast<const T *>(data + n * size_of<T>());
 }
 
-template <typename T>
-const T &Vec<T>::at(std::size_t n) const {
+template <typename T> const T &Vec<T>::at(std::size_t n) const {
   if (n >= this->size()) {
     panic<std::out_of_range>("rust::Vec index out of range");
   }
   return (*this)[n];
 }
 
-template <typename T>
-const T &Vec<T>::front() const noexcept {
+template <typename T> const T &Vec<T>::front() const noexcept {
   assert(!this->empty());
   return (*this)[0];
 }
 
-template <typename T>
-const T &Vec<T>::back() const noexcept {
+template <typename T> const T &Vec<T>::back() const noexcept {
   assert(!this->empty());
   return (*this)[this->size() - 1];
 }
 
-template <typename T>
-T &Vec<T>::operator[](std::size_t n) noexcept {
+template <typename T> T &Vec<T>::operator[](std::size_t n) noexcept {
   assert(n < this->size());
   auto data = reinterpret_cast<char *>(this->data());
   return *reinterpret_cast<T *>(data + n * size_of<T>());
 }
 
-template <typename T>
-T &Vec<T>::at(std::size_t n) {
+template <typename T> T &Vec<T>::at(std::size_t n) {
   if (n >= this->size()) {
     panic<std::out_of_range>("rust::Vec index out of range");
   }
   return (*this)[n];
 }
 
-template <typename T>
-T &Vec<T>::front() noexcept {
+template <typename T> T &Vec<T>::front() noexcept {
   assert(!this->empty());
   return (*this)[0];
 }
 
-template <typename T>
-T &Vec<T>::back() noexcept {
+template <typename T> T &Vec<T>::back() noexcept {
   assert(!this->empty());
   return (*this)[this->size() - 1];
 }
 
-template <typename T>
-void Vec<T>::reserve(std::size_t new_cap) {
+template <typename T> void Vec<T>::reserve(std::size_t new_cap) {
   this->reserve_total(new_cap);
 }
 
-template <typename T>
-void Vec<T>::push_back(const T &value) {
+template <typename T> void Vec<T>::push_back(const T &value) {
   this->emplace_back(value);
 }
 
-template <typename T>
-void Vec<T>::push_back(T &&value) {
+template <typename T> void Vec<T>::push_back(T &&value) {
   this->emplace_back(std::move(value));
 }
 
@@ -749,18 +688,13 @@ void Vec<T>::emplace_back(Args &&...args) {
   this->set_len(size + 1);
 }
 
-template <typename T>
-void Vec<T>::clear() {
-  this->truncate(0);
-}
+template <typename T> void Vec<T>::clear() { this->truncate(0); }
 
-template <typename T>
-typename Vec<T>::iterator Vec<T>::begin() noexcept {
+template <typename T> typename Vec<T>::iterator Vec<T>::begin() noexcept {
   return Slice<T>(this->data(), this->size()).begin();
 }
 
-template <typename T>
-typename Vec<T>::iterator Vec<T>::end() noexcept {
+template <typename T> typename Vec<T>::iterator Vec<T>::end() noexcept {
   return Slice<T>(this->data(), this->size()).end();
 }
 
@@ -784,8 +718,7 @@ typename Vec<T>::const_iterator Vec<T>::cend() const noexcept {
   return Slice<const T>(this->data(), this->size()).end();
 }
 
-template <typename T>
-void Vec<T>::swap(Vec &rhs) noexcept {
+template <typename T> void Vec<T>::swap(Vec &rhs) noexcept {
   using std::swap;
   swap(this->repr, rhs.repr);
 }
@@ -819,10 +752,8 @@ struct is_complete<T, decltype(sizeof(T))> : std::true_type {};
 #ifndef CXXBRIDGE1_LAYOUT
 #define CXXBRIDGE1_LAYOUT
 class layout {
-  template <typename T>
-  friend std::size_t size_of();
-  template <typename T>
-  friend std::size_t align_of();
+  template <typename T> friend std::size_t size_of();
+  template <typename T> friend std::size_t align_of();
   template <typename T>
   static typename std::enable_if<std::is_base_of<Opaque, T>::value,
                                  std::size_t>::type
@@ -861,30 +792,24 @@ class layout {
   }
 };
 
-template <typename T>
-std::size_t size_of() {
-  return layout::size_of<T>();
-}
+template <typename T> std::size_t size_of() { return layout::size_of<T>(); }
 
-template <typename T>
-std::size_t align_of() {
-  return layout::align_of<T>();
-}
+template <typename T> std::size_t align_of() { return layout::align_of<T>(); }
 #endif // CXXBRIDGE1_LAYOUT
 } // namespace cxxbridge1
 } // namespace rust
 
 namespace org {
-  namespace defi_wallet_core {
-    struct Denom;
-    struct BaseNft;
-    struct IdCollection;
-    struct Owner;
-    struct Collection;
-    using Pagination = ::org::defi_wallet_core::Pagination;
-    struct GrpcClient;
-  }
-}
+namespace defi_wallet_core {
+struct Denom;
+struct BaseNft;
+struct IdCollection;
+struct Owner;
+struct Collection;
+using Pagination = ::org::defi_wallet_core::Pagination;
+struct GrpcClient;
+} // namespace defi_wallet_core
+} // namespace org
 
 namespace org {
 namespace defi_wallet_core {
@@ -955,10 +880,14 @@ struct GrpcClient final : public ::rust::Opaque {
   ::std::uint64_t supply(::rust::String denom_id, ::rust::String owner) const;
 
   /// Owner queries the NFTs of the specified owner
-  ::org::defi_wallet_core::Owner owner(::rust::String denom_id, ::rust::String owner, const ::org::defi_wallet_core::Pagination &pagination) const;
+  ::org::defi_wallet_core::Owner
+  owner(::rust::String denom_id, ::rust::String owner,
+        const ::org::defi_wallet_core::Pagination &pagination) const;
 
   /// Collection queries the NFTs of the specified denom
-  ::org::defi_wallet_core::Collection collection(::rust::String denom_id, const ::org::defi_wallet_core::Pagination &pagination) const;
+  ::org::defi_wallet_core::Collection
+  collection(::rust::String denom_id,
+             const ::org::defi_wallet_core::Pagination &pagination) const;
 
   /// Denom queries the definition of a given denom
   ::org::defi_wallet_core::Denom denom(::rust::String denom_id) const;
@@ -967,10 +896,12 @@ struct GrpcClient final : public ::rust::Opaque {
   ::org::defi_wallet_core::Denom denom_by_name(::rust::String denom_name) const;
 
   /// Denoms queries all the denoms
-  ::rust::Vec<::org::defi_wallet_core::Denom> denoms(const ::org::defi_wallet_core::Pagination &pagination) const;
+  ::rust::Vec<::org::defi_wallet_core::Denom>
+  denoms(const ::org::defi_wallet_core::Pagination &pagination) const;
 
   /// NFT queries the NFT for the given denom and token ID
-  ::org::defi_wallet_core::BaseNft nft(::rust::String denom_id, ::rust::String token_id) const;
+  ::org::defi_wallet_core::BaseNft nft(::rust::String denom_id,
+                                       ::rust::String token_id) const;
 
   ~GrpcClient() = delete;
 
@@ -983,27 +914,47 @@ private:
 };
 #endif // CXXBRIDGE1_STRUCT_org$defi_wallet_core$GrpcClient
 
-  /// creates the signed transaction
-  /// for `MsgIssueDenom` from the Chainmain nft module
-::rust::Vec<::std::uint8_t> get_nft_issue_denom_signed_tx(::org::defi_wallet_core::CosmosSDKTxInfoRaw tx_info, const ::org::defi_wallet_core::PrivateKey &private_key, ::rust::String id, ::rust::String name, ::rust::String schema);
+/// creates the signed transaction
+/// for `MsgIssueDenom` from the Chainmain nft module
+::rust::Vec<::std::uint8_t> get_nft_issue_denom_signed_tx(
+    ::org::defi_wallet_core::CosmosSDKTxInfoRaw tx_info,
+    const ::org::defi_wallet_core::PrivateKey &private_key, ::rust::String id,
+    ::rust::String name, ::rust::String schema);
 
-  /// creates the signed transaction
-  /// for `MsgMintNft` from the Chainmain nft module
-::rust::Vec<::std::uint8_t> get_nft_mint_signed_tx(::org::defi_wallet_core::CosmosSDKTxInfoRaw tx_info, const ::org::defi_wallet_core::PrivateKey &private_key, ::rust::String id, ::rust::String denom_id, ::rust::String name, ::rust::String uri, ::rust::String data, ::rust::String recipient);
+/// creates the signed transaction
+/// for `MsgMintNft` from the Chainmain nft module
+::rust::Vec<::std::uint8_t>
+get_nft_mint_signed_tx(::org::defi_wallet_core::CosmosSDKTxInfoRaw tx_info,
+                       const ::org::defi_wallet_core::PrivateKey &private_key,
+                       ::rust::String id, ::rust::String denom_id,
+                       ::rust::String name, ::rust::String uri,
+                       ::rust::String data, ::rust::String recipient);
 
-  /// creates the signed transaction
-  /// for `MsgEditNft` from the Chainmain nft module
-::rust::Vec<::std::uint8_t> get_nft_edit_signed_tx(::org::defi_wallet_core::CosmosSDKTxInfoRaw tx_info, const ::org::defi_wallet_core::PrivateKey &private_key, ::rust::String id, ::rust::String denom_id, ::rust::String name, ::rust::String uri, ::rust::String data);
+/// creates the signed transaction
+/// for `MsgEditNft` from the Chainmain nft module
+::rust::Vec<::std::uint8_t>
+get_nft_edit_signed_tx(::org::defi_wallet_core::CosmosSDKTxInfoRaw tx_info,
+                       const ::org::defi_wallet_core::PrivateKey &private_key,
+                       ::rust::String id, ::rust::String denom_id,
+                       ::rust::String name, ::rust::String uri,
+                       ::rust::String data);
 
-  /// creates the signed transaction
-  /// for `MsgTransferNft` from the Chainmain nft module
-::rust::Vec<::std::uint8_t> get_nft_transfer_signed_tx(::org::defi_wallet_core::CosmosSDKTxInfoRaw tx_info, const ::org::defi_wallet_core::PrivateKey &private_key, ::rust::String id, ::rust::String denom_id, ::rust::String recipient);
+/// creates the signed transaction
+/// for `MsgTransferNft` from the Chainmain nft module
+::rust::Vec<::std::uint8_t> get_nft_transfer_signed_tx(
+    ::org::defi_wallet_core::CosmosSDKTxInfoRaw tx_info,
+    const ::org::defi_wallet_core::PrivateKey &private_key, ::rust::String id,
+    ::rust::String denom_id, ::rust::String recipient);
 
-  /// creates the signed transaction
-  /// for `MsgBurnNft` from the Chainmain nft module
-::rust::Vec<::std::uint8_t> get_nft_burn_signed_tx(::org::defi_wallet_core::CosmosSDKTxInfoRaw tx_info, const ::org::defi_wallet_core::PrivateKey &private_key, ::rust::String id, ::rust::String denom_id);
+/// creates the signed transaction
+/// for `MsgBurnNft` from the Chainmain nft module
+::rust::Vec<::std::uint8_t>
+get_nft_burn_signed_tx(::org::defi_wallet_core::CosmosSDKTxInfoRaw tx_info,
+                       const ::org::defi_wallet_core::PrivateKey &private_key,
+                       ::rust::String id, ::rust::String denom_id);
 
-  /// Create a new grpc client
-::rust::Box<::org::defi_wallet_core::GrpcClient> new_grpc_client(::rust::String grpc_url);
+/// Create a new grpc client
+::rust::Box<::org::defi_wallet_core::GrpcClient>
+new_grpc_client(::rust::String grpc_url);
 } // namespace defi_wallet_core
 } // namespace org

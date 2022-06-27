@@ -19,21 +19,17 @@ inline namespace cxxbridge1 {
 
 #ifndef CXXBRIDGE1_PANIC
 #define CXXBRIDGE1_PANIC
-template <typename Exception>
-void panic [[noreturn]] (const char *msg);
+template <typename Exception> void panic [[noreturn]] (const char *msg);
 #endif // CXXBRIDGE1_PANIC
 
 struct unsafe_bitcopy_t;
 
 namespace {
-template <typename T>
-class impl;
+template <typename T> class impl;
 } // namespace
 
-template <typename T>
-::std::size_t size_of();
-template <typename T>
-::std::size_t align_of();
+template <typename T>::std::size_t size_of();
+template <typename T>::std::size_t align_of();
 
 #ifndef CXXBRIDGE1_RUST_STRING
 #define CXXBRIDGE1_RUST_STRING
@@ -152,11 +148,9 @@ private:
 #ifndef CXXBRIDGE1_RUST_SLICE
 #define CXXBRIDGE1_RUST_SLICE
 namespace detail {
-template <bool>
-struct copy_assignable_if {};
+template <bool> struct copy_assignable_if {};
 
-template <>
-struct copy_assignable_if<false> {
+template <> struct copy_assignable_if<false> {
   copy_assignable_if() noexcept = default;
   copy_assignable_if(const copy_assignable_if &) noexcept = default;
   copy_assignable_if &operator=(const copy_assignable_if &) &noexcept = delete;
@@ -206,8 +200,7 @@ private:
   std::array<std::uintptr_t, 2> repr;
 };
 
-template <typename T>
-class Slice<T>::iterator final {
+template <typename T> class Slice<T>::iterator final {
 public:
   using iterator_category = std::random_access_iterator_tag;
   using value_type = T;
@@ -243,13 +236,11 @@ private:
   std::size_t stride;
 };
 
-template <typename T>
-Slice<T>::Slice() noexcept {
+template <typename T> Slice<T>::Slice() noexcept {
   sliceInit(this, reinterpret_cast<void *>(align_of<T>()), 0);
 }
 
-template <typename T>
-Slice<T>::Slice(T *s, std::size_t count) noexcept {
+template <typename T> Slice<T>::Slice(T *s, std::size_t count) noexcept {
   assert(s != nullptr || count == 0);
   sliceInit(this,
             s == nullptr && count == 0
@@ -258,49 +249,41 @@ Slice<T>::Slice(T *s, std::size_t count) noexcept {
             count);
 }
 
-template <typename T>
-T *Slice<T>::data() const noexcept {
+template <typename T> T *Slice<T>::data() const noexcept {
   return reinterpret_cast<T *>(slicePtr(this));
 }
 
-template <typename T>
-std::size_t Slice<T>::size() const noexcept {
+template <typename T> std::size_t Slice<T>::size() const noexcept {
   return sliceLen(this);
 }
 
-template <typename T>
-std::size_t Slice<T>::length() const noexcept {
+template <typename T> std::size_t Slice<T>::length() const noexcept {
   return this->size();
 }
 
-template <typename T>
-bool Slice<T>::empty() const noexcept {
+template <typename T> bool Slice<T>::empty() const noexcept {
   return this->size() == 0;
 }
 
-template <typename T>
-T &Slice<T>::operator[](std::size_t n) const noexcept {
+template <typename T> T &Slice<T>::operator[](std::size_t n) const noexcept {
   assert(n < this->size());
   auto ptr = static_cast<char *>(slicePtr(this)) + size_of<T>() * n;
   return *reinterpret_cast<T *>(ptr);
 }
 
-template <typename T>
-T &Slice<T>::at(std::size_t n) const {
+template <typename T> T &Slice<T>::at(std::size_t n) const {
   if (n >= this->size()) {
     panic<std::out_of_range>("rust::Slice index out of range");
   }
   return (*this)[n];
 }
 
-template <typename T>
-T &Slice<T>::front() const noexcept {
+template <typename T> T &Slice<T>::front() const noexcept {
   assert(!this->empty());
   return (*this)[0];
 }
 
-template <typename T>
-T &Slice<T>::back() const noexcept {
+template <typename T> T &Slice<T>::back() const noexcept {
   assert(!this->empty());
   return (*this)[this->size() - 1];
 }
@@ -433,16 +416,14 @@ typename Slice<T>::iterator Slice<T>::end() const noexcept {
   return it;
 }
 
-template <typename T>
-void Slice<T>::swap(Slice &rhs) noexcept {
+template <typename T> void Slice<T>::swap(Slice &rhs) noexcept {
   std::swap(*this, rhs);
 }
 #endif // CXXBRIDGE1_RUST_SLICE
 
 #ifndef CXXBRIDGE1_RUST_BOX
 #define CXXBRIDGE1_RUST_BOX
-template <typename T>
-class Box final {
+template <typename T> class Box final {
 public:
   using element_type = T;
   using const_pointer =
@@ -463,8 +444,7 @@ public:
   T *operator->() noexcept;
   T &operator*() noexcept;
 
-  template <typename... Fields>
-  static Box in_place(Fields &&...);
+  template <typename... Fields> static Box in_place(Fields &&...);
 
   void swap(Box &) noexcept;
 
@@ -485,11 +465,9 @@ private:
   T *ptr;
 };
 
-template <typename T>
-class Box<T>::uninit {};
+template <typename T> class Box<T>::uninit {};
 
-template <typename T>
-class Box<T>::allocation {
+template <typename T> class Box<T>::allocation {
   static T *alloc() noexcept;
   static void dealloc(T *) noexcept;
 
@@ -503,36 +481,31 @@ public:
   T *ptr;
 };
 
-template <typename T>
-Box<T>::Box(Box &&other) noexcept : ptr(other.ptr) {
+template <typename T> Box<T>::Box(Box &&other) noexcept : ptr(other.ptr) {
   other.ptr = nullptr;
 }
 
-template <typename T>
-Box<T>::Box(const T &val) {
+template <typename T> Box<T>::Box(const T &val) {
   allocation alloc;
   ::new (alloc.ptr) T(val);
   this->ptr = alloc.ptr;
   alloc.ptr = nullptr;
 }
 
-template <typename T>
-Box<T>::Box(T &&val) {
+template <typename T> Box<T>::Box(T &&val) {
   allocation alloc;
   ::new (alloc.ptr) T(std::move(val));
   this->ptr = alloc.ptr;
   alloc.ptr = nullptr;
 }
 
-template <typename T>
-Box<T>::~Box() noexcept {
+template <typename T> Box<T>::~Box() noexcept {
   if (this->ptr) {
     this->drop();
   }
 }
 
-template <typename T>
-Box<T> &Box<T>::operator=(Box &&other) &noexcept {
+template <typename T> Box<T> &Box<T>::operator=(Box &&other) &noexcept {
   if (this->ptr) {
     this->drop();
   }
@@ -541,25 +514,17 @@ Box<T> &Box<T>::operator=(Box &&other) &noexcept {
   return *this;
 }
 
-template <typename T>
-const T *Box<T>::operator->() const noexcept {
+template <typename T> const T *Box<T>::operator->() const noexcept {
   return this->ptr;
 }
 
-template <typename T>
-const T &Box<T>::operator*() const noexcept {
+template <typename T> const T &Box<T>::operator*() const noexcept {
   return *this->ptr;
 }
 
-template <typename T>
-T *Box<T>::operator->() noexcept {
-  return this->ptr;
-}
+template <typename T> T *Box<T>::operator->() noexcept { return this->ptr; }
 
-template <typename T>
-T &Box<T>::operator*() noexcept {
-  return *this->ptr;
-}
+template <typename T> T &Box<T>::operator*() noexcept { return *this->ptr; }
 
 template <typename T>
 template <typename... Fields>
@@ -571,28 +536,24 @@ Box<T> Box<T>::in_place(Fields &&...fields) {
   return from_raw(ptr);
 }
 
-template <typename T>
-void Box<T>::swap(Box &rhs) noexcept {
+template <typename T> void Box<T>::swap(Box &rhs) noexcept {
   using std::swap;
   swap(this->ptr, rhs.ptr);
 }
 
-template <typename T>
-Box<T> Box<T>::from_raw(T *raw) noexcept {
+template <typename T> Box<T> Box<T>::from_raw(T *raw) noexcept {
   Box box = uninit{};
   box.ptr = raw;
   return box;
 }
 
-template <typename T>
-T *Box<T>::into_raw() noexcept {
+template <typename T> T *Box<T>::into_raw() noexcept {
   T *raw = this->ptr;
   this->ptr = nullptr;
   return raw;
 }
 
-template <typename T>
-Box<T>::Box(uninit) noexcept {}
+template <typename T> Box<T>::Box(uninit) noexcept {}
 #endif // CXXBRIDGE1_RUST_BOX
 
 #ifndef CXXBRIDGE1_RUST_BITCOPY_T
@@ -604,8 +565,7 @@ struct unsafe_bitcopy_t final {
 
 #ifndef CXXBRIDGE1_RUST_VEC
 #define CXXBRIDGE1_RUST_VEC
-template <typename T>
-class Vec final {
+template <typename T> class Vec final {
 public:
   using value_type = T;
 
@@ -637,8 +597,7 @@ public:
   void reserve(std::size_t new_cap);
   void push_back(const T &value);
   void push_back(T &&value);
-  template <typename... Args>
-  void emplace_back(Args &&...args);
+  template <typename... Args> void emplace_back(Args &&...args);
   void truncate(std::size_t len);
   void clear();
 
@@ -666,38 +625,30 @@ private:
   std::array<std::uintptr_t, 3> repr;
 };
 
-template <typename T>
-Vec<T>::Vec(std::initializer_list<T> init) : Vec{} {
+template <typename T> Vec<T>::Vec(std::initializer_list<T> init) : Vec{} {
   this->reserve_total(init.size());
   std::move(init.begin(), init.end(), std::back_inserter(*this));
 }
 
-template <typename T>
-Vec<T>::Vec(const Vec &other) : Vec() {
+template <typename T> Vec<T>::Vec(const Vec &other) : Vec() {
   this->reserve_total(other.size());
   std::copy(other.begin(), other.end(), std::back_inserter(*this));
 }
 
-template <typename T>
-Vec<T>::Vec(Vec &&other) noexcept : repr(other.repr) {
+template <typename T> Vec<T>::Vec(Vec &&other) noexcept : repr(other.repr) {
   new (&other) Vec();
 }
 
-template <typename T>
-Vec<T>::~Vec() noexcept {
-  this->drop();
-}
+template <typename T> Vec<T>::~Vec() noexcept { this->drop(); }
 
-template <typename T>
-Vec<T> &Vec<T>::operator=(Vec &&other) &noexcept {
+template <typename T> Vec<T> &Vec<T>::operator=(Vec &&other) &noexcept {
   this->drop();
   this->repr = other.repr;
   new (&other) Vec();
   return *this;
 }
 
-template <typename T>
-Vec<T> &Vec<T>::operator=(const Vec &other) & {
+template <typename T> Vec<T> &Vec<T>::operator=(const Vec &other) & {
   if (this != &other) {
     this->drop();
     new (this) Vec(other);
@@ -705,13 +656,11 @@ Vec<T> &Vec<T>::operator=(const Vec &other) & {
   return *this;
 }
 
-template <typename T>
-bool Vec<T>::empty() const noexcept {
+template <typename T> bool Vec<T>::empty() const noexcept {
   return this->size() == 0;
 }
 
-template <typename T>
-T *Vec<T>::data() noexcept {
+template <typename T> T *Vec<T>::data() noexcept {
   return const_cast<T *>(const_cast<const Vec<T> *>(this)->data());
 }
 
@@ -722,65 +671,55 @@ const T &Vec<T>::operator[](std::size_t n) const noexcept {
   return *reinterpret_cast<const T *>(data + n * size_of<T>());
 }
 
-template <typename T>
-const T &Vec<T>::at(std::size_t n) const {
+template <typename T> const T &Vec<T>::at(std::size_t n) const {
   if (n >= this->size()) {
     panic<std::out_of_range>("rust::Vec index out of range");
   }
   return (*this)[n];
 }
 
-template <typename T>
-const T &Vec<T>::front() const noexcept {
+template <typename T> const T &Vec<T>::front() const noexcept {
   assert(!this->empty());
   return (*this)[0];
 }
 
-template <typename T>
-const T &Vec<T>::back() const noexcept {
+template <typename T> const T &Vec<T>::back() const noexcept {
   assert(!this->empty());
   return (*this)[this->size() - 1];
 }
 
-template <typename T>
-T &Vec<T>::operator[](std::size_t n) noexcept {
+template <typename T> T &Vec<T>::operator[](std::size_t n) noexcept {
   assert(n < this->size());
   auto data = reinterpret_cast<char *>(this->data());
   return *reinterpret_cast<T *>(data + n * size_of<T>());
 }
 
-template <typename T>
-T &Vec<T>::at(std::size_t n) {
+template <typename T> T &Vec<T>::at(std::size_t n) {
   if (n >= this->size()) {
     panic<std::out_of_range>("rust::Vec index out of range");
   }
   return (*this)[n];
 }
 
-template <typename T>
-T &Vec<T>::front() noexcept {
+template <typename T> T &Vec<T>::front() noexcept {
   assert(!this->empty());
   return (*this)[0];
 }
 
-template <typename T>
-T &Vec<T>::back() noexcept {
+template <typename T> T &Vec<T>::back() noexcept {
   assert(!this->empty());
   return (*this)[this->size() - 1];
 }
 
-template <typename T>
-void Vec<T>::reserve(std::size_t new_cap) {
+template <typename T> void Vec<T>::reserve(std::size_t new_cap) {
   this->reserve_total(new_cap);
 }
 
-template <typename T>
-void Vec<T>::push_back(const T &value) {
+template <typename T> void Vec<T>::push_back(const T &value) {
   this->emplace_back(value);
 }
 
-template <typename T>
-void Vec<T>::push_back(T &&value) {
+template <typename T> void Vec<T>::push_back(T &&value) {
   this->emplace_back(std::move(value));
 }
 
@@ -795,18 +734,13 @@ void Vec<T>::emplace_back(Args &&...args) {
   this->set_len(size + 1);
 }
 
-template <typename T>
-void Vec<T>::clear() {
-  this->truncate(0);
-}
+template <typename T> void Vec<T>::clear() { this->truncate(0); }
 
-template <typename T>
-typename Vec<T>::iterator Vec<T>::begin() noexcept {
+template <typename T> typename Vec<T>::iterator Vec<T>::begin() noexcept {
   return Slice<T>(this->data(), this->size()).begin();
 }
 
-template <typename T>
-typename Vec<T>::iterator Vec<T>::end() noexcept {
+template <typename T> typename Vec<T>::iterator Vec<T>::end() noexcept {
   return Slice<T>(this->data(), this->size()).end();
 }
 
@@ -830,8 +764,7 @@ typename Vec<T>::const_iterator Vec<T>::cend() const noexcept {
   return Slice<const T>(this->data(), this->size()).end();
 }
 
-template <typename T>
-void Vec<T>::swap(Vec &rhs) noexcept {
+template <typename T> void Vec<T>::swap(Vec &rhs) noexcept {
   using std::swap;
   swap(this->repr, rhs.repr);
 }
@@ -865,10 +798,8 @@ struct is_complete<T, decltype(sizeof(T))> : std::true_type {};
 #ifndef CXXBRIDGE1_LAYOUT
 #define CXXBRIDGE1_LAYOUT
 class layout {
-  template <typename T>
-  friend std::size_t size_of();
-  template <typename T>
-  friend std::size_t align_of();
+  template <typename T> friend std::size_t size_of();
+  template <typename T> friend std::size_t align_of();
   template <typename T>
   static typename std::enable_if<std::is_base_of<Opaque, T>::value,
                                  std::size_t>::type
@@ -907,35 +838,29 @@ class layout {
   }
 };
 
-template <typename T>
-std::size_t size_of() {
-  return layout::size_of<T>();
-}
+template <typename T> std::size_t size_of() { return layout::size_of<T>(); }
 
-template <typename T>
-std::size_t align_of() {
-  return layout::align_of<T>();
-}
+template <typename T> std::size_t align_of() { return layout::align_of<T>(); }
 #endif // CXXBRIDGE1_LAYOUT
 } // namespace cxxbridge1
 } // namespace rust
 
 namespace org {
-  namespace defi_wallet_core {
-    enum class CoinType : ::std::uint8_t;
-    enum class MnemonicWordCount : ::std::uint8_t;
-    enum class EthAmount : ::std::uint8_t;
-    struct EthTxInfoRaw;
-    struct CosmosSDKTxInfoRaw;
-    struct CosmosAccountInfoRaw;
-    struct CosmosTransactionReceiptRaw;
-    struct CronosTransactionReceiptRaw;
-    struct PrivateKey;
-    struct CosmosSDKMsgRaw;
-    struct Wallet;
-    struct CppLoginInfo;
-  }
-}
+namespace defi_wallet_core {
+enum class CoinType : ::std::uint8_t;
+enum class MnemonicWordCount : ::std::uint8_t;
+enum class EthAmount : ::std::uint8_t;
+struct EthTxInfoRaw;
+struct CosmosSDKTxInfoRaw;
+struct CosmosAccountInfoRaw;
+struct CosmosTransactionReceiptRaw;
+struct CronosTransactionReceiptRaw;
+struct PrivateKey;
+struct CosmosSDKMsgRaw;
+struct Wallet;
+struct CppLoginInfo;
+} // namespace defi_wallet_core
+} // namespace org
 
 namespace org {
 namespace defi_wallet_core {
@@ -1100,16 +1025,19 @@ private:
 #define CXXBRIDGE1_STRUCT_org$defi_wallet_core$Wallet
 struct Wallet final : public ::rust::Opaque {
   /// returns the default address of the wallet
-  ::rust::String get_default_address(::org::defi_wallet_core::CoinType coin) const;
+  ::rust::String
+  get_default_address(::org::defi_wallet_core::CoinType coin) const;
 
   /// returns the address from index in wallet
-  ::rust::String get_address(::org::defi_wallet_core::CoinType coin, ::std::uint32_t index) const;
+  ::rust::String get_address(::org::defi_wallet_core::CoinType coin,
+                             ::std::uint32_t index) const;
 
   /// returns the ethereum address from index in wallet
   ::rust::String get_eth_address(::std::uint32_t index) const;
 
   /// return the secret key for a given derivation path
-  ::rust::Box<::org::defi_wallet_core::PrivateKey> get_key(::rust::String derivation_path) const;
+  ::rust::Box<::org::defi_wallet_core::PrivateKey>
+  get_key(::rust::String derivation_path) const;
 
   ~Wallet() = delete;
 
@@ -1127,19 +1055,23 @@ private:
 struct CppLoginInfo final : public ::rust::Opaque {
   /// Sign Login Info
   /// constructs the plaintext message and signs it according to EIP-191
-  /// (as per EIP-4361). The returned vector is a serialized recoverable signature
-  /// (as used in Ethereum).
-  ::rust::Vec<::std::uint8_t> sign_logininfo(const ::org::defi_wallet_core::PrivateKey &private_key) const;
+  /// (as per EIP-4361). The returned vector is a serialized recoverable
+  /// signature (as used in Ethereum).
+  ::rust::Vec<::std::uint8_t>
+  sign_logininfo(const ::org::defi_wallet_core::PrivateKey &private_key) const;
 
   /// Verify Login Info
-  /// It verified the signature matches + also verifies the content of the message:
+  /// It verified the signature matches + also verifies the content of the
+  /// message:
   /// - address in the message matches the address recovered from the signature
   /// - the time is valid
   /// ...
-  /// NOTE: the server may still need to do extra verifications according to its needs
-  /// (e.g. verify chain-id, nonce, uri + possibly fetch additional data associated
-  /// with the given Ethereum address, such as ERC-20/ERC-721/ERC-1155 asset ownership)
-  ::rust::Vec<::std::uint8_t> verify_logininfo(::rust::Slice<const ::std::uint8_t> signature) const;
+  /// NOTE: the server may still need to do extra verifications according to its
+  /// needs (e.g. verify chain-id, nonce, uri + possibly fetch additional data
+  /// associated with the given Ethereum address, such as
+  /// ERC-20/ERC-721/ERC-1155 asset ownership)
+  ::rust::Vec<::std::uint8_t>
+  verify_logininfo(::rust::Slice<const ::std::uint8_t> signature) const;
 
   ~CppLoginInfo() = delete;
 
@@ -1152,90 +1084,149 @@ private:
 };
 #endif // CXXBRIDGE1_STRUCT_org$defi_wallet_core$CppLoginInfo
 
-  /// query account details from cosmos address
-::rust::String query_account_details(::rust::String api_url, ::rust::String address);
+/// query account details from cosmos address
+::rust::String query_account_details(::rust::String api_url,
+                                     ::rust::String address);
 
-  /// query account details info from cosmos address
-::org::defi_wallet_core::CosmosAccountInfoRaw query_account_details_info(::rust::String api_url, ::rust::String address);
+/// query account details info from cosmos address
+::org::defi_wallet_core::CosmosAccountInfoRaw
+query_account_details_info(::rust::String api_url, ::rust::String address);
 
-  /// broadcast the cosmos transaction
-::org::defi_wallet_core::CosmosTransactionReceiptRaw broadcast_tx(::rust::String tendermint_rpc_url, ::rust::Vec<::std::uint8_t> raw_signed_tx);
+/// broadcast the cosmos transaction
+::org::defi_wallet_core::CosmosTransactionReceiptRaw
+broadcast_tx(::rust::String tendermint_rpc_url,
+             ::rust::Vec<::std::uint8_t> raw_signed_tx);
 
-  /// query account balance from cosmos address and denom name
-::rust::String query_account_balance(::rust::String api_url, ::rust::String address, ::rust::String denom, ::std::uint8_t api_version);
+/// query account balance from cosmos address and denom name
+::rust::String query_account_balance(::rust::String api_url,
+                                     ::rust::String address,
+                                     ::rust::String denom,
+                                     ::std::uint8_t api_version);
 
-  /// creates the signed transaction for cosmos
-::rust::Vec<::std::uint8_t> get_msg_signed_tx(::org::defi_wallet_core::CosmosSDKTxInfoRaw tx_info, const ::org::defi_wallet_core::PrivateKey &private_key, const ::org::defi_wallet_core::CosmosSDKMsgRaw &msg);
+/// creates the signed transaction for cosmos
+::rust::Vec<::std::uint8_t>
+get_msg_signed_tx(::org::defi_wallet_core::CosmosSDKTxInfoRaw tx_info,
+                  const ::org::defi_wallet_core::PrivateKey &private_key,
+                  const ::org::defi_wallet_core::CosmosSDKMsgRaw &msg);
 
-  /// creates the transaction signing payload (`SignDoc`)
-  /// for `MsgSend` from the Cosmos SDK bank module
-::rust::Vec<::std::uint8_t> get_single_bank_send_signdoc(::org::defi_wallet_core::CosmosSDKTxInfoRaw tx_info, ::rust::Vec<::std::uint8_t> sender_pubkey, ::rust::String recipient_address, ::std::uint64_t amount, ::rust::String denom);
+/// creates the transaction signing payload (`SignDoc`)
+/// for `MsgSend` from the Cosmos SDK bank module
+::rust::Vec<::std::uint8_t> get_single_bank_send_signdoc(
+    ::org::defi_wallet_core::CosmosSDKTxInfoRaw tx_info,
+    ::rust::Vec<::std::uint8_t> sender_pubkey, ::rust::String recipient_address,
+    ::std::uint64_t amount, ::rust::String denom);
 
-  /// creates the signed transaction
-  /// for `MsgSend` from the Cosmos SDK bank module
-::rust::Vec<::std::uint8_t> get_single_bank_send_signed_tx(::org::defi_wallet_core::CosmosSDKTxInfoRaw tx_info, const ::org::defi_wallet_core::PrivateKey &private_key, ::rust::String recipient_address, ::std::uint64_t amount, ::rust::String denom);
+/// creates the signed transaction
+/// for `MsgSend` from the Cosmos SDK bank module
+::rust::Vec<::std::uint8_t> get_single_bank_send_signed_tx(
+    ::org::defi_wallet_core::CosmosSDKTxInfoRaw tx_info,
+    const ::org::defi_wallet_core::PrivateKey &private_key,
+    ::rust::String recipient_address, ::std::uint64_t amount,
+    ::rust::String denom);
 
-  /// generates the HD wallet with a BIP39 backup phrase (English words) and password
-::rust::Box<::org::defi_wallet_core::Wallet> new_wallet(::rust::String password, ::org::defi_wallet_core::MnemonicWordCount word_count);
+/// generates the HD wallet with a BIP39 backup phrase (English words) and
+/// password
+::rust::Box<::org::defi_wallet_core::Wallet>
+new_wallet(::rust::String password,
+           ::org::defi_wallet_core::MnemonicWordCount word_count);
 
-  /// recovers/imports HD wallet from a BIP39 backup phrase (English words) and password
-::rust::Box<::org::defi_wallet_core::Wallet> restore_wallet(::rust::String mnemonic, ::rust::String password);
+/// recovers/imports HD wallet from a BIP39 backup phrase (English words) and
+/// password
+::rust::Box<::org::defi_wallet_core::Wallet>
+restore_wallet(::rust::String mnemonic, ::rust::String password);
 
-  /// generates a random private key
+/// generates a random private key
 ::rust::Box<::org::defi_wallet_core::PrivateKey> new_privatekey() noexcept;
 
-  /// constructs private key from bytes
-::rust::Box<::org::defi_wallet_core::PrivateKey> new_privatekey_from_bytes(::rust::Vec<::std::uint8_t> bytes);
+/// constructs private key from bytes
+::rust::Box<::org::defi_wallet_core::PrivateKey>
+new_privatekey_from_bytes(::rust::Vec<::std::uint8_t> bytes);
 
-  /// constructs private key from hex string
-::rust::Box<::org::defi_wallet_core::PrivateKey> new_privatekey_from_hex(::rust::String hex);
+/// constructs private key from hex string
+::rust::Box<::org::defi_wallet_core::PrivateKey>
+new_privatekey_from_hex(::rust::String hex);
 
-  /// creates the signed transaction
-  /// for `MsgDelegate` from the Cosmos SDK staking module
-::rust::Vec<::std::uint8_t> get_staking_delegate_signed_tx(::org::defi_wallet_core::CosmosSDKTxInfoRaw tx_info, const ::org::defi_wallet_core::PrivateKey &private_key, ::rust::String validator_address, ::std::uint64_t amount, ::rust::String denom, bool with_reward_withdrawal);
+/// creates the signed transaction
+/// for `MsgDelegate` from the Cosmos SDK staking module
+::rust::Vec<::std::uint8_t> get_staking_delegate_signed_tx(
+    ::org::defi_wallet_core::CosmosSDKTxInfoRaw tx_info,
+    const ::org::defi_wallet_core::PrivateKey &private_key,
+    ::rust::String validator_address, ::std::uint64_t amount,
+    ::rust::String denom, bool with_reward_withdrawal);
 
-  /// creates the signed transaction
-  /// for `MsgBeginRedelegate` from the Cosmos SDK staking module
-::rust::Vec<::std::uint8_t> get_staking_redelegate_signed_tx(::org::defi_wallet_core::CosmosSDKTxInfoRaw tx_info, const ::org::defi_wallet_core::PrivateKey &private_key, ::rust::String validator_src_address, ::rust::String validator_dst_address, ::std::uint64_t amount, ::rust::String denom, bool with_reward_withdrawal);
+/// creates the signed transaction
+/// for `MsgBeginRedelegate` from the Cosmos SDK staking module
+::rust::Vec<::std::uint8_t> get_staking_redelegate_signed_tx(
+    ::org::defi_wallet_core::CosmosSDKTxInfoRaw tx_info,
+    const ::org::defi_wallet_core::PrivateKey &private_key,
+    ::rust::String validator_src_address, ::rust::String validator_dst_address,
+    ::std::uint64_t amount, ::rust::String denom, bool with_reward_withdrawal);
 
-  /// creates the signed transaction
-  /// for `MsgUndelegate` from the Cosmos SDK staking module
-::rust::Vec<::std::uint8_t> get_staking_unbond_signed_tx(::org::defi_wallet_core::CosmosSDKTxInfoRaw tx_info, const ::org::defi_wallet_core::PrivateKey &private_key, ::rust::String validator_address, ::std::uint64_t amount, ::rust::String denom, bool with_reward_withdrawal);
+/// creates the signed transaction
+/// for `MsgUndelegate` from the Cosmos SDK staking module
+::rust::Vec<::std::uint8_t> get_staking_unbond_signed_tx(
+    ::org::defi_wallet_core::CosmosSDKTxInfoRaw tx_info,
+    const ::org::defi_wallet_core::PrivateKey &private_key,
+    ::rust::String validator_address, ::std::uint64_t amount,
+    ::rust::String denom, bool with_reward_withdrawal);
 
-  /// creates the signed transaction
-  /// for `MsgSetWithdrawAddress` from the Cosmos SDK distributon module
-::rust::Vec<::std::uint8_t> get_distribution_set_withdraw_address_signed_tx(::org::defi_wallet_core::CosmosSDKTxInfoRaw tx_info, const ::org::defi_wallet_core::PrivateKey &private_key, ::rust::String withdraw_address);
+/// creates the signed transaction
+/// for `MsgSetWithdrawAddress` from the Cosmos SDK distributon module
+::rust::Vec<::std::uint8_t> get_distribution_set_withdraw_address_signed_tx(
+    ::org::defi_wallet_core::CosmosSDKTxInfoRaw tx_info,
+    const ::org::defi_wallet_core::PrivateKey &private_key,
+    ::rust::String withdraw_address);
 
-  /// creates the signed transaction
-  /// for `MsgWithdrawDelegatorReward` from the Cosmos SDK distributon module
-::rust::Vec<::std::uint8_t> get_distribution_withdraw_reward_signed_tx(::org::defi_wallet_core::CosmosSDKTxInfoRaw tx_info, const ::org::defi_wallet_core::PrivateKey &private_key, ::rust::String validator_address);
+/// creates the signed transaction
+/// for `MsgWithdrawDelegatorReward` from the Cosmos SDK distributon module
+::rust::Vec<::std::uint8_t> get_distribution_withdraw_reward_signed_tx(
+    ::org::defi_wallet_core::CosmosSDKTxInfoRaw tx_info,
+    const ::org::defi_wallet_core::PrivateKey &private_key,
+    ::rust::String validator_address);
 
-  /// creates the signed transaction
-  /// for `MsgTransfer` from the Cosmos SDK ibc module
-::rust::Vec<::std::uint8_t> get_ibc_transfer_signed_tx(::org::defi_wallet_core::CosmosSDKTxInfoRaw tx_info, const ::org::defi_wallet_core::PrivateKey &private_key, ::rust::String receiver, ::rust::String source_port, ::rust::String source_channel, ::rust::String denom, ::std::uint64_t token, ::std::uint64_t revision_height, ::std::uint64_t revision_number, ::std::uint64_t timeout_timestamp);
+/// creates the signed transaction
+/// for `MsgTransfer` from the Cosmos SDK ibc module
+::rust::Vec<::std::uint8_t> get_ibc_transfer_signed_tx(
+    ::org::defi_wallet_core::CosmosSDKTxInfoRaw tx_info,
+    const ::org::defi_wallet_core::PrivateKey &private_key,
+    ::rust::String receiver, ::rust::String source_port,
+    ::rust::String source_channel, ::rust::String denom, ::std::uint64_t token,
+    ::std::uint64_t revision_height, ::std::uint64_t revision_number,
+    ::std::uint64_t timeout_timestamp);
 
-  /// Create Login Info by `msg`
-  /// all information from the EIP-4361 plaintext message:
-  /// https://eips.ethereum.org/EIPS/eip-4361
-::rust::Box<::org::defi_wallet_core::CppLoginInfo> new_logininfo(::rust::String msg);
+/// Create Login Info by `msg`
+/// all information from the EIP-4361 plaintext message:
+/// https://eips.ethereum.org/EIPS/eip-4361
+::rust::Box<::org::defi_wallet_core::CppLoginInfo>
+new_logininfo(::rust::String msg);
 
-  /// create cronos tx info to sign
+/// create cronos tx info to sign
 ::org::defi_wallet_core::EthTxInfoRaw new_eth_tx_info() noexcept;
 
-  /// sign cronos tx with private key
-::rust::Vec<::std::uint8_t> build_eth_signed_tx(::org::defi_wallet_core::EthTxInfoRaw tx_info, ::rust::Str network, const ::org::defi_wallet_core::PrivateKey &secret_key);
+/// sign cronos tx with private key
+::rust::Vec<::std::uint8_t>
+build_eth_signed_tx(::org::defi_wallet_core::EthTxInfoRaw tx_info,
+                    ::rust::Str network,
+                    const ::org::defi_wallet_core::PrivateKey &secret_key);
 
-  /// sign cronos tx with private key in custom network
-::rust::Vec<::std::uint8_t> build_eth_signed_tx(::org::defi_wallet_core::EthTxInfoRaw tx_info, ::std::uint64_t chain_id, bool legacy, const ::org::defi_wallet_core::PrivateKey &secret_key);
+/// sign cronos tx with private key in custom network
+::rust::Vec<::std::uint8_t>
+build_eth_signed_tx(::org::defi_wallet_core::EthTxInfoRaw tx_info,
+                    ::std::uint64_t chain_id, bool legacy,
+                    const ::org::defi_wallet_core::PrivateKey &secret_key);
 
-  /// given the account address, it returns the amount of native token it owns
-::org::defi_wallet_core::U256 get_eth_balance(::rust::Str address, ::rust::Str api_url);
+/// given the account address, it returns the amount of native token it owns
+::org::defi_wallet_core::U256 get_eth_balance(::rust::Str address,
+                                              ::rust::Str api_url);
 
-  /// Returns the corresponding account's nonce / number of transactions
-  /// sent from it.
+/// Returns the corresponding account's nonce / number of transactions
+/// sent from it.
 ::rust::String get_eth_nonce(::rust::Str address, ::rust::Str api_url);
 
-  /// broadcast signed cronos tx
-::org::defi_wallet_core::CronosTransactionReceiptRaw broadcast_eth_signed_raw_tx(::rust::Vec<::std::uint8_t> raw_tx, ::rust::Str web3api_url, ::std::uint64_t polling_interval_ms);
+/// broadcast signed cronos tx
+::org::defi_wallet_core::CronosTransactionReceiptRaw
+broadcast_eth_signed_raw_tx(::rust::Vec<::std::uint8_t> raw_tx,
+                            ::rust::Str web3api_url,
+                            ::std::uint64_t polling_interval_ms);
 } // namespace defi_wallet_core
 } // namespace org

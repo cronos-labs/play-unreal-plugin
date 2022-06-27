@@ -3,28 +3,28 @@
 #include "cronosplay/include/defi-wallet-core-cpp/src/lib.rs.h"
 #include <stdio.h>
 
-
 class TxBuilder {
 public:
-    virtual void setData()=0;
-    virtual  org::defi_wallet_core::CosmosSDKTxInfoRaw getTxInfo()=0;
+  virtual void setData() = 0;
+  virtual org::defi_wallet_core::CosmosSDKTxInfoRaw getTxInfo() = 0;
 };
 
 // top manager
 class TxDirector {
-    TxBuilder* builder;
+  TxBuilder *builder;
+
 public:
-    void setBuilder(TxBuilder* newbuilder);
-    org::defi_wallet_core::CosmosSDKTxInfoRaw makeTx();
+  void setBuilder(TxBuilder *newbuilder);
+  org::defi_wallet_core::CosmosSDKTxInfoRaw makeTx();
 };
 
 // various txs
 class CosmosSendAmountTxBuilder : public TxBuilder {
 public:
-    org::defi_wallet_core::CosmosSDKTxInfoRaw info;
-    void setData();
-    
-    org::defi_wallet_core::CosmosSDKTxInfoRaw getTxInfo();
+  org::defi_wallet_core::CosmosSDKTxInfoRaw info;
+  void setData();
+
+  org::defi_wallet_core::CosmosSDKTxInfoRaw getTxInfo();
 };
 
 #endif /* TxBuilder_hpp */
