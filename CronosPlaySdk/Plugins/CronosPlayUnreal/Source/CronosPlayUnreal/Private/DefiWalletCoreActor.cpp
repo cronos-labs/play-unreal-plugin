@@ -772,7 +772,7 @@ void ADefiWalletCoreActor::Erc721Uri(FString contractAddress, FString tokenID,
     std::string mycronosrpc = TCHAR_TO_UTF8(*myCronosRpc);
     ::org::defi_wallet_core::Erc721 erc721 =
         new_erc721(myaddress, mycronosrpc, myCronosChainID).legacy();
-    std::string mytokenid = TCHAR_TO_UTF8(*uri);
+    std::string mytokenid = TCHAR_TO_UTF8(*tokenID); /* bug fix*/
     rust::cxxbridge1::String erc721uri = erc721.token_uri(mytokenid);
     uri = UTF8_TO_TCHAR(erc721uri.c_str());
     success = true;
@@ -792,7 +792,7 @@ void ADefiWalletCoreActor::Erc1155Uri(FString contractAddress, FString tokenID,
     std::string mycronosrpc = TCHAR_TO_UTF8(*myCronosRpc);
     ::org::defi_wallet_core::Erc1155 erc1155 =
         new_erc1155(myaddress, mycronosrpc, myCronosChainID).legacy();
-    std::string mytokenid = TCHAR_TO_UTF8(*uri);
+    std::string mytokenid = TCHAR_TO_UTF8(*tokenID);
     rust::cxxbridge1::String erc1155uri = erc1155.uri(mytokenid);
     uri = UTF8_TO_TCHAR(erc1155uri.c_str());
     success = true;
