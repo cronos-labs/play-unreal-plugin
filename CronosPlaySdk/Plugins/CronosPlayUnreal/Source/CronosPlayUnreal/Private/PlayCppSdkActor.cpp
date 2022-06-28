@@ -16,12 +16,12 @@ class UserWalletConnectCallback : public WalletConnectCallback {
 public:
   UserWalletConnectCallback() {}
   virtual ~UserWalletConnectCallback() {}
-  void onConnected(std::unique_ptr<WalletConnectSessionInfo> sessioninfo) const;
+  void onConnected(const WalletConnectSessionInfo& sessioninfo) const;
   void
-  onDisconnected(std::unique_ptr<WalletConnectSessionInfo> sessioninfo) const;
+  onDisconnected(const WalletConnectSessionInfo& sessioninfo) const;
   void
-  onConnecting(std::unique_ptr<WalletConnectSessionInfo> sessioninfo) const;
-  void onUpdated(std::unique_ptr<WalletConnectSessionInfo> sessioninfo) const;
+  onConnecting(const WalletConnectSessionInfo& sessioninfo) const;
+  void onUpdated(const WalletConnectSessionInfo& sessioninfo) const;
 };
 
 APlayCppSdkActor *APlayCppSdkActor::getInstance() { return _sdk; }
@@ -38,7 +38,7 @@ APlayCppSdkActor::APlayCppSdkActor() {
 // Called when the game starts or when spawned
 void APlayCppSdkActor::BeginPlay() { Super::BeginPlay(); }
 
-void convertSession(::com::crypto::game_sdk::WalletConnectSessionInfo &src,
+void convertSession(::com::crypto::game_sdk::WalletConnectSessionInfo src,
                     FWalletConnectSessionInfo &dst) {
   dst.connected = src.connected;
   dst.accounts.Empty();
@@ -354,44 +354,44 @@ void APlayCppSdkActor::sendEvent(const FWalletConnectSessionInfo &info) {
 }
 
 void UserWalletConnectCallback::onConnected(
-    std::unique_ptr<WalletConnectSessionInfo> sessioninfo) const {
+    const WalletConnectSessionInfo& sessioninfo) const {
   UE_LOG(LogTemp, Log, TEXT("user c++ onConnected"));
   if (APlayCppSdkActor::getInstance()) {
     FWalletConnectSessionInfo output;
-    convertSession(*sessioninfo, output);
+    convertSession(sessioninfo, output);
     output.sessionstate = EWalletconnectSessionState::StateConnected;
     APlayCppSdkActor::getInstance()->sendEvent(output);
   }
 }
 void UserWalletConnectCallback::onDisconnected(
-    std::unique_ptr<WalletConnectSessionInfo> sessioninfo) const {
+    const WalletConnectSessionInfo& sessioninfo) const {
   UE_LOG(LogTemp, Log, TEXT("user c++ onDisconnected"));
   if (APlayCppSdkActor::getInstance()) {
     FWalletConnectSessionInfo output;
-    convertSession(*sessioninfo, output);
+    convertSession(sessioninfo, output);
     output.sessionstate = EWalletconnectSessionState::StateDisconnected;
 
     APlayCppSdkActor::getInstance()->sendEvent(output);
   }
 }
 void UserWalletConnectCallback::onConnecting(
-    std::unique_ptr<WalletConnectSessionInfo> sessioninfo) const {
+    const WalletConnectSessionInfo& sessioninfo) const {
   UE_LOG(LogTemp, Log, TEXT("user c++ onConnecting"));
   if (APlayCppSdkActor::getInstance()) {
     FWalletConnectSessionInfo output;
-    convertSession(*sessioninfo, output);
+    convertSession(sessioninfo, output);
     output.sessionstate = EWalletconnectSessionState::StateConnecting;
 
     APlayCppSdkActor::getInstance()->sendEvent(output);
   }
 }
 void UserWalletConnectCallback::onUpdated(
-    std::unique_ptr<WalletConnectSessionInfo> sessioninfo) const {
+    const WalletConnectSessionInfo& sessioninfo) const {
 
   UE_LOG(LogTemp, Log, TEXT("user c++ onUpdated"));
   if (APlayCppSdkActor::getInstance()) {
     FWalletConnectSessionInfo output;
-    convertSession(*sessioninfo, output);
+    convertSession(sessioninfo, output);
     output.sessionstate = EWalletconnectSessionState::StateUpdated;
 
     APlayCppSdkActor::getInstance()->sendEvent(output);

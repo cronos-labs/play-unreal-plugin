@@ -1198,24 +1198,24 @@ private:
 #endif // CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletconnectClient
 
 extern "C" {
-void com$crypto$game_sdk$cxxbridge1$WalletConnectCallback$onConnected(const ::com::crypto::game_sdk::WalletConnectCallback &self, ::com::crypto::game_sdk::WalletConnectSessionInfo *sessioninfo) noexcept {
-  void (::com::crypto::game_sdk::WalletConnectCallback::*onConnected$)(::std::unique_ptr<::com::crypto::game_sdk::WalletConnectSessionInfo>) const = &::com::crypto::game_sdk::WalletConnectCallback::onConnected;
-  (self.*onConnected$)(::std::unique_ptr<::com::crypto::game_sdk::WalletConnectSessionInfo>(sessioninfo));
+void com$crypto$game_sdk$cxxbridge1$WalletConnectCallback$onConnected(const ::com::crypto::game_sdk::WalletConnectCallback &self, const ::com::crypto::game_sdk::WalletConnectSessionInfo &sessioninfo) noexcept {
+  void (::com::crypto::game_sdk::WalletConnectCallback::*onConnected$)(const ::com::crypto::game_sdk::WalletConnectSessionInfo &) const = &::com::crypto::game_sdk::WalletConnectCallback::onConnected;
+  (self.*onConnected$)(sessioninfo);
 }
 
-void com$crypto$game_sdk$cxxbridge1$WalletConnectCallback$onDisconnected(const ::com::crypto::game_sdk::WalletConnectCallback &self, ::com::crypto::game_sdk::WalletConnectSessionInfo *sessioninfo) noexcept {
-  void (::com::crypto::game_sdk::WalletConnectCallback::*onDisconnected$)(::std::unique_ptr<::com::crypto::game_sdk::WalletConnectSessionInfo>) const = &::com::crypto::game_sdk::WalletConnectCallback::onDisconnected;
-  (self.*onDisconnected$)(::std::unique_ptr<::com::crypto::game_sdk::WalletConnectSessionInfo>(sessioninfo));
+void com$crypto$game_sdk$cxxbridge1$WalletConnectCallback$onDisconnected(const ::com::crypto::game_sdk::WalletConnectCallback &self, const ::com::crypto::game_sdk::WalletConnectSessionInfo &sessioninfo) noexcept {
+  void (::com::crypto::game_sdk::WalletConnectCallback::*onDisconnected$)(const ::com::crypto::game_sdk::WalletConnectSessionInfo &) const = &::com::crypto::game_sdk::WalletConnectCallback::onDisconnected;
+  (self.*onDisconnected$)(sessioninfo);
 }
 
-void com$crypto$game_sdk$cxxbridge1$WalletConnectCallback$onConnecting(const ::com::crypto::game_sdk::WalletConnectCallback &self, ::com::crypto::game_sdk::WalletConnectSessionInfo *sessioninfo) noexcept {
-  void (::com::crypto::game_sdk::WalletConnectCallback::*onConnecting$)(::std::unique_ptr<::com::crypto::game_sdk::WalletConnectSessionInfo>) const = &::com::crypto::game_sdk::WalletConnectCallback::onConnecting;
-  (self.*onConnecting$)(::std::unique_ptr<::com::crypto::game_sdk::WalletConnectSessionInfo>(sessioninfo));
+void com$crypto$game_sdk$cxxbridge1$WalletConnectCallback$onConnecting(const ::com::crypto::game_sdk::WalletConnectCallback &self, const ::com::crypto::game_sdk::WalletConnectSessionInfo &sessioninfo) noexcept {
+  void (::com::crypto::game_sdk::WalletConnectCallback::*onConnecting$)(const ::com::crypto::game_sdk::WalletConnectSessionInfo &) const = &::com::crypto::game_sdk::WalletConnectCallback::onConnecting;
+  (self.*onConnecting$)(sessioninfo);
 }
 
-void com$crypto$game_sdk$cxxbridge1$WalletConnectCallback$onUpdated(const ::com::crypto::game_sdk::WalletConnectCallback &self, ::com::crypto::game_sdk::WalletConnectSessionInfo *sessioninfo) noexcept {
-  void (::com::crypto::game_sdk::WalletConnectCallback::*onUpdated$)(::std::unique_ptr<::com::crypto::game_sdk::WalletConnectSessionInfo>) const = &::com::crypto::game_sdk::WalletConnectCallback::onUpdated;
-  (self.*onUpdated$)(::std::unique_ptr<::com::crypto::game_sdk::WalletConnectSessionInfo>(sessioninfo));
+void com$crypto$game_sdk$cxxbridge1$WalletConnectCallback$onUpdated(const ::com::crypto::game_sdk::WalletConnectCallback &self, const ::com::crypto::game_sdk::WalletConnectSessionInfo &sessioninfo) noexcept {
+  void (::com::crypto::game_sdk::WalletConnectCallback::*onUpdated$)(const ::com::crypto::game_sdk::WalletConnectSessionInfo &) const = &::com::crypto::game_sdk::WalletConnectCallback::onUpdated;
+  (self.*onUpdated$)(sessioninfo);
 }
 
 ::com::crypto::game_sdk::WalletConnectSessionInfo *com$crypto$game_sdk$cxxbridge1$new_walletconnect_sessioninfo() noexcept {
