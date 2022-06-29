@@ -1,5 +1,5 @@
-#pragma warning(disable:4583)
-#pragma warning(disable:4582)
+#pragma warning(disable : 4583)
+#pragma warning(disable : 4582)
 
 #include <algorithm>
 #include <array>
@@ -21,23 +21,19 @@ inline namespace cxxbridge1 {
 
 #ifndef CXXBRIDGE1_PANIC
 #define CXXBRIDGE1_PANIC
-template <typename Exception>
-void panic [[noreturn]] (const char *msg);
+template <typename Exception> void panic [[noreturn]] (const char *msg);
 #endif // CXXBRIDGE1_PANIC
 
 struct unsafe_bitcopy_t;
 
 namespace {
-template <typename T>
-class impl;
+template <typename T> class impl;
 } // namespace
 
 class Opaque;
 
-template <typename T>
-::std::size_t size_of();
-template <typename T>
-::std::size_t align_of();
+template <typename T>::std::size_t size_of();
+template <typename T>::std::size_t align_of();
 
 #ifndef CXXBRIDGE1_RUST_STRING
 #define CXXBRIDGE1_RUST_STRING
@@ -109,11 +105,9 @@ private:
 #ifndef CXXBRIDGE1_RUST_SLICE
 #define CXXBRIDGE1_RUST_SLICE
 namespace detail {
-template <bool>
-struct copy_assignable_if {};
+template <bool> struct copy_assignable_if {};
 
-template <>
-struct copy_assignable_if<false> {
+template <> struct copy_assignable_if<false> {
   copy_assignable_if() noexcept = default;
   copy_assignable_if(const copy_assignable_if &) noexcept = default;
   copy_assignable_if &operator=(const copy_assignable_if &) &noexcept = delete;
@@ -163,8 +157,7 @@ private:
   std::array<std::uintptr_t, 2> repr;
 };
 
-template <typename T>
-class Slice<T>::iterator final {
+template <typename T> class Slice<T>::iterator final {
 public:
   using iterator_category = std::random_access_iterator_tag;
   using value_type = T;
@@ -200,13 +193,11 @@ private:
   std::size_t stride;
 };
 
-template <typename T>
-Slice<T>::Slice() noexcept {
+template <typename T> Slice<T>::Slice() noexcept {
   sliceInit(this, reinterpret_cast<void *>(align_of<T>()), 0);
 }
 
-template <typename T>
-Slice<T>::Slice(T *s, std::size_t count) noexcept {
+template <typename T> Slice<T>::Slice(T *s, std::size_t count) noexcept {
   assert(s != nullptr || count == 0);
   sliceInit(this,
             s == nullptr && count == 0
@@ -215,49 +206,41 @@ Slice<T>::Slice(T *s, std::size_t count) noexcept {
             count);
 }
 
-template <typename T>
-T *Slice<T>::data() const noexcept {
+template <typename T> T *Slice<T>::data() const noexcept {
   return reinterpret_cast<T *>(slicePtr(this));
 }
 
-template <typename T>
-std::size_t Slice<T>::size() const noexcept {
+template <typename T> std::size_t Slice<T>::size() const noexcept {
   return sliceLen(this);
 }
 
-template <typename T>
-std::size_t Slice<T>::length() const noexcept {
+template <typename T> std::size_t Slice<T>::length() const noexcept {
   return this->size();
 }
 
-template <typename T>
-bool Slice<T>::empty() const noexcept {
+template <typename T> bool Slice<T>::empty() const noexcept {
   return this->size() == 0;
 }
 
-template <typename T>
-T &Slice<T>::operator[](std::size_t n) const noexcept {
+template <typename T> T &Slice<T>::operator[](std::size_t n) const noexcept {
   assert(n < this->size());
   auto ptr = static_cast<char *>(slicePtr(this)) + size_of<T>() * n;
   return *reinterpret_cast<T *>(ptr);
 }
 
-template <typename T>
-T &Slice<T>::at(std::size_t n) const {
+template <typename T> T &Slice<T>::at(std::size_t n) const {
   if (n >= this->size()) {
     panic<std::out_of_range>("rust::Slice index out of range");
   }
   return (*this)[n];
 }
 
-template <typename T>
-T &Slice<T>::front() const noexcept {
+template <typename T> T &Slice<T>::front() const noexcept {
   assert(!this->empty());
   return (*this)[0];
 }
 
-template <typename T>
-T &Slice<T>::back() const noexcept {
+template <typename T> T &Slice<T>::back() const noexcept {
   assert(!this->empty());
   return (*this)[this->size() - 1];
 }
@@ -390,8 +373,7 @@ typename Slice<T>::iterator Slice<T>::end() const noexcept {
   return it;
 }
 
-template <typename T>
-void Slice<T>::swap(Slice &rhs) noexcept {
+template <typename T> void Slice<T>::swap(Slice &rhs) noexcept {
   std::swap(*this, rhs);
 }
 #endif // CXXBRIDGE1_RUST_SLICE
@@ -405,8 +387,7 @@ struct unsafe_bitcopy_t final {
 
 #ifndef CXXBRIDGE1_RUST_VEC
 #define CXXBRIDGE1_RUST_VEC
-template <typename T>
-class Vec final {
+template <typename T> class Vec final {
 public:
   using value_type = T;
 
@@ -438,8 +419,7 @@ public:
   void reserve(std::size_t new_cap);
   void push_back(const T &value);
   void push_back(T &&value);
-  template <typename... Args>
-  void emplace_back(Args &&...args);
+  template <typename... Args> void emplace_back(Args &&...args);
   void truncate(std::size_t len);
   void clear();
 
@@ -467,38 +447,30 @@ private:
   std::array<std::uintptr_t, 3> repr;
 };
 
-template <typename T>
-Vec<T>::Vec(std::initializer_list<T> init) : Vec{} {
+template <typename T> Vec<T>::Vec(std::initializer_list<T> init) : Vec{} {
   this->reserve_total(init.size());
   std::move(init.begin(), init.end(), std::back_inserter(*this));
 }
 
-template <typename T>
-Vec<T>::Vec(const Vec &other) : Vec() {
+template <typename T> Vec<T>::Vec(const Vec &other) : Vec() {
   this->reserve_total(other.size());
   std::copy(other.begin(), other.end(), std::back_inserter(*this));
 }
 
-template <typename T>
-Vec<T>::Vec(Vec &&other) noexcept : repr(other.repr) {
+template <typename T> Vec<T>::Vec(Vec &&other) noexcept : repr(other.repr) {
   new (&other) Vec();
 }
 
-template <typename T>
-Vec<T>::~Vec() noexcept {
-  this->drop();
-}
+template <typename T> Vec<T>::~Vec() noexcept { this->drop(); }
 
-template <typename T>
-Vec<T> &Vec<T>::operator=(Vec &&other) &noexcept {
+template <typename T> Vec<T> &Vec<T>::operator=(Vec &&other) &noexcept {
   this->drop();
   this->repr = other.repr;
   new (&other) Vec();
   return *this;
 }
 
-template <typename T>
-Vec<T> &Vec<T>::operator=(const Vec &other) & {
+template <typename T> Vec<T> &Vec<T>::operator=(const Vec &other) & {
   if (this != &other) {
     this->drop();
     new (this) Vec(other);
@@ -506,13 +478,11 @@ Vec<T> &Vec<T>::operator=(const Vec &other) & {
   return *this;
 }
 
-template <typename T>
-bool Vec<T>::empty() const noexcept {
+template <typename T> bool Vec<T>::empty() const noexcept {
   return this->size() == 0;
 }
 
-template <typename T>
-T *Vec<T>::data() noexcept {
+template <typename T> T *Vec<T>::data() noexcept {
   return const_cast<T *>(const_cast<const Vec<T> *>(this)->data());
 }
 
@@ -523,65 +493,55 @@ const T &Vec<T>::operator[](std::size_t n) const noexcept {
   return *reinterpret_cast<const T *>(data + n * size_of<T>());
 }
 
-template <typename T>
-const T &Vec<T>::at(std::size_t n) const {
+template <typename T> const T &Vec<T>::at(std::size_t n) const {
   if (n >= this->size()) {
     panic<std::out_of_range>("rust::Vec index out of range");
   }
   return (*this)[n];
 }
 
-template <typename T>
-const T &Vec<T>::front() const noexcept {
+template <typename T> const T &Vec<T>::front() const noexcept {
   assert(!this->empty());
   return (*this)[0];
 }
 
-template <typename T>
-const T &Vec<T>::back() const noexcept {
+template <typename T> const T &Vec<T>::back() const noexcept {
   assert(!this->empty());
   return (*this)[this->size() - 1];
 }
 
-template <typename T>
-T &Vec<T>::operator[](std::size_t n) noexcept {
+template <typename T> T &Vec<T>::operator[](std::size_t n) noexcept {
   assert(n < this->size());
   auto data = reinterpret_cast<char *>(this->data());
   return *reinterpret_cast<T *>(data + n * size_of<T>());
 }
 
-template <typename T>
-T &Vec<T>::at(std::size_t n) {
+template <typename T> T &Vec<T>::at(std::size_t n) {
   if (n >= this->size()) {
     panic<std::out_of_range>("rust::Vec index out of range");
   }
   return (*this)[n];
 }
 
-template <typename T>
-T &Vec<T>::front() noexcept {
+template <typename T> T &Vec<T>::front() noexcept {
   assert(!this->empty());
   return (*this)[0];
 }
 
-template <typename T>
-T &Vec<T>::back() noexcept {
+template <typename T> T &Vec<T>::back() noexcept {
   assert(!this->empty());
   return (*this)[this->size() - 1];
 }
 
-template <typename T>
-void Vec<T>::reserve(std::size_t new_cap) {
+template <typename T> void Vec<T>::reserve(std::size_t new_cap) {
   this->reserve_total(new_cap);
 }
 
-template <typename T>
-void Vec<T>::push_back(const T &value) {
+template <typename T> void Vec<T>::push_back(const T &value) {
   this->emplace_back(value);
 }
 
-template <typename T>
-void Vec<T>::push_back(T &&value) {
+template <typename T> void Vec<T>::push_back(T &&value) {
   this->emplace_back(std::move(value));
 }
 
@@ -596,18 +556,13 @@ void Vec<T>::emplace_back(Args &&...args) {
   this->set_len(size + 1);
 }
 
-template <typename T>
-void Vec<T>::clear() {
-  this->truncate(0);
-}
+template <typename T> void Vec<T>::clear() { this->truncate(0); }
 
-template <typename T>
-typename Vec<T>::iterator Vec<T>::begin() noexcept {
+template <typename T> typename Vec<T>::iterator Vec<T>::begin() noexcept {
   return Slice<T>(this->data(), this->size()).begin();
 }
 
-template <typename T>
-typename Vec<T>::iterator Vec<T>::end() noexcept {
+template <typename T> typename Vec<T>::iterator Vec<T>::end() noexcept {
   return Slice<T>(this->data(), this->size()).end();
 }
 
@@ -631,8 +586,7 @@ typename Vec<T>::const_iterator Vec<T>::cend() const noexcept {
   return Slice<const T>(this->data(), this->size()).end();
 }
 
-template <typename T>
-void Vec<T>::swap(Vec &rhs) noexcept {
+template <typename T> void Vec<T>::swap(Vec &rhs) noexcept {
   using std::swap;
   swap(this->repr, rhs.repr);
 }
@@ -677,10 +631,8 @@ struct is_complete<T, decltype(sizeof(T))> : std::true_type {};
 #ifndef CXXBRIDGE1_LAYOUT
 #define CXXBRIDGE1_LAYOUT
 class layout {
-  template <typename T>
-  friend std::size_t size_of();
-  template <typename T>
-  friend std::size_t align_of();
+  template <typename T> friend std::size_t size_of();
+  template <typename T> friend std::size_t align_of();
   template <typename T>
   static typename std::enable_if<std::is_base_of<Opaque, T>::value,
                                  std::size_t>::type
@@ -719,20 +671,13 @@ class layout {
   }
 };
 
-template <typename T>
-std::size_t size_of() {
-  return layout::size_of<T>();
-}
+template <typename T> std::size_t size_of() { return layout::size_of<T>(); }
 
-template <typename T>
-std::size_t align_of() {
-  return layout::align_of<T>();
-}
+template <typename T> std::size_t align_of() { return layout::align_of<T>(); }
 #endif // CXXBRIDGE1_LAYOUT
 
 namespace detail {
-template <typename T, typename = void *>
-struct operator_new {
+template <typename T, typename = void *> struct operator_new {
   void *operator()(::std::size_t sz) { return ::operator new(sz); }
 };
 
@@ -742,8 +687,7 @@ struct operator_new<T, decltype(T::operator new(sizeof(T)))> {
 };
 } // namespace detail
 
-template <typename T>
-union MaybeUninit {
+template <typename T> union MaybeUninit {
   T value;
   void *operator new(::std::size_t sz) { return detail::operator_new<T>{}(sz); }
   MaybeUninit() {}
@@ -758,8 +702,7 @@ struct PtrLen final {
 };
 } // namespace repr
 
-template <>
-class impl<Error> final {
+template <> class impl<Error> final {
 public:
   static Error error(repr::PtrLen repr) noexcept {
     Error error;
@@ -773,11 +716,11 @@ public:
 } // namespace rust
 
 namespace org {
-  namespace defi_wallet_core {
-    struct U256;
-    struct U256WithOverflow;
-  }
-}
+namespace defi_wallet_core {
+struct U256;
+struct U256WithOverflow;
+} // namespace defi_wallet_core
+} // namespace org
 
 namespace org {
 namespace defi_wallet_core {
@@ -790,35 +733,45 @@ struct U256 final {
   ::rust::String to_string() const noexcept;
 
   /// Addition which saturates at the maximum value.
-  ::org::defi_wallet_core::U256 saturating_add(::org::defi_wallet_core::U256 other) const noexcept;
+  ::org::defi_wallet_core::U256
+  saturating_add(::org::defi_wallet_core::U256 other) const noexcept;
 
   /// Subtraction which saturates at zero.
-  ::org::defi_wallet_core::U256 saturating_sub(::org::defi_wallet_core::U256 other) const noexcept;
+  ::org::defi_wallet_core::U256
+  saturating_sub(::org::defi_wallet_core::U256 other) const noexcept;
 
   /// Multiplication which saturates at maximum value.
-  ::org::defi_wallet_core::U256 saturating_mul(::org::defi_wallet_core::U256 other) const noexcept;
+  ::org::defi_wallet_core::U256
+  saturating_mul(::org::defi_wallet_core::U256 other) const noexcept;
 
-  /// Returns the addition along with a boolean indicating whether an arithmetic overflow
-  /// would occur. If an overflow would have occurred then the wrapped value is returned.
-  ::org::defi_wallet_core::U256WithOverflow overflowing_add(::org::defi_wallet_core::U256 other) const noexcept;
-
-  /// Returns the subtraction along with a boolean indicating whether an arithmetic overflow
-  /// would occur. If an overflow would have occurred then the wrapped value is returned.
-  ::org::defi_wallet_core::U256WithOverflow overflowing_sub(::org::defi_wallet_core::U256 other) const noexcept;
-
-  /// Returns the multiplication along with a boolean indicating whether an arithmetic overflow
-  /// would occur. If an overflow would have occurred then the wrapped value is returned.
-  ::org::defi_wallet_core::U256WithOverflow overflowing_mul(::org::defi_wallet_core::U256 other) const noexcept;
-
-  /// Returns the fast exponentiation by squaring along with a boolean indicating whether an
-  /// arithmetic overflow would occur. If an overflow would have occurred then the wrapped
+  /// Returns the addition along with a boolean indicating whether an arithmetic
+  /// overflow would occur. If an overflow would have occurred then the wrapped
   /// value is returned.
-  ::org::defi_wallet_core::U256WithOverflow overflowing_pow(::org::defi_wallet_core::U256 other) const noexcept;
+  ::org::defi_wallet_core::U256WithOverflow
+  overflowing_add(::org::defi_wallet_core::U256 other) const noexcept;
+
+  /// Returns the subtraction along with a boolean indicating whether an
+  /// arithmetic overflow would occur. If an overflow would have occurred then
+  /// the wrapped value is returned.
+  ::org::defi_wallet_core::U256WithOverflow
+  overflowing_sub(::org::defi_wallet_core::U256 other) const noexcept;
+
+  /// Returns the multiplication along with a boolean indicating whether an
+  /// arithmetic overflow would occur. If an overflow would have occurred then
+  /// the wrapped value is returned.
+  ::org::defi_wallet_core::U256WithOverflow
+  overflowing_mul(::org::defi_wallet_core::U256 other) const noexcept;
+
+  /// Returns the fast exponentiation by squaring along with a boolean
+  /// indicating whether an arithmetic overflow would occur. If an overflow
+  /// would have occurred then the wrapped value is returned.
+  ::org::defi_wallet_core::U256WithOverflow
+  overflowing_pow(::org::defi_wallet_core::U256 other) const noexcept;
 
   /// Negates self in an overflowing fashion.
-  /// Returns !self + 1 using wrapping operations to return the value that represents
-  /// the negation of this unsigned value. Note that for positive unsigned values
-  /// overflow always occurs, but negating 0 does not overflow.
+  /// Returns !self + 1 using wrapping operations to return the value that
+  /// represents the negation of this unsigned value. Note that for positive
+  /// unsigned values overflow always occurs, but negating 0 does not overflow.
   ::org::defi_wallet_core::U256WithOverflow overflowing_neg() const noexcept;
 
   /// add, exception is rasided if overflow
@@ -834,15 +787,17 @@ struct U256 final {
   ::org::defi_wallet_core::U256 pow(::org::defi_wallet_core::U256 other) const;
 
   /// Negates self in an overflowing fashion.
-  /// Returns !self + 1 using wrapping operations to return the value that represents
-  /// the negation of this unsigned value.
+  /// Returns !self + 1 using wrapping operations to return the value that
+  /// represents the negation of this unsigned value.
   ::org::defi_wallet_core::U256 neg() const noexcept;
 
   /// Returns a pair `(self / other)`
-  ::org::defi_wallet_core::U256 div(::org::defi_wallet_core::U256 other) const noexcept;
+  ::org::defi_wallet_core::U256
+  div(::org::defi_wallet_core::U256 other) const noexcept;
 
   /// Returns a pair `(self % other)`
-  ::org::defi_wallet_core::U256 rem(::org::defi_wallet_core::U256 other) const noexcept;
+  ::org::defi_wallet_core::U256
+  rem(::org::defi_wallet_core::U256 other) const noexcept;
 
   /// Write to the slice in big-endian format.
   void to_big_endian(::rust::Vec<::std::uint8_t> &bytes) const noexcept;
@@ -850,8 +805,8 @@ struct U256 final {
   /// Write to the slice in little-endian format.
   void to_little_endian(::rust::Vec<::std::uint8_t> &bytes) const noexcept;
 
-  /// Format the output for the user which prefer to see values in ether (instead of wei)
-  /// Divides the input by 1e18
+  /// Format the output for the user which prefer to see values in ether
+  /// (instead of wei) Divides the input by 1e18
   ::org::defi_wallet_core::U256 format_ether() const noexcept;
 
   /// Convert to common ethereum unit types: ether, gwei, or wei
@@ -877,58 +832,116 @@ struct U256WithOverflow final {
 #endif // CXXBRIDGE1_STRUCT_org$defi_wallet_core$U256WithOverflow
 
 extern "C" {
-bool org$defi_wallet_core$cxxbridge1$U256$operator$eq(const U256 &, const U256 &) noexcept;
-bool org$defi_wallet_core$cxxbridge1$U256WithOverflow$operator$eq(const U256WithOverflow &, const U256WithOverflow &) noexcept;
+bool org$defi_wallet_core$cxxbridge1$U256$operator$eq(const U256 &,
+                                                      const U256 &) noexcept;
+bool org$defi_wallet_core$cxxbridge1$U256WithOverflow$operator$eq(
+    const U256WithOverflow &, const U256WithOverflow &) noexcept;
 
-::rust::repr::PtrLen org$defi_wallet_core$cxxbridge1$u256_from_dec_str(::rust::String *value, ::org::defi_wallet_core::U256 *return$) noexcept;
+::rust::repr::PtrLen org$defi_wallet_core$cxxbridge1$u256_from_dec_str(
+    ::rust::String *value, ::org::defi_wallet_core::U256 *return$) noexcept;
 
-::rust::repr::PtrLen org$defi_wallet_core$cxxbridge1$u256_from_str_radix(::rust::String *txt, ::std::uint32_t radix, ::org::defi_wallet_core::U256 *return$) noexcept;
+::rust::repr::PtrLen org$defi_wallet_core$cxxbridge1$u256_from_str_radix(
+    ::rust::String *txt, ::std::uint32_t radix,
+    ::org::defi_wallet_core::U256 *return$) noexcept;
 
-::org::defi_wallet_core::U256 org$defi_wallet_core$cxxbridge1$u256_max_value() noexcept;
+::org::defi_wallet_core::U256
+org$defi_wallet_core$cxxbridge1$u256_max_value() noexcept;
 
-void org$defi_wallet_core$cxxbridge1$U256$to_string(const ::org::defi_wallet_core::U256 &self, ::rust::String *return$) noexcept;
+void org$defi_wallet_core$cxxbridge1$U256$to_string(
+    const ::org::defi_wallet_core::U256 &self,
+    ::rust::String *return$) noexcept;
 
-::org::defi_wallet_core::U256 org$defi_wallet_core$cxxbridge1$U256$saturating_add(const ::org::defi_wallet_core::U256 &self, ::org::defi_wallet_core::U256 other) noexcept;
+::org::defi_wallet_core::U256
+org$defi_wallet_core$cxxbridge1$U256$saturating_add(
+    const ::org::defi_wallet_core::U256 &self,
+    ::org::defi_wallet_core::U256 other) noexcept;
 
-::org::defi_wallet_core::U256 org$defi_wallet_core$cxxbridge1$U256$saturating_sub(const ::org::defi_wallet_core::U256 &self, ::org::defi_wallet_core::U256 other) noexcept;
+::org::defi_wallet_core::U256
+org$defi_wallet_core$cxxbridge1$U256$saturating_sub(
+    const ::org::defi_wallet_core::U256 &self,
+    ::org::defi_wallet_core::U256 other) noexcept;
 
-::org::defi_wallet_core::U256 org$defi_wallet_core$cxxbridge1$U256$saturating_mul(const ::org::defi_wallet_core::U256 &self, ::org::defi_wallet_core::U256 other) noexcept;
+::org::defi_wallet_core::U256
+org$defi_wallet_core$cxxbridge1$U256$saturating_mul(
+    const ::org::defi_wallet_core::U256 &self,
+    ::org::defi_wallet_core::U256 other) noexcept;
 
-::org::defi_wallet_core::U256WithOverflow org$defi_wallet_core$cxxbridge1$U256$overflowing_add(const ::org::defi_wallet_core::U256 &self, ::org::defi_wallet_core::U256 other) noexcept;
+::org::defi_wallet_core::U256WithOverflow
+org$defi_wallet_core$cxxbridge1$U256$overflowing_add(
+    const ::org::defi_wallet_core::U256 &self,
+    ::org::defi_wallet_core::U256 other) noexcept;
 
-::org::defi_wallet_core::U256WithOverflow org$defi_wallet_core$cxxbridge1$U256$overflowing_sub(const ::org::defi_wallet_core::U256 &self, ::org::defi_wallet_core::U256 other) noexcept;
+::org::defi_wallet_core::U256WithOverflow
+org$defi_wallet_core$cxxbridge1$U256$overflowing_sub(
+    const ::org::defi_wallet_core::U256 &self,
+    ::org::defi_wallet_core::U256 other) noexcept;
 
-::org::defi_wallet_core::U256WithOverflow org$defi_wallet_core$cxxbridge1$U256$overflowing_mul(const ::org::defi_wallet_core::U256 &self, ::org::defi_wallet_core::U256 other) noexcept;
+::org::defi_wallet_core::U256WithOverflow
+org$defi_wallet_core$cxxbridge1$U256$overflowing_mul(
+    const ::org::defi_wallet_core::U256 &self,
+    ::org::defi_wallet_core::U256 other) noexcept;
 
-::org::defi_wallet_core::U256WithOverflow org$defi_wallet_core$cxxbridge1$U256$overflowing_pow(const ::org::defi_wallet_core::U256 &self, ::org::defi_wallet_core::U256 other) noexcept;
+::org::defi_wallet_core::U256WithOverflow
+org$defi_wallet_core$cxxbridge1$U256$overflowing_pow(
+    const ::org::defi_wallet_core::U256 &self,
+    ::org::defi_wallet_core::U256 other) noexcept;
 
-::org::defi_wallet_core::U256WithOverflow org$defi_wallet_core$cxxbridge1$U256$overflowing_neg(const ::org::defi_wallet_core::U256 &self) noexcept;
+::org::defi_wallet_core::U256WithOverflow
+org$defi_wallet_core$cxxbridge1$U256$overflowing_neg(
+    const ::org::defi_wallet_core::U256 &self) noexcept;
 
-::rust::repr::PtrLen org$defi_wallet_core$cxxbridge1$U256$add(const ::org::defi_wallet_core::U256 &self, ::org::defi_wallet_core::U256 other, ::org::defi_wallet_core::U256 *return$) noexcept;
+::rust::repr::PtrLen org$defi_wallet_core$cxxbridge1$U256$add(
+    const ::org::defi_wallet_core::U256 &self,
+    ::org::defi_wallet_core::U256 other,
+    ::org::defi_wallet_core::U256 *return$) noexcept;
 
-::rust::repr::PtrLen org$defi_wallet_core$cxxbridge1$U256$sub(const ::org::defi_wallet_core::U256 &self, ::org::defi_wallet_core::U256 other, ::org::defi_wallet_core::U256 *return$) noexcept;
+::rust::repr::PtrLen org$defi_wallet_core$cxxbridge1$U256$sub(
+    const ::org::defi_wallet_core::U256 &self,
+    ::org::defi_wallet_core::U256 other,
+    ::org::defi_wallet_core::U256 *return$) noexcept;
 
-::rust::repr::PtrLen org$defi_wallet_core$cxxbridge1$U256$mul(const ::org::defi_wallet_core::U256 &self, ::org::defi_wallet_core::U256 other, ::org::defi_wallet_core::U256 *return$) noexcept;
+::rust::repr::PtrLen org$defi_wallet_core$cxxbridge1$U256$mul(
+    const ::org::defi_wallet_core::U256 &self,
+    ::org::defi_wallet_core::U256 other,
+    ::org::defi_wallet_core::U256 *return$) noexcept;
 
-::rust::repr::PtrLen org$defi_wallet_core$cxxbridge1$U256$pow(const ::org::defi_wallet_core::U256 &self, ::org::defi_wallet_core::U256 other, ::org::defi_wallet_core::U256 *return$) noexcept;
+::rust::repr::PtrLen org$defi_wallet_core$cxxbridge1$U256$pow(
+    const ::org::defi_wallet_core::U256 &self,
+    ::org::defi_wallet_core::U256 other,
+    ::org::defi_wallet_core::U256 *return$) noexcept;
 
-::org::defi_wallet_core::U256 org$defi_wallet_core$cxxbridge1$U256$neg(const ::org::defi_wallet_core::U256 &self) noexcept;
+::org::defi_wallet_core::U256 org$defi_wallet_core$cxxbridge1$U256$neg(
+    const ::org::defi_wallet_core::U256 &self) noexcept;
 
-::org::defi_wallet_core::U256 org$defi_wallet_core$cxxbridge1$U256$div(const ::org::defi_wallet_core::U256 &self, ::org::defi_wallet_core::U256 other) noexcept;
+::org::defi_wallet_core::U256 org$defi_wallet_core$cxxbridge1$U256$div(
+    const ::org::defi_wallet_core::U256 &self,
+    ::org::defi_wallet_core::U256 other) noexcept;
 
-::org::defi_wallet_core::U256 org$defi_wallet_core$cxxbridge1$U256$rem(const ::org::defi_wallet_core::U256 &self, ::org::defi_wallet_core::U256 other) noexcept;
+::org::defi_wallet_core::U256 org$defi_wallet_core$cxxbridge1$U256$rem(
+    const ::org::defi_wallet_core::U256 &self,
+    ::org::defi_wallet_core::U256 other) noexcept;
 
-void org$defi_wallet_core$cxxbridge1$U256$to_big_endian(const ::org::defi_wallet_core::U256 &self, ::rust::Vec<::std::uint8_t> &bytes) noexcept;
+void org$defi_wallet_core$cxxbridge1$U256$to_big_endian(
+    const ::org::defi_wallet_core::U256 &self,
+    ::rust::Vec<::std::uint8_t> &bytes) noexcept;
 
-void org$defi_wallet_core$cxxbridge1$U256$to_little_endian(const ::org::defi_wallet_core::U256 &self, ::rust::Vec<::std::uint8_t> &bytes) noexcept;
+void org$defi_wallet_core$cxxbridge1$U256$to_little_endian(
+    const ::org::defi_wallet_core::U256 &self,
+    ::rust::Vec<::std::uint8_t> &bytes) noexcept;
 
-::rust::repr::PtrLen org$defi_wallet_core$cxxbridge1$parse_ether(::rust::String *eth, ::org::defi_wallet_core::U256 *return$) noexcept;
+::rust::repr::PtrLen org$defi_wallet_core$cxxbridge1$parse_ether(
+    ::rust::String *eth, ::org::defi_wallet_core::U256 *return$) noexcept;
 
-::rust::repr::PtrLen org$defi_wallet_core$cxxbridge1$parse_units(::rust::String *amount, ::rust::String *units, ::org::defi_wallet_core::U256 *return$) noexcept;
+::rust::repr::PtrLen org$defi_wallet_core$cxxbridge1$parse_units(
+    ::rust::String *amount, ::rust::String *units,
+    ::org::defi_wallet_core::U256 *return$) noexcept;
 
-::org::defi_wallet_core::U256 org$defi_wallet_core$cxxbridge1$U256$format_ether(const ::org::defi_wallet_core::U256 &self) noexcept;
+::org::defi_wallet_core::U256 org$defi_wallet_core$cxxbridge1$U256$format_ether(
+    const ::org::defi_wallet_core::U256 &self) noexcept;
 
-::rust::repr::PtrLen org$defi_wallet_core$cxxbridge1$U256$format_units(const ::org::defi_wallet_core::U256 &self, ::rust::String *units, ::rust::String *return$) noexcept;
+::rust::repr::PtrLen org$defi_wallet_core$cxxbridge1$U256$format_units(
+    const ::org::defi_wallet_core::U256 &self, ::rust::String *units,
+    ::rust::String *return$) noexcept;
 } // extern "C"
 
 bool U256::operator==(const U256 &rhs) const noexcept {
@@ -940,35 +953,39 @@ bool U256::operator!=(const U256 &rhs) const noexcept {
 }
 
 bool U256WithOverflow::operator==(const U256WithOverflow &rhs) const noexcept {
-  return org$defi_wallet_core$cxxbridge1$U256WithOverflow$operator$eq(*this, rhs);
+  return org$defi_wallet_core$cxxbridge1$U256WithOverflow$operator$eq(*this,
+                                                                      rhs);
 }
 
 bool U256WithOverflow::operator!=(const U256WithOverflow &rhs) const noexcept {
   return !(*this == rhs);
 }
 
-  /// Convert from a decimal string.
+/// Convert from a decimal string.
 ::org::defi_wallet_core::U256 u256(::rust::String value) {
   ::rust::MaybeUninit<::org::defi_wallet_core::U256> return$;
-  ::rust::repr::PtrLen error$ = org$defi_wallet_core$cxxbridge1$u256_from_dec_str(&value, &return$.value);
+  ::rust::repr::PtrLen error$ =
+      org$defi_wallet_core$cxxbridge1$u256_from_dec_str(&value, &return$.value);
   if (error$.ptr) {
     throw ::rust::impl<::rust::Error>::error(error$);
   }
   return ::std::move(return$.value);
 }
 
-  /// Converts a string slice in a given base to an integer. Only supports radixes of 10
-  /// and 16.
+/// Converts a string slice in a given base to an integer. Only supports radixes
+/// of 10 and 16.
 ::org::defi_wallet_core::U256 u256(::rust::String txt, ::std::uint32_t radix) {
   ::rust::MaybeUninit<::org::defi_wallet_core::U256> return$;
-  ::rust::repr::PtrLen error$ = org$defi_wallet_core$cxxbridge1$u256_from_str_radix(&txt, radix, &return$.value);
+  ::rust::repr::PtrLen error$ =
+      org$defi_wallet_core$cxxbridge1$u256_from_str_radix(&txt, radix,
+                                                          &return$.value);
   if (error$.ptr) {
     throw ::rust::impl<::rust::Error>::error(error$);
   }
   return ::std::move(return$.value);
 }
 
-  /// The maximum value which can be inhabited by this type.
+/// The maximum value which can be inhabited by this type.
 ::org::defi_wallet_core::U256 u256_max_value() noexcept {
   return org$defi_wallet_core$cxxbridge1$u256_max_value();
 }
@@ -979,68 +996,84 @@ bool U256WithOverflow::operator!=(const U256WithOverflow &rhs) const noexcept {
   return ::std::move(return$.value);
 }
 
-::org::defi_wallet_core::U256 U256::saturating_add(::org::defi_wallet_core::U256 other) const noexcept {
+::org::defi_wallet_core::U256
+U256::saturating_add(::org::defi_wallet_core::U256 other) const noexcept {
   return org$defi_wallet_core$cxxbridge1$U256$saturating_add(*this, other);
 }
 
-::org::defi_wallet_core::U256 U256::saturating_sub(::org::defi_wallet_core::U256 other) const noexcept {
+::org::defi_wallet_core::U256
+U256::saturating_sub(::org::defi_wallet_core::U256 other) const noexcept {
   return org$defi_wallet_core$cxxbridge1$U256$saturating_sub(*this, other);
 }
 
-::org::defi_wallet_core::U256 U256::saturating_mul(::org::defi_wallet_core::U256 other) const noexcept {
+::org::defi_wallet_core::U256
+U256::saturating_mul(::org::defi_wallet_core::U256 other) const noexcept {
   return org$defi_wallet_core$cxxbridge1$U256$saturating_mul(*this, other);
 }
 
-::org::defi_wallet_core::U256WithOverflow U256::overflowing_add(::org::defi_wallet_core::U256 other) const noexcept {
+::org::defi_wallet_core::U256WithOverflow
+U256::overflowing_add(::org::defi_wallet_core::U256 other) const noexcept {
   return org$defi_wallet_core$cxxbridge1$U256$overflowing_add(*this, other);
 }
 
-::org::defi_wallet_core::U256WithOverflow U256::overflowing_sub(::org::defi_wallet_core::U256 other) const noexcept {
+::org::defi_wallet_core::U256WithOverflow
+U256::overflowing_sub(::org::defi_wallet_core::U256 other) const noexcept {
   return org$defi_wallet_core$cxxbridge1$U256$overflowing_sub(*this, other);
 }
 
-::org::defi_wallet_core::U256WithOverflow U256::overflowing_mul(::org::defi_wallet_core::U256 other) const noexcept {
+::org::defi_wallet_core::U256WithOverflow
+U256::overflowing_mul(::org::defi_wallet_core::U256 other) const noexcept {
   return org$defi_wallet_core$cxxbridge1$U256$overflowing_mul(*this, other);
 }
 
-::org::defi_wallet_core::U256WithOverflow U256::overflowing_pow(::org::defi_wallet_core::U256 other) const noexcept {
+::org::defi_wallet_core::U256WithOverflow
+U256::overflowing_pow(::org::defi_wallet_core::U256 other) const noexcept {
   return org$defi_wallet_core$cxxbridge1$U256$overflowing_pow(*this, other);
 }
 
-::org::defi_wallet_core::U256WithOverflow U256::overflowing_neg() const noexcept {
+::org::defi_wallet_core::U256WithOverflow
+U256::overflowing_neg() const noexcept {
   return org$defi_wallet_core$cxxbridge1$U256$overflowing_neg(*this);
 }
 
-::org::defi_wallet_core::U256 U256::add(::org::defi_wallet_core::U256 other) const {
+::org::defi_wallet_core::U256
+U256::add(::org::defi_wallet_core::U256 other) const {
   ::rust::MaybeUninit<::org::defi_wallet_core::U256> return$;
-  ::rust::repr::PtrLen error$ = org$defi_wallet_core$cxxbridge1$U256$add(*this, other, &return$.value);
+  ::rust::repr::PtrLen error$ =
+      org$defi_wallet_core$cxxbridge1$U256$add(*this, other, &return$.value);
   if (error$.ptr) {
     throw ::rust::impl<::rust::Error>::error(error$);
   }
   return ::std::move(return$.value);
 }
 
-::org::defi_wallet_core::U256 U256::sub(::org::defi_wallet_core::U256 other) const {
+::org::defi_wallet_core::U256
+U256::sub(::org::defi_wallet_core::U256 other) const {
   ::rust::MaybeUninit<::org::defi_wallet_core::U256> return$;
-  ::rust::repr::PtrLen error$ = org$defi_wallet_core$cxxbridge1$U256$sub(*this, other, &return$.value);
+  ::rust::repr::PtrLen error$ =
+      org$defi_wallet_core$cxxbridge1$U256$sub(*this, other, &return$.value);
   if (error$.ptr) {
     throw ::rust::impl<::rust::Error>::error(error$);
   }
   return ::std::move(return$.value);
 }
 
-::org::defi_wallet_core::U256 U256::mul(::org::defi_wallet_core::U256 other) const {
+::org::defi_wallet_core::U256
+U256::mul(::org::defi_wallet_core::U256 other) const {
   ::rust::MaybeUninit<::org::defi_wallet_core::U256> return$;
-  ::rust::repr::PtrLen error$ = org$defi_wallet_core$cxxbridge1$U256$mul(*this, other, &return$.value);
+  ::rust::repr::PtrLen error$ =
+      org$defi_wallet_core$cxxbridge1$U256$mul(*this, other, &return$.value);
   if (error$.ptr) {
     throw ::rust::impl<::rust::Error>::error(error$);
   }
   return ::std::move(return$.value);
 }
 
-::org::defi_wallet_core::U256 U256::pow(::org::defi_wallet_core::U256 other) const {
+::org::defi_wallet_core::U256
+U256::pow(::org::defi_wallet_core::U256 other) const {
   ::rust::MaybeUninit<::org::defi_wallet_core::U256> return$;
-  ::rust::repr::PtrLen error$ = org$defi_wallet_core$cxxbridge1$U256$pow(*this, other, &return$.value);
+  ::rust::repr::PtrLen error$ =
+      org$defi_wallet_core$cxxbridge1$U256$pow(*this, other, &return$.value);
   if (error$.ptr) {
     throw ::rust::impl<::rust::Error>::error(error$);
   }
@@ -1051,11 +1084,13 @@ bool U256WithOverflow::operator!=(const U256WithOverflow &rhs) const noexcept {
   return org$defi_wallet_core$cxxbridge1$U256$neg(*this);
 }
 
-::org::defi_wallet_core::U256 U256::div(::org::defi_wallet_core::U256 other) const noexcept {
+::org::defi_wallet_core::U256
+U256::div(::org::defi_wallet_core::U256 other) const noexcept {
   return org$defi_wallet_core$cxxbridge1$U256$div(*this, other);
 }
 
-::org::defi_wallet_core::U256 U256::rem(::org::defi_wallet_core::U256 other) const noexcept {
+::org::defi_wallet_core::U256
+U256::rem(::org::defi_wallet_core::U256 other) const noexcept {
   return org$defi_wallet_core$cxxbridge1$U256$rem(*this, other);
 }
 
@@ -1067,20 +1102,23 @@ void U256::to_little_endian(::rust::Vec<::std::uint8_t> &bytes) const noexcept {
   org$defi_wallet_core$cxxbridge1$U256$to_little_endian(*this, bytes);
 }
 
-  /// Converts the input to a U256 and converts from Ether to Wei.
+/// Converts the input to a U256 and converts from Ether to Wei.
 ::org::defi_wallet_core::U256 parse_ether(::rust::String eth) {
   ::rust::MaybeUninit<::org::defi_wallet_core::U256> return$;
-  ::rust::repr::PtrLen error$ = org$defi_wallet_core$cxxbridge1$parse_ether(&eth, &return$.value);
+  ::rust::repr::PtrLen error$ =
+      org$defi_wallet_core$cxxbridge1$parse_ether(&eth, &return$.value);
   if (error$.ptr) {
     throw ::rust::impl<::rust::Error>::error(error$);
   }
   return ::std::move(return$.value);
 }
 
-  /// Multiplies the provided amount with 10^{units} provided.
-::org::defi_wallet_core::U256 parse_units(::rust::String amount, ::rust::String units) {
+/// Multiplies the provided amount with 10^{units} provided.
+::org::defi_wallet_core::U256 parse_units(::rust::String amount,
+                                          ::rust::String units) {
   ::rust::MaybeUninit<::org::defi_wallet_core::U256> return$;
-  ::rust::repr::PtrLen error$ = org$defi_wallet_core$cxxbridge1$parse_units(&amount, &units, &return$.value);
+  ::rust::repr::PtrLen error$ = org$defi_wallet_core$cxxbridge1$parse_units(
+      &amount, &units, &return$.value);
   if (error$.ptr) {
     throw ::rust::impl<::rust::Error>::error(error$);
   }
@@ -1093,7 +1131,9 @@ void U256::to_little_endian(::rust::Vec<::std::uint8_t> &bytes) const noexcept {
 
 ::rust::String U256::format_units(::rust::String units) const {
   ::rust::MaybeUninit<::rust::String> return$;
-  ::rust::repr::PtrLen error$ = org$defi_wallet_core$cxxbridge1$U256$format_units(*this, &units, &return$.value);
+  ::rust::repr::PtrLen error$ =
+      org$defi_wallet_core$cxxbridge1$U256$format_units(*this, &units,
+                                                        &return$.value);
   if (error$.ptr) {
     throw ::rust::impl<::rust::Error>::error(error$);
   }
