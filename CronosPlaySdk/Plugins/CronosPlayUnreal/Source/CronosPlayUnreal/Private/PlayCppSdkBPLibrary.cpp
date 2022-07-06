@@ -1,4 +1,7 @@
-
+#include "HttpModule.h"
+#include "Interfaces/IHttpRequest.h"
+#include "Interfaces/IHttpResponse.h"
+#include "Kismet/KismetRenderingLibrary.h"
 #include "PlayCppSdkBPLibrary.h"
 #include "CronosPlayUnreal.h"
 #include "cronosplay/include/extra-cpp-bindings/src/lib.rs.h"
@@ -7,6 +10,24 @@
 using namespace std;
 using namespace com::crypto::game_sdk;
 using namespace rust;
+
+static FString g_src_ipfs = TEXT("ipfs://");
+static FString g_dst_ipfs = TEXT("https://ipfs.io/ipfs/");
+static FString g_user_agent = "CronosPlay-UnrealEngine-Agent";
+
+void UPlayCppSdkBPLibrary::SetupUserAgent(FString useragent) {
+  g_user_agent = useragent;
+}
+// ipfs:// -> https://ipfs.io/ipfs/
+FString convert_ipfs_url(const FString &src) {
+  FString dst = src.Replace(*g_src_ipfs, *g_dst_ipfs);
+  return dst;
+}
+
+void UPlayCppSdkBPLibrary::SetupIpfsConverting(FString src, FString dst) {
+  g_src_ipfs = src;
+  g_dst_ipfs = dst;
+}
 
 void convertRawTx(Vec<RawTxDetail> &history, TArray<FRawTxDetail> &output) {
   output.Empty();
@@ -180,3 +201,146 @@ UTexture2D *UPlayCppSdkBPLibrary::GenerateQrCode(FString string) {
 UPlayCppSdkBPLibrary::UPlayCppSdkBPLibrary(
     const FObjectInitializer &ObjectInitializer)
     : Super(ObjectInitializer) {}
+
+void UPlayCppSdkBPLibrary::GetJsonStringFromUri(FGetJsonStringFromUri Out,
+                                                FString tokenuriuser) {
+
+  FString tokenuri = convert_ipfs_url(tokenuriuser);
+
+  AsyncTask(ENamedThreads::AnyHiPriThreadNormalTask, [Out, tokenuri]() {
+    FHttpModule &httpModule = FHttpModule::Get();
+    TSharedRef<IHttpRequest, ESPMode::ThreadSafe> httprequest =
+        httpModule.CreateRequest();
+    httprequest->SetVerb(TEXT("GET"));
+    httprequest->SetHeader(TEXT("User-Agent"), g_user_agent);
+    httprequest->SetHeader(TEXT("Content-Type"),
+                           TEXT("application/x-www-form-urlencoded"));
+    httprequest->SetURL(tokenuri);
+
+    httprequest->OnProcessRequestComplete().BindLambda(
+        [&](FHttpRequestPtr callbackrequest, FHttpResponsePtr callbackresponse,
+            bool connectedSuccessfully) mutable {
+          FString jsonstring;
+          FString result;
+          if (connectedSuccessfully) {
+            FString response = callbackresponse->GetContentAsString();
+            jsonstring = response;
+            result = TEXT("");
+          } else {
+            switch (callbackrequest->GetStatus()) {
+            case EHttpRequestStatus::Failed_ConnectionError:
+              result = TEXT("Connection failed.");
+            default:
+              result = TEXT("Request failed.");
+            }
+          }
+
+          AsyncTask(ENamedThreads::GameThread, [Out, jsonstring, result]() {
+            Out.ExecuteIfBound(jsonstring, result);
+          });
+        });
+
+    httprequest->ProcessRequest();
+  });
+}
+
+void UPlayCppSdkBPLibrary::GetNftImageInfoFromUri(FGetNftImageInfoFromUri Out,
+                                                  FString tokenuriuser) {
+  FString tokenuri = convert_ipfs_url(tokenuriuser);
+
+  AsyncTask(ENamedThreads::AnyHiPriThreadNormalTask, [Out, tokenuri]() {
+    FHttpModule &httpModule = FHttpModule::Get();
+    TSharedRef<IHttpRequest, ESPMode::ThreadSafe> httprequest =
+        httpModule.CreateRequest();
+    httprequest->SetVerb(TEXT("GET"));
+    httprequest->SetHeader(TEXT("Content-Type"),
+                           TEXT("application/x-www-form-urlencoded"));
+    httprequest->SetHeader(TEXT("User-Agent"), g_user_agent);
+    httprequest->SetURL(tokenuri);
+
+    httprequest->OnProcessRequestComplete().BindLambda(
+
+        [&](FHttpRequestPtr callbackrequest, FHttpResponsePtr callbackresponse,
+            bool connectedSuccessfully) mutable {
+          FString result;
+          FString jsonstring;
+          FCronosNftInfo nftinfo;
+          if (connectedSuccessfully) {
+            FString response = callbackresponse->GetContentAsString();
+            jsonstring = response;
+            TSharedRef<TJsonReader<TCHAR>> jsonreader =
+                TJsonReaderFactory<TCHAR>::Create(jsonstring);
+            TSharedPtr<FJsonObject> jsonobject =
+                MakeShareable(new FJsonObject());
+            if (!FJsonSerializer::Deserialize(jsonreader, jsonobject) ||
+                !jsonobject.IsValid()) {
+              result = TEXT("GetNftImageInfoFromUri Failed to parse json");
+            } else {
+              nftinfo.JsonString = jsonstring;
+              jsonobject->TryGetStringField(TEXT("name"), nftinfo.Name);
+              jsonobject->TryGetStringField(TEXT("description"),
+                                            nftinfo.Description);
+              jsonobject->TryGetStringField(TEXT("image"), nftinfo.Image);
+              nftinfo.ImageUrl = convert_ipfs_url(nftinfo.Image);
+              result = TEXT("");
+            }
+          } else {
+            switch (callbackrequest->GetStatus()) {
+            case EHttpRequestStatus::Failed_ConnectionError:
+              result = TEXT("Connection failed.");
+            default:
+              result = TEXT("Request failed.");
+            }
+          }
+
+          AsyncTask(ENamedThreads::GameThread, [Out, nftinfo, result]() {
+            Out.ExecuteIfBound(nftinfo, result);
+          });
+        });
+
+    httprequest->ProcessRequest();
+  });
+}
+
+// CAUTION: This function is dangerous. Validate imageurl and check validity
+void UPlayCppSdkBPLibrary::GetNftImageFromUrl(FGetNftImageFromUrl Out,
+                                              FString imageurl) {
+  AsyncTask(ENamedThreads::AnyHiPriThreadNormalTask, [Out, imageurl]() {
+    FHttpModule &httpModule = FHttpModule::Get();
+    TSharedRef<IHttpRequest, ESPMode::ThreadSafe> httprequest =
+        httpModule.CreateRequest();
+    httprequest->SetVerb(TEXT("GET"));
+    httprequest->SetHeader(TEXT("User-Agent"), g_user_agent);
+    httprequest->SetURL(imageurl);
+
+    httprequest->OnProcessRequestComplete().BindLambda(
+        [&](FHttpRequestPtr callbackrequest, FHttpResponsePtr callbackresponse,
+            bool connectedSuccessfully) mutable {
+          UTexture2D *nftimage = NULL;
+          FString result;
+          if (connectedSuccessfully) {
+            // dangerous. Validate imageurl and check validity
+            nftimage = UKismetRenderingLibrary::ImportBufferAsTexture2D(
+                NULL, callbackresponse->GetContent());
+            if (NULL == nftimage) {
+              result = TEXT("Failed to import image.");
+            } else {
+              result = TEXT("");
+            }
+          } else {
+            switch (callbackrequest->GetStatus()) {
+            case EHttpRequestStatus::Failed_ConnectionError:
+              result = TEXT("Connection failed.");
+            default:
+              result = TEXT("Request failed.");
+            }
+          }
+
+          AsyncTask(ENamedThreads::GameThread, [Out, nftimage, result]() {
+            Out.ExecuteIfBound(nftimage, result);
+          });
+        });
+
+    httprequest->ProcessRequest();
+  });
+}

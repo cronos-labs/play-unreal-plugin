@@ -7,6 +7,39 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "PlayCppSdkBPLibrary.generated.h"
 
+/**
+ Cronos NFT Info
+ */
+USTRUCT(BlueprintType)
+struct FCronosNftInfo {
+  GENERATED_BODY()
+
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CronosPlayUnreal")
+  FString JsonString;
+
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CronosPlayUnreal")
+  FString Name;
+
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CronosPlayUnreal")
+  FString Description;
+
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CronosPlayUnreal")
+  FString Image;
+
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CronosPlayUnreal")
+  FString ImageUrl;
+};
+
+/// callback of get json
+DECLARE_DYNAMIC_DELEGATE_TwoParams(FGetJsonStringFromUri, FString, JsonString,
+                                   FString, Result);
+
+DECLARE_DYNAMIC_DELEGATE_TwoParams(FGetNftImageInfoFromUri, FCronosNftInfo,
+                                   NftImageInfo, FString, Result);
+
+DECLARE_DYNAMIC_DELEGATE_TwoParams(FGetNftImageFromUrl, UTexture2D *, NftImage,
+                                   FString, Result);
+
 /// Token Query Options
 UENUM(BlueprintType)
 enum class EQueryOption : uint8 {
@@ -92,7 +125,7 @@ public:
    */
   UFUNCTION(BlueprintCallable,
             meta = (DisplayName = "GetTransactionHistoryBlocking",
-                    Keywords = "Wallet"),
+                    Keywords = "Nft,Token,TransactionHistory,CronoScan"),
             Category = "PlayCppSdk")
   static void GetTransactionHistoryBlocking(FString address, FString apikey,
                                             TArray<FRawTxDetail> &output,
@@ -111,7 +144,7 @@ public:
    */
   UFUNCTION(BlueprintCallable,
             meta = (DisplayName = "GetErc20TransferHistoryBlocking",
-                    Keywords = "Wallet"),
+                    Keywords = "Nft,Token,Erc20,TransferHistory,CronoScan"),
             Category = "PlayCppSdk")
   static void
   GetErc20TransferHistoryBlocking(FString address, FString ContractAddress,
@@ -136,7 +169,7 @@ public:
    */
   UFUNCTION(BlueprintCallable,
             meta = (DisplayName = "GetErc721TransferHistoryBlocking",
-                    Keywords = "Wallet"),
+                    Keywords = "Nft,Token,Erc721,TransferHistory,CronoScan"),
             Category = "PlayCppSdk")
   static void
   GetErc721TransferHistoryBlocking(FString address, FString ContractAddress,
@@ -155,7 +188,8 @@ public:
    * @param output_message error message of the query
    */
   UFUNCTION(BlueprintCallable,
-            meta = (DisplayName = "GetTokensBlocking", Keywords = "Wallet"),
+            meta = (DisplayName = "GetTokensBlocking",
+                    Keywords = "Nft,Token,Url,Blockscout"),
             Category = "PlayCppSdk")
   static void GetTokensBlocking(FString blockscoutBaseUrl,
                                 FString account_address,
@@ -183,7 +217,7 @@ public:
 
   UFUNCTION(BlueprintCallable,
             meta = (DisplayName = "GetTokenTransfersBlocking",
-                    Keywords = "Wallet"),
+                    Keywords = "Nft,Token,Transfers,Blockscout"),
             Category = "PlayCppSdk")
   static void GetTokenTransfersBlocking(FString blockscoutBaseUrl,
                                         FString address,
@@ -198,7 +232,74 @@ public:
    * @return the QRCode as a texture
    */
   UFUNCTION(BlueprintCallable,
-            meta = (DisplayName = "GenerateQrCode", Keywords = "Wallet"),
+            meta = (DisplayName = "GenerateQrCode",
+                    Keywords = "Wallet,QR,Qrcode,Texture"),
             Category = "PlayCppSdk")
   static UTexture2D *GenerateQrCode(FString string);
+
+  /**
+   * GetNftTokenUri
+   * @param tokenuri  tokenuri to get json
+   * @param Out callback, fetched json string
+   */
+  UFUNCTION(BlueprintCallable,
+            meta = (DisplayName = "GetJsonStringFromUri",
+                    Keywords = "Nft,Json,Uri"),
+            Category = "PlayCppSdk")
+
+  static void GetJsonStringFromUri(FGetJsonStringFromUri Out, FString tokenuri);
+
+  /**
+   * GetNftImageFromUri
+   * @param tokenuri  tokenuri to get json
+   * @param Out callback, fetched nft image url
+   */
+  UFUNCTION(BlueprintCallable,
+            meta = (DisplayName = "GetNftImageUrlFromUri",
+                    Keywords = "Nft,Ipfs,Image,Uri"),
+            Category = "PlayCppSdk")
+
+  static void GetNftImageInfoFromUri(FGetNftImageInfoFromUri Out,
+                                     FString tokenuri);
+
+  /**
+   * GetNftImageFromUrl
+   * CAUTION: This function is dangerous. Validate imageurl and check , because
+   * it can download any data from arbitrary url. before calling this api,
+   * please check the image url is valid. validity check references:
+   *  https://cloud.google.com/vision/docs/detecting-safe-search
+   *  https://docs.aws.amazon.com/rekognition/latest/dg/moderation.html
+   *  https://docs.microsoft.com/en-us/gaming/gdk/_content/gc/policies/xr/xr018
+   * @param imageurl  imageurl to get nft image
+   * @param Out callback, fetched nft image
+   */
+  UFUNCTION(BlueprintCallable,
+            meta = (DisplayName = "GetNftImageFromUrl",
+                    Keywords = "Nft,Ipfs,Image,Texture,Url"),
+            Category = "PlayCppSdk")
+
+  static void GetNftImageFromUrl(FGetNftImageFromUrl Out, FString imageurl);
+
+  /**
+   * SetupIpfsConverting
+   * @param src ipfs uri "ipfs://"
+   * @param dst ipfs url "https://ipfs.io/ipfs/"
+   */
+  UFUNCTION(BlueprintCallable,
+            meta = (DisplayName = "SetupIpfsConverting",
+                    Keywords = "Nft,Ipfs,Uri,Url"),
+            Category = "PlayCppSdk")
+
+  static void SetupIpfsConverting(FString src, FString dst);
+
+  /**
+   * SetupUserAgent for http access
+   * @param useragent "CronosPlay-UnrealEngine-Agent"
+   */
+  UFUNCTION(BlueprintCallable,
+            meta = (DisplayName = "SetupIpfsConverting",
+                    Keywords = "Nft,Ipfs,UserAgent,Http"),
+            Category = "PlayCppSdk")
+
+  static void SetupUserAgent(FString useragent);
 };
