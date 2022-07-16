@@ -1,6 +1,15 @@
 # Changelog
 
-## [Unreleased]
+
+## [v0.0.2-alpha] - 2022-07-18
+- Update to play-cpp-sdk v0.0.2-alpha
+- fix incorrect tokenid in Erc721Uri, Erc1155Uri
+- change code-style
+- add tokenuri download and texture generation
+- change folder structure for unrealengine marketplace
+- remove play-cpp-sdk binary, add downloading in Makefile, CI Build
+
+## [v0.0.1-alpha] - 2022-06-21
 ### Added
 - Add function BroadcastEthTxAsync to broadcast eth-tx
 - Add function DefiWalletCore Apis

@@ -21,12 +21,17 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           submodules: recursive
 
+      - name: Prepare PlayCppSdk
+        run: |
+          make 
+
       - name: Package For Windows,Mac
         run: |
           FILENAME="CronosPlaySdk.zip"
-          cd CronosPlaySdk/Plugins 
-          zip -r ../../${FILENAME} CronosPlayUnreal
-          cd ../..
+          cd ..
+          zip -r ${FILENAME} play-unreal-plugin -x "play-unreal-plugin/.git/*"  "play-unreal-plugin/.github/*" "play-unreal-plugin/install/*"
+          mv ${FILENAME} play-unreal-plugin
+          cd play-unreal-plugin
           sha256sum ${FILENAME} > "checksums.txt"
           echo "release_file=${FILENAME}" >> $GITHUB_ENV
           echo "checksum_file=checksums.txt" >> $GITHUB_ENV
