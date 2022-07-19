@@ -1,0 +1,29 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "v0.0.2-alpha",
+	"FriendlyName": "CronosPlayUnreal",
+	"Description": "Cronos labs",
+	"Category": "Programming",
+	"CreatedBy": "Cronos labs",
+	"CreatedByURL": "https://cronos.org",
+	"DocsURL": "https://cronos.org/docs/play/getting-started_unreal.html",
+	"MarketplaceURL": "",
+	"SupportURL": "https://cronos.org/play",
+	"EngineVersion": "4.27.0",
+	"CanContainContent": true,
+	"IsBetaVersion": false,
+	"IsExperimentalVersion": false,
+	"Installed": false,
+	"Modules": [
+		{
+			"Name": "CronosPlayUnreal",
+			"Type": "Runtime",
+			"LoadingPhase": "PreDefault",
+			"WhitelistPlatforms": [
+				"Win64",
+				"Mac",
+			]		
+		}		
+	]
+}

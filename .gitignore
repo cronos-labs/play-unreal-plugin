@@ -85,3 +85,4 @@ defi-wallet-core-rs
 *.log
 *.json
 
+install/*
