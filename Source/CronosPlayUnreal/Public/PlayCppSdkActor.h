@@ -306,4 +306,6 @@ public:
    *
    */
   void sendEvent(const FWalletConnectSessionInfo &);
+
+  static void destroyCoreClient();
 };

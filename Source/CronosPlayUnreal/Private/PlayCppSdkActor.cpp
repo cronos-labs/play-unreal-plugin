@@ -57,17 +57,7 @@ void convertSession(::com::crypto::game_sdk::WalletConnectSessionInfo src,
 // Called every frame
 void APlayCppSdkActor::Tick(float DeltaTime) { Super::Tick(DeltaTime); }
 
-void APlayCppSdkActor::DestroyClient() {
-
-  if (_coreClient != NULL) {
-    UE_LOG(LogTemp, Log, TEXT("PlayCppSdkActor DestroyClient Result %s"));
-
-    // restored back
-    Box<WalletconnectClient> tmpwallet =
-        Box<WalletconnectClient>::from_raw(_coreClient);
-    _coreClient = NULL;
-  }
-}
+void APlayCppSdkActor::DestroyClient() { destroyCoreClient(); }
 
 void APlayCppSdkActor::Destroyed() {
   Super::Destroyed();
@@ -395,3 +385,17 @@ void UserWalletConnectCallback::onUpdated(
     APlayCppSdkActor::getInstance()->sendEvent(output);
   }
 }
+
+void APlayCppSdkActor::destroyCoreClient() {
+  if (_coreClient != NULL) {
+    UE_LOG(LogTemp, Log, TEXT("PlayCppSdkActor destroyCoreClient"));
+
+    // restored back, close tokio-runtime
+    // ue4 editor gracefully closed
+    Box<WalletconnectClient> tmpwallet =
+        Box<WalletconnectClient>::from_raw(_coreClient);
+    _coreClient = NULL;
+  }
+}
+
+void StopWalletConnect() { APlayCppSdkActor::destroyCoreClient(); }
