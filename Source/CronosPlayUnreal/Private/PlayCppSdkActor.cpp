@@ -272,7 +272,7 @@ void APlayCppSdkActor::SignPersonalBlocking(FString usermessage,
       dstaddress[i] = address[i];
     }
     Vec<uint8_t> sig1 =
-        _coreClient->sign_personal_blocking("hello", dstaddress);
+        _coreClient->sign_personal_blocking(TCHAR_TO_UTF8(*usermessage), dstaddress);
 
     copyVecToTArray(sig1, output);
     assert(sig1.size() == output.Num());
