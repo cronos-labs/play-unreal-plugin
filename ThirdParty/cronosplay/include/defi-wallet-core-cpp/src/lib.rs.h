@@ -1228,5 +1228,8 @@ build_eth_signed_tx(::org::defi_wallet_core::EthTxInfoRaw tx_info,
 broadcast_eth_signed_raw_tx(::rust::Vec<::std::uint8_t> raw_tx,
                             ::rust::Str web3api_url,
                             ::std::uint64_t polling_interval_ms);
+
+/// set cronos http-agent name
+void set_cronos_httpagent(::rust::Str agent);
 } // namespace defi_wallet_core
 } // namespace org

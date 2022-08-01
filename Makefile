@@ -1,8 +1,8 @@
-PLAYCPPSDK=v0.0.2-alpha
+PLAYCPPSDK=v0.0.3-alpha
 MACSRC=https://github.com/cronos-labs/play-cpp-sdk/releases/download/$(PLAYCPPSDK)/play_cpp_sdk_Darwin_x86_64.tar.gz
-MACHASH="5b5167a2a375b0a443c8156088456ff159410bc37a6d8e0f876041f867621ca3  play_cpp_sdk_Darwin_x86_64.tar.gz"
+MACHASH="95eb546124063e223927bfdb7be658e171f8eb0dd2c0ef75c4b95454d0c49b6e  play_cpp_sdk_Darwin_x86_64.tar.gz"
 WINDOWSSRC=https://github.com/cronos-labs/play-cpp-sdk/releases/download/$(PLAYCPPSDK)/play_cpp_sdk_Windows_x86_64.zip
-WINDOWSHASH="43624bcb713b901986ce0d526f7f718bfff4a27c29d413130cf4a4469d0cac68 play_cpp_sdk_Windows_x86_64.zip"
+WINDOWSHASH="9ad8bedaaa96e8a5898126d40da527a4180b8c7cfe8ab7a2d6d01445ad476efd *play_cpp_sdk_Windows_x86_64.zip"
 
 all: prepare download checkhash uncompress
 

@@ -4,6 +4,7 @@
 #include "Interfaces/IHttpResponse.h"
 #include "Kismet/KismetRenderingLibrary.h"
 #include "CronosPlayUnreal.h"
+#include "PlayCppSdkDownloader.h"
 #include "Runtime/Launch/Resources/Version.h"
 #include "cronosplay/include/extra-cpp-bindings/src/lib.rs.h"
 #include "cronosplay/include/rust/cxx.h"
@@ -194,3 +195,8 @@ UTexture2D *UPlayCppSdkBPLibrary::GenerateQrCode(FString string) {
 UPlayCppSdkBPLibrary::UPlayCppSdkBPLibrary(
     const FObjectInitializer &ObjectInitializer)
     : Super(ObjectInitializer) {}
+
+void UPlayCppSdkBPLibrary::SetupUserAgent(FString UserAgent) {
+  UPlayCppSdkDownloader::UserAgent = UserAgent;
+  ::org::defi_wallet_core::set_cronos_httpagent(TCHAR_TO_UTF8(*UserAgent));
+}

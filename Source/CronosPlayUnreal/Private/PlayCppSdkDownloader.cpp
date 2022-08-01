@@ -3,15 +3,12 @@
 #include "Interfaces/IHttpRequest.h"
 #include "Interfaces/IHttpResponse.h"
 #include "Kismet/KismetRenderingLibrary.h"
-
+FString UPlayCppSdkDownloader::UserAgent =
+    TEXT("CronosPlay-UnrealEngine-Agent");
 // ipfs:// -> https://ipfs.io/ipfs/
 FString UPlayCppSdkDownloader::convert_ipfs_url(const FString &src) {
   FString dst = src.Replace(*SrcIpfs, *DstIpfs);
   return dst;
-}
-
-void UPlayCppSdkDownloader::SetupUserAgent(FString useragent) {
-  UserAgent = useragent;
 }
 
 void UPlayCppSdkDownloader::SetupIpfsConverting(FString src, FString dst) {
@@ -24,7 +21,6 @@ UPlayCppSdkDownloader::UPlayCppSdkDownloader() {
   HttpModule = &FHttpModule::Get();
   SrcIpfs = TEXT("ipfs://");
   DstIpfs = TEXT("https://ipfs.io/ipfs/");
-  UserAgent = "CronosPlay-UnrealEngine-Agent";
 }
 
 void UPlayCppSdkDownloader::OnPlayDownloadProgressCallback(
