@@ -4,6 +4,7 @@
 #include "Interfaces/IHttpResponse.h"
 #include "Kismet/KismetRenderingLibrary.h"
 #include "CronosPlayUnreal.h"
+#include "Runtime/Launch/Resources/Version.h"
 #include "cronosplay/include/extra-cpp-bindings/src/lib.rs.h"
 #include "cronosplay/include/rust/cxx.h"
 #include "qrcodegen.hpp"
@@ -156,6 +157,14 @@ void UPlayCppSdkBPLibrary::GetTransactionHistoryBlocking(
   }
 }
 
+FTexturePlatformData *GetTexturePlatformData(UTexture2D *Texture) {
+#if ENGINE_MAJOR_VERSION == 4
+  return Texture->PlatformData;
+#else
+  return Texture->GetPlatformData();
+#endif
+}
+
 UTexture2D *UPlayCppSdkBPLibrary::GenerateQrCode(FString string) {
   qrcodegen::QrCode qr = qrcodegen::QrCode::encodeText(
       TCHAR_TO_UTF8(*string), qrcodegen::QrCode::Ecc::LOW);
@@ -170,11 +179,13 @@ UTexture2D *UPlayCppSdkBPLibrary::GenerateQrCode(FString string) {
       pixels[x + y * size] = color;
     }
   }
+
   UTexture2D *texture = UTexture2D::CreateTransient(
       size, size, EPixelFormat::PF_B8G8R8A8, "QRCode");
-  void *data = texture->PlatformData->Mips[0].BulkData.Lock(LOCK_READ_WRITE);
+  void *data =
+      GetTexturePlatformData(texture)->Mips[0].BulkData.Lock(LOCK_READ_WRITE);
   FMemory::Memcpy(data, pixels.GetData(), size * size * 4);
-  texture->PlatformData->Mips[0].BulkData.Unlock();
+  GetTexturePlatformData(texture)->Mips[0].BulkData.Unlock();
   texture->UpdateResource();
   texture->Filter = TextureFilter::TF_Nearest;
   return texture;
