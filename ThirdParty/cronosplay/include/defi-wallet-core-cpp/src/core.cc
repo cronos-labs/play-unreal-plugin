@@ -1369,6 +1369,9 @@ org$defi_wallet_core$cxxbridge1$broadcast_eth_signed_raw_tx(
     ::rust::Vec<::std::uint8_t> *raw_tx, ::rust::Str web3api_url,
     ::std::uint64_t polling_interval_ms,
     ::org::defi_wallet_core::CronosTransactionReceiptRaw *return$) noexcept;
+
+::rust::repr::PtrLen org$defi_wallet_core$cxxbridge1$set_cronos_httpagent(
+    ::rust::Str agent) noexcept;
 } // extern "C"
 
 /// query account details from cosmos address
@@ -1864,6 +1867,15 @@ broadcast_eth_signed_raw_tx(::rust::Vec<::std::uint8_t> raw_tx,
     throw ::rust::impl<::rust::Error>::error(error$);
   }
   return ::std::move(return$.value);
+}
+
+/// set cronos http-agent name
+void set_cronos_httpagent(::rust::Str agent) {
+  ::rust::repr::PtrLen error$ =
+      org$defi_wallet_core$cxxbridge1$set_cronos_httpagent(agent);
+  if (error$.ptr) {
+    throw ::rust::impl<::rust::Error>::error(error$);
+  }
 }
 } // namespace defi_wallet_core
 } // namespace org

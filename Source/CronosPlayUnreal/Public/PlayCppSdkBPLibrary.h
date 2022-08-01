@@ -203,4 +203,14 @@ public:
                     Keywords = "Wallet,QR,Qrcode,Texture"),
             Category = "PlayCppSdk")
   static UTexture2D *GenerateQrCode(FString string);
+
+  /**
+   * SetupUserAgent for http access
+   * @param useragent "CronosPlay-UnrealEngine-Agent"
+   */
+  UFUNCTION(BlueprintCallable,
+            meta = (DisplayName = "SetupUserAgent",
+                    Keywords = "Json,Rpc,UserAgent,Http"),
+            Category = "PlayCppSdk")
+  static void SetupUserAgent(FString UserAgent);
 };

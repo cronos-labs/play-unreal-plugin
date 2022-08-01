@@ -52,9 +52,9 @@ protected:
   FHttpModule *HttpModule;
 
 public:
-  FString SrcIpfs;   // "ipfs://"
-  FString DstIpfs;   // "https://ipfs.io/ipfs/"
-  FString UserAgent; // "CronosPlay-UnrealEngine-Agent"
+  FString SrcIpfs;          // "ipfs://"
+  FString DstIpfs;          // "https://ipfs.io/ipfs/"
+  static FString UserAgent; // "CronosPlay-UnrealEngine-Agent"
 
   UPlayCppSdkDownloader();
   FString convert_ipfs_url(const FString &src);
@@ -75,17 +75,6 @@ public:
             Category = "PlayCppSdk")
 
   void SetupIpfsConverting(FString src, FString dst);
-
-  /**
-   * SetupUserAgent for http access
-   * @param useragent "CronosPlay-UnrealEngine-Agent"
-   */
-  UFUNCTION(BlueprintCallable,
-            meta = (DisplayName = "SetupIpfsConverting",
-                    Keywords = "Nft,Ipfs,UserAgent,Http"),
-            Category = "PlayCppSdk")
-
-  void SetupUserAgent(FString useragent);
 
   /**
    * GetNftTokenUri
