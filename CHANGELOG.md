@@ -1,13 +1,20 @@
 # Changelog
 
+## [v0.0.3-alpha] - 2022-08-03
+- Fix usermessage not being set in SignPersonalBlocking
+- Support UE5
+- Add install-play-cpp-sdk.bat
+- Use play-cpp-sdk v0.0.3-alpha
+- Add blueprint asset to plugin
+- Set http agent for http downloading, cronos rpc apis ( CronosPlay-UnrealEngine-Agent )
 
 ## [v0.0.2-alpha] - 2022-07-18
 - Update to play-cpp-sdk v0.0.2-alpha
-- fix incorrect tokenid in Erc721Uri, Erc1155Uri
-- change code-style
-- add tokenuri download and texture generation
-- change folder structure for unrealengine marketplace
-- remove play-cpp-sdk binary, add downloading in Makefile, CI Build
+- Fix incorrect tokenid in Erc721Uri, Erc1155Uri
+- Change code-style
+- Add tokenuri download and texture generation
+- Change folder structure for unrealengine marketplace
+- Remove play-cpp-sdk binary, add downloading in Makefile, CI Build
 
 ## [v0.0.1-alpha] - 2022-06-21
 ### Added
