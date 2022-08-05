@@ -1,16 +1,16 @@
 {
 	"FileVersion": 3,
+	"FriendlyName": "Cronos Play for Unreal Engine",
 	"Version": 1,
-	"VersionName": "v0.0.2-alpha",
-	"FriendlyName": "CronosPlayUnreal",
+	"VersionName": "v0.0.4-alpha",
+	"EngineVersion": "4.27.2",
 	"Description": "Cronos labs",
 	"Category": "Programming",
 	"CreatedBy": "Cronos labs",
 	"CreatedByURL": "https://cronos.org",
 	"DocsURL": "https://cronos.org/docs/play/getting-started_unreal.html",
-	"MarketplaceURL": "",
+	"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/product/4488d810074049ac988e755a3d9dc0c4",
 	"SupportURL": "https://cronos.org/play",
-	"EngineVersion": "4.27.0",
 	"CanContainContent": true,
 	"IsBetaVersion": false,
 	"IsExperimentalVersion": false,
@@ -22,8 +22,8 @@
 			"LoadingPhase": "PreDefault",
 			"WhitelistPlatforms": [
 				"Win64",
-				"Mac",
-			]		
-		}		
+				"Mac"
+			]
+		}
 	]
 }

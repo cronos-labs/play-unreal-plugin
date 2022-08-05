@@ -1,5 +1,8 @@
 # Changelog
 
+## [v0.0.4-alpha] - 2022-08-05
+- Follow epic game marketplace guideline
+
 ## [v0.0.3-alpha] - 2022-08-03
 - Fix usermessage not being set in SignPersonalBlocking
 - Support UE5
