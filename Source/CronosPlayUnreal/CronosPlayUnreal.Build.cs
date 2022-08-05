@@ -9,7 +9,7 @@ public class CronosPlayUnreal : ModuleRules {
   protected string ThirdPartyPath {
     get {
       return Path.GetFullPath(
-          Path.Combine(ModuleDirectory, "..", "..", "ThirdParty"));
+          Path.Combine(ModuleDirectory, "..", "ThirdParty"));
     }
   }
 
