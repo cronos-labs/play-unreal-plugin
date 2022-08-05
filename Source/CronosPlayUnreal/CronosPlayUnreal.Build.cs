@@ -1,3 +1,5 @@
+// Copyright 2022, Cronos Labs. All Rights Reserved
+
 using System;
 using System.IO;
 using UnrealBuildTool;
@@ -7,7 +9,7 @@ public class CronosPlayUnreal : ModuleRules {
   protected string ThirdPartyPath {
     get {
       return Path.GetFullPath(
-          Path.Combine(ModuleDirectory, "..", "..", "ThirdParty"));
+          Path.Combine(ModuleDirectory, "..", "ThirdParty"));
     }
   }
 

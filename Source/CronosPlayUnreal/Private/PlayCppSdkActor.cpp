@@ -1,3 +1,5 @@
+// Copyright 2022, Cronos Labs. All Rights Reserved
+
 #include "PlayCppSdkActor.h"
 
 #include "cronosplay/include/extra-cpp-bindings/src/lib.rs.h"
