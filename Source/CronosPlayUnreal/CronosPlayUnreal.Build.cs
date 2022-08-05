@@ -1,3 +1,5 @@
+// Copyright 2022, Cronos Labs. All Rights Reserved
+
 using System;
 using System.IO;
 using UnrealBuildTool;

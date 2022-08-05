@@ -1,3 +1,5 @@
+// Copyright 2022, Cronos Labs. All Rights Reserved
+
 /**
  * wallet-connect apis
  * how callback works for c++ events

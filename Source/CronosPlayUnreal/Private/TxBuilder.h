@@ -1,3 +1,5 @@
+// Copyright 2022, Cronos Labs. All Rights Reserved
+
 #ifndef TxBuilder_hpp
 #define TxBuilder_hpp
 #include "cronosplay/include/defi-wallet-core-cpp/src/lib.rs.h"
