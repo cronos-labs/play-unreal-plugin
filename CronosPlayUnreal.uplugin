@@ -3,7 +3,7 @@
 	"FriendlyName": "Cronos Play for Unreal Engine",
 	"Version": 1,
 	"VersionName": "v0.0.4-alpha",
-	"EngineVersion": "4.27.2",
+	"EngineVersion": "4.27.0",
 	"Description": "Cronos labs",
 	"Category": "Programming",
 	"CreatedBy": "Cronos labs",
