@@ -7,6 +7,7 @@
  */
 #pragma once
 #include "CoreMinimal.h"
+#include "Engine.h"
 #include "GameFramework/Actor.h"
 #include "cronosplay/include/defi-wallet-core-cpp/src/contract.rs.h"
 #include "cronosplay/include/defi-wallet-core-cpp/src/lib.rs.h"

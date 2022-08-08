@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include "Async/Async.h"
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "cronosplay/include/extra-cpp-bindings/src/lib.rs.h"

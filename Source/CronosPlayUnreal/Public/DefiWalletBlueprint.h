@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "Async/Async.h"
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "DefiWalletBlueprint.generated.h"
