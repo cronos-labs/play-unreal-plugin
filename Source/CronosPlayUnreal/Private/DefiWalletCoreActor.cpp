@@ -1,5 +1,5 @@
-// Copyright 2022, Cronos Labs. All Rights Reserved
 
+// Copyright 2022, Cronos Labs. All Rights Reserved
 #include "DefiWalletCoreActor.h"
 
 #include <iostream>
@@ -13,6 +13,7 @@ using namespace org::defi_wallet_core;
 const int EthCoinType = 60;
 std::string to_hex(const unsigned char *data, int len);
 void from_hex(const std::string &s, unsigned char *data, int len);
+void zeroize_buffer(char *dst, char value, int length);
 
 FCosmosNFTDenom convertDenom(::org::defi_wallet_core::Denom src) {
   FCosmosNFTDenom ret;
@@ -362,6 +363,14 @@ void ADefiWalletCoreActor::InitializeWallet(FString mnemonics, FString password,
   }
 }
 
+/**
+ * CAUTION: use only for testing & development purpose
+ * storing mnemonics need caution, please not to expose user mnemonics for
+ * public such as github, logs, files , etc.
+ *
+ * WARNING!!!: never transfer menmonics to 3rd party library or networking, ipc,
+ * logs or any kind of remote and zeroize after copying
+ */
 void ADefiWalletCoreActor::InitializeNewDevelopmentOnlyWallet(
     FString password, EMnemonicsWordCount wordcount, FString &output,
     bool &success, FString &output_message) {
@@ -396,6 +405,10 @@ void ADefiWalletCoreActor::InitializeNewDevelopmentOnlyWallet(
     rust::cxxbridge1::String result =
         _coreWallet->get_address(CoinType::CryptoOrgMainnet, 0);
     output = UTF8_TO_TCHAR(result.c_str());
+    // zeroize mnemonics
+
+    zeroize_buffer((char *)result.data(), 0, result.size());
+
     success = true;
   } catch (const rust::cxxbridge1::Error &e) {
     success = false;
@@ -403,6 +416,78 @@ void ADefiWalletCoreActor::InitializeNewDevelopmentOnlyWallet(
     output_message =
         FString::Printf(TEXT("CronosPlayUnreal InitializeWallet Error: %s"),
                         UTF8_TO_TCHAR(e.what()));
+  }
+}
+
+/**
+ * CAUTION: use only for testing & development purpose
+ * storing mnemonics need caution, please not to expose user mnemonics for
+ * public such as github, logs, files , etc.
+ *
+ * WARNING!!!: never transfer menmonics to 3rd party library or networking, ipc,
+ * logs or any kind of remote and zeroize after copying
+ */
+void ADefiWalletCoreActor::GetBackupMnemonicPhrase(FString &output,
+                                                   bool &success,
+                                                   FString &output_message) {
+
+  try {
+    if (NULL == _coreWallet) {
+      success = false;
+      output_message = TEXT("Invalid Wallet");
+      return;
+    }
+
+    assert(_coreWallet != NULL);
+    rust::cxxbridge1::String result = _coreWallet->get_backup_mnemonic_phrase();
+    output = UTF8_TO_TCHAR(result.c_str());
+    // zeroize mnemonics
+    zeroize_buffer((char *)result.data(), 0, result.size());
+
+    success = true;
+  } catch (const rust::cxxbridge1::Error &e) {
+    success = false;
+    output = TEXT("");
+    output_message = FString::Printf(
+        TEXT("CronosPlayUnreal GetBackupMnemonicPhrase Error: %s"),
+        UTF8_TO_TCHAR(e.what()));
+  }
+}
+
+void ADefiWalletCoreActor::DevelopmentOnlyGenerateMnemonics(
+    FString password, EMnemonicsWordCount wordcount, FString &output,
+    bool &success, FString &output_message) {
+  try {
+
+    ::org::defi_wallet_core::MnemonicWordCount mywordcount;
+    switch (wordcount) {
+    case EMnemonicsWordCount::Twelve:
+      mywordcount = ::org::defi_wallet_core::MnemonicWordCount::Twelve;
+      break;
+    case EMnemonicsWordCount::Eighteen:
+      mywordcount = ::org::defi_wallet_core::MnemonicWordCount::Eighteen;
+      break;
+    case EMnemonicsWordCount::TwentyFour:
+      mywordcount = ::org::defi_wallet_core::MnemonicWordCount::TwentyFour;
+      break;
+    default:
+      throw "Invalid Word Count";
+      break;
+    }
+    rust::String result =
+        generate_mnemonics(TCHAR_TO_UTF8(*password), mywordcount);
+
+    output = UTF8_TO_TCHAR(result.c_str());
+    // zeroize mnemonics
+    zeroize_buffer((char *)result.data(), 0, result.size());
+
+    success = true;
+  } catch (const rust::cxxbridge1::Error &e) {
+    success = false;
+    output = TEXT("");
+    output_message = FString::Printf(
+        TEXT("CronosPlayUnreal DevelopmentOnlyGenerateMnemonics Error: %s"),
+        UTF8_TO_TCHAR(e.what()));
   }
 }
 
@@ -1584,5 +1669,11 @@ void ADefiWalletCoreActor::Erc1155Approve(
     output_message =
         FString::Printf(TEXT("CronosPlayUnreal Erc1155Approve Error: %s"),
                         UTF8_TO_TCHAR(e.what()));
+  }
+}
+
+void zeroize_buffer(char *dst, char value, int length) {
+  for (int i = 0; i < length; i++) {
+    dst[i] = value;
   }
 }

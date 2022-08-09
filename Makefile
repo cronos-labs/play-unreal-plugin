@@ -1,9 +1,9 @@
 UNAME := $(shell uname)
-PLAYCPPSDK=v0.0.3-alpha
+PLAYCPPSDK=v0.0.4-alpha
 MACSRC=https://github.com/cronos-labs/play-cpp-sdk/releases/download/$(PLAYCPPSDK)/play_cpp_sdk_Darwin_x86_64.tar.gz
-MACHASH="95eb546124063e223927bfdb7be658e171f8eb0dd2c0ef75c4b95454d0c49b6e  play_cpp_sdk_Darwin_x86_64.tar.gz"
+MACHASH="61e3eb7aa34a860a2822852fdcd3b9fb1d7809f741fd32c15328c1230fe142e6  play_cpp_sdk_Darwin_x86_64.tar.gz"
 WINDOWSSRC=https://github.com/cronos-labs/play-cpp-sdk/releases/download/$(PLAYCPPSDK)/play_cpp_sdk_Windows_x86_64.zip
-WINDOWSHASH="9ad8bedaaa96e8a5898126d40da527a4180b8c7cfe8ab7a2d6d01445ad476efd *play_cpp_sdk_Windows_x86_64.zip"
+WINDOWSHASH="56797bc1f67ea4e00a0cffcc8fe048b58703fd913d44ec81a68402f238e363f8 *play_cpp_sdk_Windows_x86_64.zip"
 
 all: rm prepare download checkhash uncompress
 
