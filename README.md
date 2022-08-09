@@ -1,81 +1,52 @@
-# Cronos Play Unreal SDK
-Cronos Play Unreal SDK is a plugin for Unreal Engine that allows interacting with blockchain
-networks in a self-custodial way.
+# Cronos Play for Unreal Engine
+Cronos Play for Unreal Engine is a plugin for Unreal Engine that allows interacting with
+blockchain networks in a self-custodial way.
+
+![Icon128.png](./Resources/Icon128.png)
 
 ## Security Warning
 
 No security audits of this project have ever been performed yet.
 
-The project is still in development and is *alpha* quality. 
+The project is still in development and is *alpha* quality.
 
 USE AT YOUR OWN RISK!
 
 ## Pre-requisites
-Unreal Engine 4.27 and 5.0 are supported, i.e. one of them should be installed via the Epic Games Launcher.
+- Unreal Engine 4.27 and 5.0 are supported, i.e. one of them should be installed via the Epic
+  Games Launcher.
+- Windows: Visual Studio 2019 or newer
+- MacOS: Xcode 13.2.1
 
 ## Building
-Building is supported via the [Unreal Build System](https://docs.unrealengine.com/4.27/en-US/ProductionPipelines/UnrealBuildSystem/) (C#):
 
-1. Run copydll.sh or copydll.bat (important)
-2. Click on the `.project` file
-3. The project will be built automatically
+### Step 1: Download the release zip file in [Release](https://github.com/cronos-labs/play-unreal-plugin/releases) page
+Skip this step if you prefer building from source.
 
-### Documentation Generation
-Currently, this is supported on Windows via [KantanDocGen Plugin](https://github.com/kamrann/KantanDocGenPlugin):
+### Step 2:  Install [play-cpp-sdk](https://github.com/cronos-labs/play-cpp-sdk)
+Skip this step if you prefer building from the release zip file.
 
-1. Run getdoc.sh inside [Git shell](https://gitforwindows.org)
-2. Enable KantanDocGenPlugin in plugins 
-3. Open the plugin dialog: File -> KantanDocGen 
-4. Navigate in this dialog: Class Search -> Native Module -> Click + -> **CronosPlayUnreal**
-5. Click on "Generate Docs"
-    - location: **CronosPlaySdk/Saved/KantanDocGen/**
+- Step 2a: Clone this project
+- Step 2b: run `make` (mac) or run `install-play-cpp-sdk.bat` (windows) to setup [play-cpp-sdk](https://github.com/cronos-labs/play-cpp-sdk).
 
+### Step 3: Run RunUAT.bat[or RunUAT.sh] script to build the plugin
+``` bash
+Engine\Build\BatchFiles\RunUAT.bat[or RunUAT.sh] BuildPlugin -Plugin=[Path to .uplugin file, must be outside engine directory] -Package=[Output directory] -Rocket
+```
 
 ### Windows
-Make sure you use Visual Studio 2019 or later.(2022) 
-it's already coded, if any compiling errors occur, add these line to top of c++ file
+Make sure you use Visual Studio 2019 or newer.
+
+If any compiling errors occur, try to disable 4583 and 4582 warnings with the following lines:
 ```c++
 #pragma warning(disable:4583)
 #pragma warning(disable:4582)
 ```
 
-
 ###  macOS
-Make sure you use Xcode 13.2.1.
-If you are building the C++ SDK bindings and the corresponding binaries from Rust for Unreal Engine 5,
-then make sure to set a deployment target for the [Cronos Play C++ SDK](https://github.com/crypto-com/play-cpp-sdk):
+Make sure you use Xcode 13.2.1 (Xcode 13.3 or newer has unused variables errors when compiling
+the unreal source codes, until the issue is fixed by Epic Games).
 
-```bash
-export MACOSX_DEPLOYMENT_TARGET=10.15
-cargo build ..
-```
-
-You can check the deployment target using the `otool`:
-```bash
-otool -l <resulting binary>.dylib
-```
-
-The `LC_BUILD_VERSION/minos` should be 10.15.
-
-
-### How to compile
-1. install unreal engine 4.27
-2. git clone this repository
-3. open CronosPlaySdk/CronosPlaySdk.uproject 
-
-### How to install
-1. git clone this repository, and run `cd CronosPlaySdk` & copydll.sh or copydll.bat to copy dynamic libraries for ue4 editor
-2. mkdir `Plugins` folder in your project
-3. copy ./CronosPlaySdk/Plugins/CronosPlayUnreal `yourproject/Plugins/` , it's automatically detected in the project
-4. also copydll.sh or copydll.bat to the project folder, and run it to copy dynamic libraries for ue4 editor
-
-
-### How to start coding
-1. click `add blueprint` in ue4 menu
-2. inherit DefiWalletCoreActor or PlayCppSdkActor     
-3. drag & drop your class to the scene
-4. category is **CronosPlayUnreal**
-5. apis in `..Blueprint.h` is stateless, can be called any place in the blueprint
-
-### More information for Cronos Play
-If you are a game developer, please visit [Cronos Play](https://cronos.org/play) or fill this [Contact Form](https://airtable.com/shrFiQnLrcpeBp2lS) for more information.
+## More information about Cronos Play
+If you are a game developer, please visit [Cronos Play](https://cronos.org/play) or fill this
+[Contact Form](https://airtable.com/shrFiQnLrcpeBp2lS) for more information.
