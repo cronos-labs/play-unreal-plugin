@@ -145,6 +145,14 @@ struct FCosmosNFTIDCollection {
   TArray<FString> TokenIDs;
 };
 
+/// wallet connect session state
+UENUM(BlueprintType)
+enum class EMnemonicsWordCount : uint8 {
+  Twelve UMETA(DisplayName = "12 mnemonics"),
+  Eighteen UMETA(DisplayName = "18 mnemonics"),
+  TwentyFour UMETA(DisplayName = "24 mnemonics"),
+};
+
 /**
  * Cosmos NFT Owner
  */
@@ -176,6 +184,23 @@ public:
             Category = "CronosPlayUnreal")
   void InitializeWallet(FString mnemonics, FString password, FString &output,
                         bool &success, FString &output_message);
+
+  /**
+   * Restore wallet with mnemnonics.
+   * @param password  salt in mnemonics restoration
+   * @param wordcount  mnemonics word count (12, 18, 24)
+   * @param output generated address (index=0)
+   * @param success whether succeed or not
+   * @param message error message, "" if succeed
+   */
+  UFUNCTION(BlueprintCallable,
+            meta = (DisplayName = "InitializeNewDevelopmentOnlyWallet",
+                    Keywords = "Wallet"),
+            Category = "CronosPlayUnreal")
+  void InitializeNewDevelopmentOnlyWallet(FString password,
+                                          EMnemonicsWordCount wordcount,
+                                          FString &output, bool &success,
+                                          FString &output_message);
 
   /**
    * Cosmos send amount.
@@ -462,6 +487,24 @@ public:
                       FString &output_message);
 
   /**
+   * Get erc-1155 balance of batch
+   * @param contractAddress erc1155 contract address
+   * @param accountAddresses account addresses to fetch balance
+   * @param tokenIDs toiken ids to fetch balance
+   * @param balanceofbatch balances
+   * @param success whether succeed or not
+   * @param message error message, "" if succeed
+   */
+  UFUNCTION(BlueprintCallable,
+            meta = (DisplayName = "Erc1155Balance", Keywords = "Wallet"),
+            Category = "CronosPlayUnreal")
+  void Erc1155BalanceOfBatch(FString contractAddress,
+                             TArray<FString> accountAddresses,
+                             TArray<FString> tokenIDs,
+                             TArray<FString> &balanceofbatch, bool &success,
+                             FString &output_message);
+
+  /**
    * Get erc-20 name
    * @param contractAddress erc20 contract address
    * @param name get name
@@ -554,6 +597,38 @@ public:
                  bool &success, FString &output_message);
 
   /**
+   * Get erc-721 Approved
+   * @param contractAddress erc721 contract address
+   * @param tokenID token id
+   * @param result approved
+   * @param success whether succeed or not
+   * @param message error message, "" if succeed
+   */
+  UFUNCTION(BlueprintCallable,
+            meta = (DisplayName = "Erc721GetApproved", Keywords = "Wallet"),
+            Category = "CronosPlayUnreal")
+  void Erc721GetApproved(FString contractAddress, FString tokenID,
+                         FString &result, bool &success,
+                         FString &output_message);
+
+  /**
+   * Get erc-721 IsApprovedForAll
+   * @param contractAddress erc721 contract address
+   * @param erc721owner owner address
+   * @param erc721approvedaddress  approved address
+   * @param result is approved for all
+   * @param success whether succeed or not
+   * @param message error message, "" if succeed
+   */
+  UFUNCTION(BlueprintCallable,
+            meta = (DisplayName = "Erc721IsApprovedForAll",
+                    Keywords = "Wallet"),
+            Category = "CronosPlayUnreal")
+  void Erc721IsApprovedForAll(FString contractAddress, FString erc721owner,
+                              FString erc721approvedaddress, bool &result,
+                              bool &success, FString &output_message);
+
+  /**
    * Get erc-721 owner
    * @param contractAddress erc 721 contract address
    * @param tokenID token id
@@ -568,6 +643,53 @@ public:
                    bool &success, FString &output_message);
 
   /**
+   * Get erc-721 total suppy
+   * @param contractAddress erc 721 contract address
+   * @param totalsupply total suppy
+   * @param success whether succeed or not
+   * @param message error message, "" if succeed
+   */
+  UFUNCTION(BlueprintCallable,
+            meta = (DisplayName = "Erc721TotalSupply", Keywords = "Wallet"),
+            Category = "CronosPlayUnreal")
+  void Erc721TotalSupply(FString contractAddress, FString &totalsupply,
+                         bool &success, FString &output_message);
+
+  /*
+   *  Returns a token ID at a given index of all the tokens stored by the
+   * contract. Use along with totalSupply to enumerate all tokens.
+   * @param contractAddress erc 721 contract address
+   * @param erc721index which index
+   * @param token  a token ID at a given index
+   * @param success whether succeed or not
+   * @param message error message, "" if succeed
+   */
+  UFUNCTION(BlueprintCallable,
+            meta = (DisplayName = "Erc721TokenByIndex", Keywords = "Wallet"),
+            Category = "CronosPlayUnreal")
+  void Erc721TokenByIndex(FString contractAddress, FString erc721index,
+                          FString &token, bool &success,
+                          FString &output_message);
+
+  /*
+   * Returns a token ID owned by owner at a given index of its token list. Use
+   * along with balanceOf to enumerate all of owner's tokens.
+   * @param contractAddress erc 721 contract address
+   * @param erc721owner owner
+   * @param erc721index which index
+   * @param token  a token ID at a given index
+   * @param success whether succeed or not
+   * @param message error message, "" if succeed
+   */
+  UFUNCTION(BlueprintCallable,
+            meta = (DisplayName = "Erc721TokenOwnerByIndex",
+                    Keywords = "Wallet"),
+            Category = "CronosPlayUnreal")
+  void Erc721TokenOwnerByIndex(FString contractAddress, FString erc721owner,
+                               FString erc721index, FString &token,
+                               bool &success, FString &output_message);
+
+  /**
    * Get erc-1155 uri
    * @param contractAddress erc 1155 contract address
    * @param tokenID token ID
@@ -580,6 +702,23 @@ public:
             Category = "CronosPlayUnreal")
   void Erc1155Uri(FString contractAddress, FString tokenID, FString &uri,
                   bool &success, FString &output_message);
+
+  /**
+   * Get erc-1155 IsApprovedForAll
+   * @param contractAddress erc721 contract address
+   * @param erc1155owner owner address
+   * @param erc1155approvedaddress  approved address
+   * @param result is approved for all
+   * @param success whether succeed or not
+   * @param message error message, "" if succeed
+   */
+  UFUNCTION(BlueprintCallable,
+            meta = (DisplayName = "Erc1155IsApprovedForAll",
+                    Keywords = "Wallet"),
+            Category = "CronosPlayUnreal")
+  void Erc1155IsApprovedForAll(FString contractAddress, FString erc1155owner,
+                               FString erc1155approvedaddress, bool &result,
+                               bool &success, FString &output_message);
 
   /**
    * erc20 Moves `amount` tokens from the caller’s account to `to_address`.
@@ -637,6 +776,20 @@ public:
                     FString &output_message);
 
   /**
+   * Returns the amount of tokens in existence
+   * @param contractAddress erc20 contract
+   * @param owner erc20 owner *@param spender erc20 spender *@param
+   * @param result allowance
+   */
+
+  UFUNCTION(BlueprintCallable,
+            meta = (DisplayName = "Erc20Allowance", Keywords = "Wallet"),
+            Category = "CronosPlayUnreal")
+  void Erc20Allowance(FString contractAddress, FString erc20owner,
+                      FString erc20spender, FString &result, bool &success,
+                      FString &output_message);
+
+  /**
    * erc721 Moves `amount` tokens from `from_address` to `to_address` using the
    * allowance mechanism.
    * @param contractAddress erc20 contract
@@ -655,6 +808,50 @@ public:
                           FString fromAddress, FString toAddress,
                           FString tokenid, FCronosTransactionReceiptRaw &result,
                           bool &success, FString &output_message);
+
+  /**
+   * Safely transfers `token_id` token from `from_address` to `to_address`.
+   * @param contractAddress erc20 contract
+   * @param walletindex which index to use?
+   * @param fromAddress  from address to move
+   * @param toAddress to address
+   * @param tokenid token id
+   * @param result receipt
+   * @param success whether succeed or not
+   * @param message error message, "" if succeed
+   */
+  UFUNCTION(BlueprintCallable,
+            meta = (DisplayName = "Erc721SafeTransferFrom",
+                    Keywords = "Wallet"),
+            Category = "CronosPlayUnreal")
+  void Erc721SafeTransferFrom(FString contractAddress, int walletindex,
+                              FString fromAddress, FString toAddress,
+                              FString tokenid,
+                              FCronosTransactionReceiptRaw &result,
+                              bool &success, FString &output_message);
+
+  /**
+   * Safely transfers `token_id` token from `from_address` to `to_address` with
+   * `additional_data`.
+   * @param contractAddress erc20 contract
+   * @param walletindex which index to use?
+   * @param fromAddress  from address to move
+   * @param toAddress to address
+   * @param tokenid token id
+   * @param result receipt
+   * @param success whether succeed or not
+   * @param message error message, "" if succeed
+   */
+  UFUNCTION(BlueprintCallable,
+            meta = (DisplayName = "Erc721SafeTransferFromWithData",
+                    Keywords = "Wallet"),
+            Category = "CronosPlayUnreal")
+  void Erc721SafeTransferFromWithData(FString contractAddress, int walletindex,
+                                      FString fromAddress, FString toAddress,
+                                      FString tokenid,
+                                      TArray<uint8> additionaldata,
+                                      FCronosTransactionReceiptRaw &result,
+                                      bool &success, FString &output_message);
 
   /**
    * erc721 Allows `approved_address` to withdraw from your account multiple
@@ -682,20 +879,47 @@ public:
    * @param fromAddress  from address to move
    * @param toAddress to address
    * @param tokenid token id
+   * @param amount  amount
    * @param additionaldata additional data
    * @param result receipt
    * @param success whether succeed or not
    * @param message error message, "" if succeed
    */
   UFUNCTION(BlueprintCallable,
-            meta = (DisplayName = "Erc1155TransferFrom", Keywords = "Wallet"),
+            meta = (DisplayName = "Erc1155SafeTransferFrom",
+                    Keywords = "Wallet"),
             Category = "CronosPlayUnreal")
-  void Erc1155TransferFrom(FString contractAddress, int walletindex,
-                           FString fromAddress, FString toAddress,
-                           FString tokenid, FString amount,
-                           TArray<uint8> additionaldata,
-                           FCronosTransactionReceiptRaw &result, bool &success,
-                           FString &output_message);
+  void Erc1155SafeTransferFrom(FString contractAddress, int walletindex,
+                               FString fromAddress, FString toAddress,
+                               FString tokenid, FString amount,
+                               TArray<uint8> additionaldata,
+                               FCronosTransactionReceiptRaw &result,
+                               bool &success, FString &output_message);
+
+  /**
+   * Batched version of safeTransferFrom.
+   * @param contractAddress erc20 contract
+   * @param walletindex which index to use?
+   * @param fromAddress  from address to move
+   * @param toAddress to address
+   * @param tokenids token ids
+   * @param amounts amounts
+   * @param additionaldata additional data
+   * @param result receipt
+   * @param success whether succeed or not
+   * @param message error message, "" if succeed
+   */
+  UFUNCTION(BlueprintCallable,
+            meta = (DisplayName = "Erc1155SafeTransferFrom",
+                    Keywords = "Wallet"),
+            Category = "CronosPlayUnreal")
+  void Erc1155SafeBatchTransferFrom(FString contractAddress, int walletindex,
+                                    FString fromAddress, FString toAddress,
+                                    TArray<FString> tokenids,
+                                    TArray<FString> amounts,
+                                    TArray<uint8> additionaldata,
+                                    FCronosTransactionReceiptRaw &result,
+                                    bool &success, FString &output_message);
 
   /**
    * erc1155 Allows `approved_address` to withdraw from your account multiple
