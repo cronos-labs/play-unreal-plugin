@@ -362,6 +362,50 @@ void ADefiWalletCoreActor::InitializeWallet(FString mnemonics, FString password,
   }
 }
 
+void ADefiWalletCoreActor::InitializeNewDevelopmentOnlyWallet(
+    FString password, EMnemonicsWordCount wordcount, FString &output,
+    bool &success, FString &output_message) {
+  try {
+    if (NULL != _coreWallet) {
+      success = false;
+      output_message = TEXT("Wallet Already Exists");
+      return;
+    }
+
+    ::org::defi_wallet_core::MnemonicWordCount mywordcount;
+    switch (wordcount) {
+    case EMnemonicsWordCount::Twelve:
+      mywordcount = ::org::defi_wallet_core::MnemonicWordCount::Twelve;
+      break;
+    case EMnemonicsWordCount::Eighteen:
+      mywordcount = ::org::defi_wallet_core::MnemonicWordCount::Eighteen;
+      break;
+    case EMnemonicsWordCount::TwentyFour:
+      mywordcount = ::org::defi_wallet_core::MnemonicWordCount::TwentyFour;
+      break;
+    default:
+      throw "Invalid Word Count";
+      break;
+    }
+    rust::cxxbridge1::Box<org::defi_wallet_core::Wallet> tmpWallet =
+        new_wallet(TCHAR_TO_UTF8(*password), mywordcount);
+    // ownership transferred
+    _coreWallet = tmpWallet.into_raw();
+
+    assert(_coreWallet != NULL);
+    rust::cxxbridge1::String result =
+        _coreWallet->get_address(CoinType::CryptoOrgMainnet, 0);
+    output = UTF8_TO_TCHAR(result.c_str());
+    success = true;
+  } catch (const rust::cxxbridge1::Error &e) {
+    success = false;
+    output = TEXT("");
+    output_message =
+        FString::Printf(TEXT("CronosPlayUnreal InitializeWallet Error: %s"),
+                        UTF8_TO_TCHAR(e.what()));
+  }
+}
+
 void ADefiWalletCoreActor::GetAddress(int32 index, FString &output,
                                       bool &success, FString &output_message) {
   try {
@@ -728,6 +772,42 @@ void ADefiWalletCoreActor::Erc1155Balance(FString contractAddress,
   }
 }
 
+void ADefiWalletCoreActor::Erc1155BalanceOfBatch(
+    FString contractAddress, TArray<FString> accountAddresses,
+    TArray<FString> tokenIDs, TArray<FString> &balanceofbatch, bool &success,
+    FString &output_message) {
+  try {
+    std::string mycontractaddress = TCHAR_TO_UTF8(*contractAddress);
+
+    rust::Vec<rust::String> myaccountaddresses;
+    for (int i = 0; i < accountAddresses.Num(); i++) {
+      myaccountaddresses.push_back(TCHAR_TO_UTF8(*accountAddresses[i]));
+    }
+
+    rust::Vec<rust::String> mytokenids;
+    for (int i = 0; i < tokenIDs.Num(); i++) {
+      mytokenids.push_back(TCHAR_TO_UTF8(*tokenIDs[i]));
+    }
+    std::string mycronosrpc = TCHAR_TO_UTF8(*myCronosRpc);
+    Erc1155 erc1155 =
+        new_erc1155(mycontractaddress, mycronosrpc, myCronosChainID).legacy();
+    ::rust::Vec<::rust::String> erc1155_balances =
+        erc1155.balance_of_batch(myaccountaddresses, mytokenids);
+
+    balanceofbatch.Empty();
+    for (int i = 0; i < erc1155_balances.size(); i++) {
+      balanceofbatch.Add(UTF8_TO_TCHAR(erc1155_balances[i].c_str()));
+    }
+    success = true;
+
+  } catch (const rust::cxxbridge1::Error &e) {
+    success = false;
+    output_message = FString::Printf(
+        TEXT("CronosPlayUnreal Erc1155BalanceOfBatch Error: %s"),
+        UTF8_TO_TCHAR(e.what()));
+  }
+}
+
 void ADefiWalletCoreActor::Erc721Name(FString contractAddress, FString &name,
                                       bool &success, FString &output_message) {
   try {
@@ -785,6 +865,51 @@ void ADefiWalletCoreActor::Erc721Uri(FString contractAddress, FString tokenID,
   }
 }
 
+void ADefiWalletCoreActor::Erc721GetApproved(FString contractAddress,
+                                             FString tokenID, FString &result,
+                                             bool &success,
+                                             FString &output_message) {
+  try {
+    std::string myaddress = TCHAR_TO_UTF8(*contractAddress);
+    std::string mycronosrpc = TCHAR_TO_UTF8(*myCronosRpc);
+    ::org::defi_wallet_core::Erc721 erc721 =
+        new_erc721(myaddress, mycronosrpc, myCronosChainID).legacy();
+    std::string mytokenid = TCHAR_TO_UTF8(*tokenID); /* bug fix*/
+    rust::cxxbridge1::String erc721getapproved = erc721.get_approved(mytokenid);
+    result = UTF8_TO_TCHAR(erc721getapproved.c_str());
+    success = true;
+
+  } catch (const rust::cxxbridge1::Error &e) {
+    success = false;
+    output_message =
+        FString::Printf(TEXT("CronosPlayUnreal Erc721GetApproved Error: %s"),
+                        UTF8_TO_TCHAR(e.what()));
+  }
+}
+
+void ADefiWalletCoreActor::Erc721IsApprovedForAll(FString contractAddress,
+                                                  FString erc721owner,
+                                                  FString erc721approvedaddress,
+                                                  bool &result, bool &success,
+                                                  FString &output_message) {
+  try {
+    std::string myaddress = TCHAR_TO_UTF8(*contractAddress);
+    std::string mycronosrpc = TCHAR_TO_UTF8(*myCronosRpc);
+    ::org::defi_wallet_core::Erc721 erc721 =
+        new_erc721(myaddress, mycronosrpc, myCronosChainID).legacy();
+    std::string myowner = TCHAR_TO_UTF8(*erc721owner);
+    std::string myapprovedaddress = TCHAR_TO_UTF8(*erc721approvedaddress);
+    result = erc721.is_approved_for_all(myowner, myapprovedaddress);
+    success = true;
+
+  } catch (const rust::cxxbridge1::Error &e) {
+    success = false;
+    output_message = FString::Printf(
+        TEXT("CronosPlayUnreal Erc721IsApprovedForAll Error: %s"),
+        UTF8_TO_TCHAR(e.what()));
+  }
+}
+
 void ADefiWalletCoreActor::Erc1155Uri(FString contractAddress, FString tokenID,
                                       FString &uri, bool &success,
                                       FString &output_message) {
@@ -802,6 +927,28 @@ void ADefiWalletCoreActor::Erc1155Uri(FString contractAddress, FString tokenID,
     success = false;
     output_message = FString::Printf(
         TEXT("CronosPlayUnreal Erc1155Uri Error: %s"), UTF8_TO_TCHAR(e.what()));
+  }
+}
+
+void ADefiWalletCoreActor::Erc1155IsApprovedForAll(
+    FString contractAddress, FString erc1155owner,
+    FString erc1155approvedaddress, bool &result, bool &success,
+    FString &output_message) {
+  try {
+    std::string myaddress = TCHAR_TO_UTF8(*contractAddress);
+    std::string mycronosrpc = TCHAR_TO_UTF8(*myCronosRpc);
+    ::org::defi_wallet_core::Erc1155 erc1155 =
+        new_erc1155(myaddress, mycronosrpc, myCronosChainID).legacy();
+    std::string myowner = TCHAR_TO_UTF8(*erc1155owner);
+    std::string myapprovedaddress = TCHAR_TO_UTF8(*erc1155approvedaddress);
+    result = erc1155.is_approved_for_all(myowner, myapprovedaddress);
+    success = true;
+
+  } catch (const rust::cxxbridge1::Error &e) {
+    success = false;
+    output_message = FString::Printf(
+        TEXT("CronosPlayUnreal Erc11551IsApprovedForAll Error: %s"),
+        UTF8_TO_TCHAR(e.what()));
   }
 }
 
@@ -824,6 +971,76 @@ void ADefiWalletCoreActor::Erc721Owner(FString contractAddress, FString tokenID,
     output_message =
         FString::Printf(TEXT("CronosPlayUnreal Erc721Owner Error: %s"),
                         UTF8_TO_TCHAR(e.what()));
+  }
+}
+
+void ADefiWalletCoreActor::Erc721TotalSupply(FString contractAddress,
+                                             FString &totalsupply,
+                                             bool &success,
+                                             FString &output_message) {
+  try {
+    std::string mycontractaddress = TCHAR_TO_UTF8(*contractAddress);
+    std::string mycronosrpc = TCHAR_TO_UTF8(*myCronosRpc);
+    Erc721 erc721 =
+        new_erc721(mycontractaddress, mycronosrpc, myCronosChainID).legacy();
+    rust::cxxbridge1::String erc721totalsupply =
+        erc721.total_supply().to_string();
+
+    totalsupply = UTF8_TO_TCHAR(erc721totalsupply.c_str());
+    success = true;
+
+  } catch (const rust::cxxbridge1::Error &e) {
+    success = false;
+    output_message =
+        FString::Printf(TEXT("CronosPlayUnreal Erc721TotalSupply Error: %s"),
+                        UTF8_TO_TCHAR(e.what()));
+  }
+}
+
+void ADefiWalletCoreActor::Erc721TokenByIndex(FString contractAddress,
+                                              FString erc721index,
+                                              FString &token, bool &success,
+                                              FString &output_message) {
+  try {
+    std::string mycontractaddress = TCHAR_TO_UTF8(*contractAddress);
+    std::string mycronosrpc = TCHAR_TO_UTF8(*myCronosRpc);
+    std::string myindex = TCHAR_TO_UTF8(*erc721index);
+    Erc721 erc721 =
+        new_erc721(mycontractaddress, mycronosrpc, myCronosChainID).legacy();
+    rust::cxxbridge1::String erc721token = erc721.token_by_index(myindex);
+
+    token = UTF8_TO_TCHAR(erc721token.c_str());
+    success = true;
+
+  } catch (const rust::cxxbridge1::Error &e) {
+    success = false;
+    output_message =
+        FString::Printf(TEXT("CronosPlayUnreal Erc721TokenByIndex Error: %s"),
+                        UTF8_TO_TCHAR(e.what()));
+  }
+}
+
+void ADefiWalletCoreActor::Erc721TokenOwnerByIndex(
+    FString contractAddress, FString erc721owner, FString erc721index,
+    FString &token, bool &success, FString &output_message) {
+  try {
+    std::string mycontractaddress = TCHAR_TO_UTF8(*contractAddress);
+    std::string mycronosrpc = TCHAR_TO_UTF8(*myCronosRpc);
+    std::string myowner = TCHAR_TO_UTF8(*erc721owner);
+    std::string myindex = TCHAR_TO_UTF8(*erc721index);
+    Erc721 erc721 =
+        new_erc721(mycontractaddress, mycronosrpc, myCronosChainID).legacy();
+    rust::cxxbridge1::String erc721token =
+        erc721.token_of_owner_by_index(myowner, myindex);
+
+    token = UTF8_TO_TCHAR(erc721token.c_str());
+    success = true;
+
+  } catch (const rust::cxxbridge1::Error &e) {
+    success = false;
+    output_message = FString::Printf(
+        TEXT("CronosPlayUnreal Erc721TokenOwnerByIndex Error: %s"),
+        UTF8_TO_TCHAR(e.what()));
   }
 }
 
@@ -1048,6 +1265,34 @@ void ADefiWalletCoreActor::Erc20Approve(FString contractAddress,
   }
 }
 
+void ADefiWalletCoreActor::Erc20Allowance(FString contractAddress,
+                                          FString erc20owner,
+                                          FString erc20spender, FString &result,
+                                          bool &success,
+                                          FString &output_message) {
+
+  try {
+    std::string mycontractaddress = TCHAR_TO_UTF8(*contractAddress);
+    std::string mycronosrpc = TCHAR_TO_UTF8(*myCronosRpc);
+
+    std::string myowner = TCHAR_TO_UTF8(*erc20owner);
+    std::string myspender = TCHAR_TO_UTF8(*erc20spender);
+    Erc20 erc20 =
+        new_erc20(mycontractaddress, mycronosrpc, myCronosChainID).legacy();
+    rust::cxxbridge1::String erc20allowance =
+        erc20.allowance(myowner, myspender);
+    result = UTF8_TO_TCHAR(erc20allowance.c_str());
+
+    success = true;
+
+  } catch (const rust::cxxbridge1::Error &e) {
+    success = false;
+    output_message =
+        FString::Printf(TEXT("CronosPlayUnreal Erc20Allowance Error: %s"),
+                        UTF8_TO_TCHAR(e.what()));
+  }
+}
+
 void ADefiWalletCoreActor::Erc721TransferFrom(
     FString contractAddress, int walletindex, FString fromAddress,
     FString toAddress, FString tokenid, FCronosTransactionReceiptRaw &result,
@@ -1083,6 +1328,91 @@ void ADefiWalletCoreActor::Erc721TransferFrom(
     output_message =
         FString::Printf(TEXT("CronosPlayUnreal Erc721TransferFrom Error: %s"),
                         UTF8_TO_TCHAR(e.what()));
+  }
+}
+
+void ADefiWalletCoreActor::Erc721SafeTransferFrom(
+    FString contractAddress, int walletindex, FString fromAddress,
+    FString toAddress, FString tokenid, FCronosTransactionReceiptRaw &result,
+    bool &success, FString &output_message) {
+  try {
+    if (NULL == _coreWallet) {
+      success = false;
+      output_message = TEXT("Invalid Wallet");
+      return;
+    }
+
+    char hdpath[100];
+    snprintf(hdpath, sizeof(hdpath), "m/44'/%d'/0'/0/%d", EthCoinType,
+             walletindex);
+    rust::cxxbridge1::Box<PrivateKey> privatekey = _coreWallet->get_key(hdpath);
+
+    std::string mycontractaddress = TCHAR_TO_UTF8(*contractAddress);
+    std::string myfromaddress = TCHAR_TO_UTF8(*fromAddress);
+    std::string mytoaddress = TCHAR_TO_UTF8(*toAddress);
+    std::string mycronosrpc = TCHAR_TO_UTF8(*myCronosRpc);
+    std::string mytokenid = TCHAR_TO_UTF8(*tokenid);
+
+    Erc721 erc721 =
+        new_erc721(mycontractaddress, mycronosrpc, myCronosChainID).legacy();
+    ::org::defi_wallet_core::CronosTransactionReceiptRaw receipt =
+        erc721.safe_transfer_from(myfromaddress, mytoaddress, mytokenid,
+                                  *privatekey);
+    convertCronosTXReceipt(receipt, result);
+    success = true;
+
+  } catch (const rust::cxxbridge1::Error &e) {
+    success = false;
+    output_message = FString::Printf(
+        TEXT("CronosPlayUnreal Erc721SafeTransferFrom Error: %s"),
+        UTF8_TO_TCHAR(e.what()));
+  }
+}
+
+void ADefiWalletCoreActor::Erc721SafeTransferFromWithData(
+    FString contractAddress, int walletindex, FString fromAddress,
+    FString toAddress, FString tokenid, TArray<uint8> additionaldata,
+    FCronosTransactionReceiptRaw &result, bool &success,
+    FString &output_message) {
+  try {
+    if (NULL == _coreWallet) {
+      success = false;
+      output_message = TEXT("Invalid Wallet");
+      return;
+    }
+
+    char hdpath[100];
+    snprintf(hdpath, sizeof(hdpath), "m/44'/%d'/0'/0/%d", EthCoinType,
+             walletindex);
+    rust::cxxbridge1::Box<PrivateKey> privatekey = _coreWallet->get_key(hdpath);
+
+    std::string mycontractaddress = TCHAR_TO_UTF8(*contractAddress);
+    std::string myfromaddress = TCHAR_TO_UTF8(*fromAddress);
+    std::string mytoaddress = TCHAR_TO_UTF8(*toAddress);
+    std::string mycronosrpc = TCHAR_TO_UTF8(*myCronosRpc);
+    std::string mytokenid = TCHAR_TO_UTF8(*tokenid);
+
+    ::rust::Vec<::std::uint8_t> myadditionaldata;
+    myadditionaldata.clear();
+    for (int i = 0; i < additionaldata.Num(); i++) {
+      myadditionaldata.push_back(additionaldata[i]);
+    }
+    assert(myadditionaldata.size() == additionaldata.Num());
+
+    Erc721 erc721 =
+        new_erc721(mycontractaddress, mycronosrpc, myCronosChainID).legacy();
+    ::org::defi_wallet_core::CronosTransactionReceiptRaw receipt =
+        erc721.safe_transfer_from_with_data(myfromaddress, mytoaddress,
+                                            mytokenid, myadditionaldata,
+                                            *privatekey);
+    convertCronosTXReceipt(receipt, result);
+    success = true;
+
+  } catch (const rust::cxxbridge1::Error &e) {
+    success = false;
+    output_message = FString::Printf(
+        TEXT("CronosPlayUnreal Erc721SafeTransferFromWithData Error: %s"),
+        UTF8_TO_TCHAR(e.what()));
   }
 }
 
@@ -1122,7 +1452,7 @@ void ADefiWalletCoreActor::Erc721Approve(
   }
 }
 
-void ADefiWalletCoreActor::Erc1155TransferFrom(
+void ADefiWalletCoreActor::Erc1155SafeTransferFrom(
     FString contractAddress, int walletindex, FString fromAddress,
     FString toAddress, FString tokenid, FString amount,
     TArray<uint8> additionaldata, FCronosTransactionReceiptRaw &result,
@@ -1162,9 +1492,63 @@ void ADefiWalletCoreActor::Erc1155TransferFrom(
 
   } catch (const rust::cxxbridge1::Error &e) {
     success = false;
-    output_message =
-        FString::Printf(TEXT("CronosPlayUnreal Erc1155TransferFrom Error: %s"),
-                        UTF8_TO_TCHAR(e.what()));
+    output_message = FString::Printf(
+        TEXT("CronosPlayUnreal Erc1155SafeTransferFrom Error: %s"),
+        UTF8_TO_TCHAR(e.what()));
+  }
+}
+
+void ADefiWalletCoreActor::Erc1155SafeBatchTransferFrom(
+    FString contractAddress, int walletindex, FString fromAddress,
+    FString toAddress, TArray<FString> tokenids, TArray<FString> amounts,
+    TArray<uint8> additionaldata, FCronosTransactionReceiptRaw &result,
+    bool &success, FString &output_message) {
+  try {
+    if (NULL == _coreWallet) {
+      success = false;
+      output_message = TEXT("Invalid Wallet");
+      return;
+    }
+
+    char hdpath[100];
+    snprintf(hdpath, sizeof(hdpath), "m/44'/%d'/0'/0/%d", EthCoinType,
+             walletindex);
+    rust::cxxbridge1::Box<PrivateKey> privatekey = _coreWallet->get_key(hdpath);
+
+    std::string mycontractaddress = TCHAR_TO_UTF8(*contractAddress);
+    std::string myfromaddress = TCHAR_TO_UTF8(*fromAddress);
+    std::string mytoaddress = TCHAR_TO_UTF8(*toAddress);
+    rust::Vec<rust::String> mytokenids;
+    for (int i = 0; i < tokenids.Num(); i++) {
+      mytokenids.push_back(TCHAR_TO_UTF8(*tokenids[i]));
+    }
+
+    rust::Vec<rust::String> myamounts;
+    for (int i = 0; i < amounts.Num(); i++) {
+      myamounts.push_back(TCHAR_TO_UTF8(*amounts[i]));
+    }
+    std::string mycronosrpc = TCHAR_TO_UTF8(*myCronosRpc);
+    ::rust::Vec<::std::uint8_t> myadditionaldata;
+    myadditionaldata.clear();
+    for (int i = 0; i < additionaldata.Num(); i++) {
+      myadditionaldata.push_back(additionaldata[i]);
+    }
+    assert(myadditionaldata.size() == additionaldata.Num());
+
+    Erc1155 erc1155 =
+        new_erc1155(mycontractaddress, mycronosrpc, myCronosChainID).legacy();
+    ::org::defi_wallet_core::CronosTransactionReceiptRaw receipt =
+        erc1155.safe_batch_transfer_from(myfromaddress, mytoaddress, mytokenids,
+                                         myamounts, myadditionaldata,
+                                         *privatekey);
+    convertCronosTXReceipt(receipt, result);
+    success = true;
+
+  } catch (const rust::cxxbridge1::Error &e) {
+    success = false;
+    output_message = FString::Printf(
+        TEXT("CronosPlayUnreal Erc1155SafeBatchTransferFrom Error: %s"),
+        UTF8_TO_TCHAR(e.what()));
   }
 }
 
