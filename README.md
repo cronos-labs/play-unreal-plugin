@@ -47,6 +47,6 @@ If any compiling errors occur, try to disable 4583 and 4582 warnings with the fo
 Make sure you use Xcode 13.2.1 (Xcode 13.3 or newer has unused variables errors when compiling
 the unreal source codes, until the issue is fixed by Epic Games).
 
-## More information for Cronos Play
+## More information about Cronos Play
 If you are a game developer, please visit [Cronos Play](https://cronos.org/play) or fill this
 [Contact Form](https://airtable.com/shrFiQnLrcpeBp2lS) for more information.
