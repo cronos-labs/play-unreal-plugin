@@ -1,7 +1,9 @@
 # Changelog
 
-## [v0.0.4-alpha] - 2022-08-05
+## [v0.0.4-alpha] - 2022-08-11
 - Follow epic game marketplace guideline
+- Add get-backup-mnemonics, generate-mnemonics
+
 
 ## [v0.0.3-alpha] - 2022-08-03
 - Fix usermessage not being set in SignPersonalBlocking

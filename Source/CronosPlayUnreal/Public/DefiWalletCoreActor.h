@@ -203,6 +203,36 @@ public:
                                           FString &output_message);
 
   /**
+   * Get backup mnemonic phrase.
+   * @param output backup mnemonics
+   * @param success whether succeed or not
+   * @param message error message, "" if succeed
+   */
+  UFUNCTION(BlueprintCallable,
+            meta = (DisplayName = "GetBackupMnemonicPhrase",
+                    Keywords = "Wallet"),
+            Category = "CronosPlayUnreal")
+  void GetBackupMnemonicPhrase(FString &output, bool &success,
+                               FString &output_message);
+
+  /**
+   * Restore wallet with mnemnonics.
+   * @param password  salt in mnemonics restoration
+   * @param wordcount  mnemonics word count (12, 18, 24)
+   * @param output generated mnemonics
+   * @param success whether succeed or not
+   * @param message error message, "" if succeed
+   */
+  UFUNCTION(BlueprintCallable,
+            meta = (DisplayName = "DevelopmentOnlyGenerateMnemonics",
+                    Keywords = "Wallet"),
+            Category = "CronosPlayUnreal")
+  void DevelopmentOnlyGenerateMnemonics(FString password,
+                                        EMnemonicsWordCount wordcount,
+                                        FString &output, bool &success,
+                                        FString &output_message);
+
+  /**
    * Cosmos send amount.
    * @param walletIndex   address index which starts from 0
    * @param fromaddress  sender address

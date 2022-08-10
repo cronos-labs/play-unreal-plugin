@@ -1120,6 +1120,9 @@ private:
 #ifndef CXXBRIDGE1_STRUCT_org$defi_wallet_core$Wallet
 #define CXXBRIDGE1_STRUCT_org$defi_wallet_core$Wallet
 struct Wallet final : public ::rust::Opaque {
+  /// get backup mnemonic phrase
+  ::rust::String get_backup_mnemonic_phrase() const;
+
   /// returns the default address of the wallet
   ::rust::String
   get_default_address(::org::defi_wallet_core::CoinType coin) const;
@@ -1242,6 +1245,16 @@ org$defi_wallet_core$cxxbridge1$Wallet$operator$alignof() noexcept;
     ::rust::String *password,
     ::org::defi_wallet_core::MnemonicWordCount word_count,
     ::rust::Box<::org::defi_wallet_core::Wallet> *return$) noexcept;
+
+::rust::repr::PtrLen
+org$defi_wallet_core$cxxbridge1$Wallet$get_backup_mnemonic_phrase(
+    const ::org::defi_wallet_core::Wallet &self,
+    ::rust::String *return$) noexcept;
+
+::rust::repr::PtrLen org$defi_wallet_core$cxxbridge1$generate_mnemonics(
+    ::rust::String *password,
+    ::org::defi_wallet_core::MnemonicWordCount word_count,
+    ::rust::String *return$) noexcept;
 
 ::rust::repr::PtrLen org$defi_wallet_core$cxxbridge1$restore_wallet(
     ::rust::String *mnemonic, ::rust::String *password,
@@ -1521,6 +1534,31 @@ new_wallet(::rust::String password,
   ::rust::MaybeUninit<::rust::Box<::org::defi_wallet_core::Wallet>> return$;
   ::rust::repr::PtrLen error$ = org$defi_wallet_core$cxxbridge1$new_wallet(
       &password, word_count, &return$.value);
+  if (error$.ptr) {
+    throw ::rust::impl<::rust::Error>::error(error$);
+  }
+  return ::std::move(return$.value);
+}
+
+::rust::String Wallet::get_backup_mnemonic_phrase() const {
+  ::rust::MaybeUninit<::rust::String> return$;
+  ::rust::repr::PtrLen error$ =
+      org$defi_wallet_core$cxxbridge1$Wallet$get_backup_mnemonic_phrase(
+          *this, &return$.value);
+  if (error$.ptr) {
+    throw ::rust::impl<::rust::Error>::error(error$);
+  }
+  return ::std::move(return$.value);
+}
+
+/// generate mnemonics
+::rust::String
+generate_mnemonics(::rust::String password,
+                   ::org::defi_wallet_core::MnemonicWordCount word_count) {
+  ::rust::MaybeUninit<::rust::String> return$;
+  ::rust::repr::PtrLen error$ =
+      org$defi_wallet_core$cxxbridge1$generate_mnemonics(&password, word_count,
+                                                         &return$.value);
   if (error$.ptr) {
     throw ::rust::impl<::rust::Error>::error(error$);
   }
