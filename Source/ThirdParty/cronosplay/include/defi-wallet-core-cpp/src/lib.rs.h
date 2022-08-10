@@ -1024,6 +1024,9 @@ private:
 #ifndef CXXBRIDGE1_STRUCT_org$defi_wallet_core$Wallet
 #define CXXBRIDGE1_STRUCT_org$defi_wallet_core$Wallet
 struct Wallet final : public ::rust::Opaque {
+  /// get backup mnemonic phrase
+  ::rust::String get_backup_mnemonic_phrase() const;
+
   /// returns the default address of the wallet
   ::rust::String
   get_default_address(::org::defi_wallet_core::CoinType coin) const;
@@ -1129,6 +1132,11 @@ get_msg_signed_tx(::org::defi_wallet_core::CosmosSDKTxInfoRaw tx_info,
 ::rust::Box<::org::defi_wallet_core::Wallet>
 new_wallet(::rust::String password,
            ::org::defi_wallet_core::MnemonicWordCount word_count);
+
+/// generate mnemonics
+::rust::String
+generate_mnemonics(::rust::String password,
+                   ::org::defi_wallet_core::MnemonicWordCount word_count);
 
 /// recovers/imports HD wallet from a BIP39 backup phrase (English words) and
 /// password
