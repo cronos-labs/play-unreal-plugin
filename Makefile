@@ -35,5 +35,5 @@ endif
 uncompress:
 	cd install/mac && tar xvf play_cpp_sdk_Darwin_x86_64.tar.gz
 	cd install/windows && unzip play_cpp_sdk_Windows_x86_64.zip
-	cp install/mac/sdk/lib/* ./Source/ThirdParty/cronosplay/lib/Mac
-	cp install/windows/sdk/lib/* ./Source/ThirdParty/cronosplay/lib/Win64
+	cp install/mac/sdk/lib/libplay_cpp_sdk.a ./Source/ThirdParty/cronosplay/lib/Mac
+	cp install/windows/sdk/lib/play_cpp_sdk.lib ./Source/ThirdParty/cronosplay/lib/Win64
