@@ -8,9 +8,9 @@
 #include "CronosPlayUnreal.h"
 #include "PlayCppSdkDownloader.h"
 #include "Runtime/Launch/Resources/Version.h"
-#include "cronosplay/include/extra-cpp-bindings/src/lib.rs.h"
-#include "cronosplay/include/rust/cxx.h"
-#include "qrcodegen.hpp"
+#include "PlayCppSdkLibrary/Include/extra-cpp-bindings/src/lib.rs.h"
+#include "PlayCppSdkLibrary/Include/rust/cxx.h"
+#include "PlayQrcodeLibrary/Include/qrcodegen.hpp"
 using namespace std;
 using namespace com::crypto::game_sdk;
 using namespace rust;
