@@ -1,5 +1,9 @@
 # Changelog
 
+## [v0.0.6-alpha] - 2022-08-17
+- Use QRCODE in play-cpp-sdk
+- Support Linux
+
 ## [v0.0.4-alpha] - 2022-08-11
 - Follow epic game marketplace guideline
 - Add get-backup-mnemonics, generate-mnemonics

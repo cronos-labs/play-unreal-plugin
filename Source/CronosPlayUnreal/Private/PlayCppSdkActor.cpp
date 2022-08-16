@@ -2,8 +2,8 @@
 
 #include "PlayCppSdkActor.h"
 
-#include "cronosplay/include/extra-cpp-bindings/src/lib.rs.h"
-#include "cronosplay/include/rust/cxx.h"
+#include "PlayCppSdkLibrary/Include/extra-cpp-bindings/src/lib.rs.h"
+#include "PlayCppSdkLibrary/Include/rust/cxx.h"
 #include <iostream>
 #include <memory>
 using namespace std;

@@ -2,7 +2,7 @@
 
 #ifndef TxBuilder_hpp
 #define TxBuilder_hpp
-#include "cronosplay/include/defi-wallet-core-cpp/src/lib.rs.h"
+#include "PlayCppSdkLibrary/Include/defi-wallet-core-cpp/src/lib.rs.h"
 #include <stdio.h>
 
 class TxBuilder {

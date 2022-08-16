@@ -854,6 +854,7 @@ namespace game_sdk {
 using WalletConnectCallback = ::com::crypto::game_sdk::WalletConnectCallback;
 using WalletConnectSessionInfo =
     ::com::crypto::game_sdk::WalletConnectSessionInfo;
+struct WalletQrcode;
 struct WalletConnectTxLegacy;
 struct WalletConnectAddress;
 struct WalletConnectEnsureSessionResult;
@@ -871,6 +872,17 @@ using OptionalArguments = ::com::crypto::game_sdk::OptionalArguments;
 namespace com {
 namespace crypto {
 namespace game_sdk {
+#ifndef CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletQrcode
+#define CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletQrcode
+struct WalletQrcode final {
+  ::rust::String qrcode;
+  ::rust::Vec<::std::uint8_t> image;
+  ::std::uint32_t size;
+
+  using IsRelocatable = ::std::true_type;
+};
+#endif // CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletQrcode
+
 #ifndef CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectTxLegacy
 #define CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectTxLegacy
 /// wallet connect cronos(eth) legacy-tx signing info
@@ -1054,6 +1066,9 @@ private:
   };
 };
 #endif // CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletconnectClient
+
+::com::crypto::game_sdk::WalletQrcode
+generate_qrcode(::rust::String qrcodestring);
 
 /// restore walletconnect-session from string
 ::rust::Box<::com::crypto::game_sdk::WalletconnectClient>

@@ -938,6 +938,7 @@ namespace game_sdk {
 using WalletConnectCallback = ::com::crypto::game_sdk::WalletConnectCallback;
 using WalletConnectSessionInfo =
     ::com::crypto::game_sdk::WalletConnectSessionInfo;
+struct WalletQrcode;
 struct WalletConnectTxLegacy;
 struct WalletConnectAddress;
 struct WalletConnectEnsureSessionResult;
@@ -955,6 +956,17 @@ using OptionalArguments = ::com::crypto::game_sdk::OptionalArguments;
 namespace com {
 namespace crypto {
 namespace game_sdk {
+#ifndef CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletQrcode
+#define CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletQrcode
+struct WalletQrcode final {
+  ::rust::String qrcode;
+  ::rust::Vec<::std::uint8_t> image;
+  ::std::uint32_t size;
+
+  using IsRelocatable = ::std::true_type;
+};
+#endif // CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletQrcode
+
 #ifndef CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectTxLegacy
 #define CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectTxLegacy
 /// wallet connect cronos(eth) legacy-tx signing info
@@ -1285,6 +1297,10 @@ bool com$crypto$game_sdk$cxxbridge1$RawTokenResult$operator$eq(
     const RawTokenResult &, const RawTokenResult &) noexcept;
 bool com$crypto$game_sdk$cxxbridge1$TokenHolderDetail$operator$eq(
     const TokenHolderDetail &, const TokenHolderDetail &) noexcept;
+
+::rust::repr::PtrLen com$crypto$game_sdk$cxxbridge1$generate_qrcode(
+    ::rust::String *qrcodestring,
+    ::com::crypto::game_sdk::WalletQrcode *return$) noexcept;
 ::std::size_t
 com$crypto$game_sdk$cxxbridge1$WalletconnectClient$operator$sizeof() noexcept;
 ::std::size_t
@@ -1472,6 +1488,17 @@ bool TokenHolderDetail::operator==(
 bool TokenHolderDetail::operator!=(
     const TokenHolderDetail &rhs) const noexcept {
   return !(*this == rhs);
+}
+
+::com::crypto::game_sdk::WalletQrcode
+generate_qrcode(::rust::String qrcodestring) {
+  ::rust::MaybeUninit<::com::crypto::game_sdk::WalletQrcode> return$;
+  ::rust::repr::PtrLen error$ = com$crypto$game_sdk$cxxbridge1$generate_qrcode(
+      &qrcodestring, &return$.value);
+  if (error$.ptr) {
+    throw ::rust::impl<::rust::Error>::error(error$);
+  }
+  return ::std::move(return$.value);
 }
 
 ::std::size_t WalletconnectClient::layout::size() noexcept {
