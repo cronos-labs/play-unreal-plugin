@@ -14,6 +14,9 @@ public class CronosPlayUnreal : ModuleRules {
   }
 
   public CronosPlayUnreal(ReadOnlyTargetRules Target) : base(Target) {
+    bEnableExceptions = true;
+
+
     PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
     CppStandard = CppStandardVersion.Cpp17;
 
@@ -52,6 +55,9 @@ public class CronosPlayUnreal : ModuleRules {
     } else if (UnrealTargetPlatform.Mac == Target.Platform) {
       PublicAdditionalLibraries.Add(Path.Combine(
           LibrariesPath, "cronosplay", "lib", "Mac", "libplay_cpp_sdk.a"));
+    } else if (UnrealTargetPlatform.Linux == Target.Platform) {
+      PublicAdditionalLibraries.Add(Path.Combine(
+          LibrariesPath, "cronosplay", "lib", "Linux", "libplay_cpp_sdk.a"));
     }
   }
 }
