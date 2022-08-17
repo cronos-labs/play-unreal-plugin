@@ -1,12 +1,12 @@
-set PLAYCPPSDK=v0.0.3-alpha
+set PLAYCPPSDK=v0.0.6-alpha
 set WINDOWSSRC=https://github.com/cronos-labs/play-cpp-sdk/releases/download/%PLAYCPPSDK%/play_cpp_sdk_Windows_x86_64.zip
-set WINDOWSHASH="9ad8bedaaa96e8a5898126d40da527a4180b8c7cfe8ab7a2d6d01445ad476efd play_cpp_sdk_Windows_x86_64.zip"
+set WINDOWSHASH="56797bc1f67ea4e00a0cffcc8fe048b58703fd913d44ec81a68402f238e363f8 play_cpp_sdk_Windows_x86_64.zip"
 
 rmdir install\windows\ /s /q
-rmdir Source\ThirdParty\cronosplay\lib\Win64\ /s /q
+rmdir Source\ThirdParty\PlayCppSdkLibrary\Lib\Win64\ /s /q
 
 mkdir -p install\windows
-mkdir -p Source\ThirdParty\cronosplay\lib\Win64
+mkdir -p Source\ThirdParty\PlayCppSdkLibrary\Lib\Win64
 
 cd install\windows
 powershell -Command "Invoke-WebRequest %WINDOWSSRC% -OutFile play_cpp_sdk_Windows_x86_64.zip"

@@ -8,9 +8,8 @@
 #include "CronosPlayUnreal.h"
 #include "PlayCppSdkDownloader.h"
 #include "Runtime/Launch/Resources/Version.h"
-#include "cronosplay/include/extra-cpp-bindings/src/lib.rs.h"
-#include "cronosplay/include/rust/cxx.h"
-#include "qrcodegen.hpp"
+#include "PlayCppSdkLibrary/Include/extra-cpp-bindings/src/lib.rs.h"
+#include "PlayCppSdkLibrary/Include/rust/cxx.h"
 using namespace std;
 using namespace com::crypto::game_sdk;
 using namespace rust;
@@ -169,29 +168,37 @@ FTexturePlatformData *GetTexturePlatformData(UTexture2D *Texture) {
 }
 
 UTexture2D *UPlayCppSdkBPLibrary::GenerateQrCode(FString string) {
-  qrcodegen::QrCode qr = qrcodegen::QrCode::encodeText(
-      TCHAR_TO_UTF8(*string), qrcodegen::QrCode::Ecc::LOW);
-  uint8 size = qr.getSize();
-  TArray<FColor> pixels;
-  pixels.SetNumZeroed(size * size);
-  FColor black = FColor::Black;
-  FColor white = FColor::White;
-  for (uint8 x = 0; x < size; x++) {
-    for (uint8 y = 0; y < size; y++) {
-      FColor color = qr.getModule(x, y) ? white : black;
-      pixels[x + y * size] = color;
-    }
-  }
+  try {
+    ::com::crypto::game_sdk::WalletQrcode qr =
+        generate_qrcode(TCHAR_TO_UTF8(*string));
+    uint8 size = qr.size;
+    TArray<FColor> pixels;
+    pixels.SetNumZeroed(size * size);
+    FColor black = FColor::Black;
+    FColor white = FColor::White;
+    for (uint8 y = 0; y < size; y++)
+      for (uint8 x = 0; x < size; x++) {
+        {
+          int index = x + y * size;
+          pixels[index] = qr.image[index] ? white : black;
+        }
+      }
 
-  UTexture2D *texture = UTexture2D::CreateTransient(
-      size, size, EPixelFormat::PF_B8G8R8A8, "QRCode");
-  void *data =
-      GetTexturePlatformData(texture)->Mips[0].BulkData.Lock(LOCK_READ_WRITE);
-  FMemory::Memcpy(data, pixels.GetData(), size * size * 4);
-  GetTexturePlatformData(texture)->Mips[0].BulkData.Unlock();
-  texture->UpdateResource();
-  texture->Filter = TextureFilter::TF_Nearest;
-  return texture;
+    UTexture2D *texture = UTexture2D::CreateTransient(
+        size, size, EPixelFormat::PF_B8G8R8A8, "QRCode");
+    void *data =
+        GetTexturePlatformData(texture)->Mips[0].BulkData.Lock(LOCK_READ_WRITE);
+    FMemory::Memcpy(data, pixels.GetData(), size * size * 4);
+    GetTexturePlatformData(texture)->Mips[0].BulkData.Unlock();
+    texture->UpdateResource();
+    texture->Filter = TextureFilter::TF_Nearest;
+    return texture;
+
+  } catch (const rust::cxxbridge1::Error &e) {
+    UE_LOG(LogTemp, Error, TEXT("PlayCppSdk GenerateQrCode Error: %s"),
+           UTF8_TO_TCHAR(e.what()));
+    return nullptr;
+  }
 }
 
 UPlayCppSdkBPLibrary::UPlayCppSdkBPLibrary(

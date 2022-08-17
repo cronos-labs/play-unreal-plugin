@@ -7,8 +7,8 @@
 #include <sstream>
 
 #include "TxBuilder.h"
-#include "cronosplay/include/defi-wallet-core-cpp/src/lib.rs.h"
-#include "cronosplay/include/rust/cxx.h"
+#include "PlayCppSdkLibrary/Include/defi-wallet-core-cpp/src/lib.rs.h"
+#include "PlayCppSdkLibrary/Include/rust/cxx.h"
 using namespace std;
 using namespace org::defi_wallet_core;
 string to_hex(const unsigned char *data, int len);
