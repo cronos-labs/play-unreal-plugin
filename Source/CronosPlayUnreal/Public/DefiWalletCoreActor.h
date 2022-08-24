@@ -409,9 +409,9 @@ public:
    * @param walletIndex wallet index which starts from 0
    * @param fromaddress sender address
    * @param toaddress receiver address
-   * @param amount amount to send in base format
-   * @param gasLimit gas limit
-   * @param gasPrice gas price, fee= gasLiimit * gasPrice
+   * @param amount amount in eth decimal, eg. 0.1 means 0.1 eth
+   * @param gasLimit gas limit, fee= gasLimit * gasPrice
+   * @param gasPrice gas price in wei, eg. 1wei= 1/(10^18)eth  1wei=1/(10^9)gwei
    * @param success whether succeed or not
    * @param message error message, "" if succeed
    * @return signed transaction as bytes
@@ -430,9 +430,9 @@ public:
    * @param walletIndex wallet index which starts from 0
    * @param fromaddress sender address
    * @param toaddress receiver address
-   * @param amount amount to send in base format
-   * @param gasLimit gas limit
-   * @param gasPrice gas price, fee= gasLiimit * gasPrice
+   * @param amount amount in eth decimal, eg. 0.1 means 0.1 eth
+   * @param gasLimit gas limit, fee= gasLimit * gasPrice
+   * @param gasPrice gas price in wei, eg. 1wei= 1/(10^18)eth  1wei=1/(10^9)gwei
    * @param output transaction hash
    * @param success whether succeed or not
    * @param message error message, "" if succeed
