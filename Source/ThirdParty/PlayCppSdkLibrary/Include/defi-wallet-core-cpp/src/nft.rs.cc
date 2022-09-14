@@ -1,5 +1,5 @@
-#include "lib.rs.h"
 #include "../../nft.h"
+#include "lib.rs.h"
 #include <algorithm>
 #include <array>
 #include <cassert>

@@ -1,6 +1,5 @@
-#include "../../walletconnectcallback.h"
-#include "../../walletconnectcallback.h"
 #include "../../pay.h"
+#include "../../walletconnectcallback.h"
 #include <algorithm>
 #include <array>
 #include <cassert>
@@ -1112,7 +1111,7 @@ enum class QueryOption : ::std::uint8_t {
 /// WallnetConnect API
 struct WalletconnectClient final : public ::rust::Opaque {
   /// setup callback
-  void setup_callback(
+  void setup_callback_blocking(
       ::std::unique_ptr<::com::crypto::game_sdk::WalletConnectCallback>
           usercallback);
 
@@ -1319,7 +1318,7 @@ com$crypto$game_sdk$cxxbridge1$walletconnect_restore_client(
         *return$) noexcept;
 
 ::rust::repr::PtrLen
-com$crypto$game_sdk$cxxbridge1$WalletconnectClient$setup_callback(
+com$crypto$game_sdk$cxxbridge1$WalletconnectClient$setup_callback_blocking(
     ::com::crypto::game_sdk::WalletconnectClient &self,
     ::com::crypto::game_sdk::WalletConnectCallback *usercallback) noexcept;
 
@@ -1541,11 +1540,11 @@ walletconnect_new_client(::rust::String description, ::rust::String url,
   return ::std::move(return$.value);
 }
 
-void WalletconnectClient::setup_callback(
+void WalletconnectClient::setup_callback_blocking(
     ::std::unique_ptr<::com::crypto::game_sdk::WalletConnectCallback>
         usercallback) {
   ::rust::repr::PtrLen error$ =
-      com$crypto$game_sdk$cxxbridge1$WalletconnectClient$setup_callback(
+      com$crypto$game_sdk$cxxbridge1$WalletconnectClient$setup_callback_blocking(
           *this, usercallback.release());
   if (error$.ptr) {
     throw ::rust::impl<::rust::Error>::error(error$);

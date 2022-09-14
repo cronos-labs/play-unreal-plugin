@@ -192,7 +192,7 @@ void APlayCppSdkActor::SetupCallback(
 
     WalletConnectCallback *usercallbackraw = new UserWalletConnectCallback();
     std::unique_ptr<WalletConnectCallback> usercallback(usercallbackraw);
-    _coreClient->setup_callback(std::move(usercallback));
+    _coreClient->setup_callback_blocking(std::move(usercallback));
 
     success = true;
   } catch (const rust::cxxbridge1::Error &e) {
