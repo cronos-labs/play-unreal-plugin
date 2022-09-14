@@ -27,7 +27,7 @@ public class PlayCppSdkLibrary : ModuleRules {
 
     PublicIncludePaths.Add(IncludePath);
 
-    if (UnrealTargetPlatform.Win64 == Target.Platform) {
+    if (Target.Platform == UnrealTargetPlatform.Win64) {
       PublicAdditionalLibraries.Add(
           Path.Combine(LibrariesPath, "Win64", "play_cpp_sdk.lib"));
 
@@ -39,12 +39,19 @@ public class PlayCppSdkLibrary : ModuleRules {
       PublicAdditionalLibraries.Add("crypt32.lib");
       PublicAdditionalLibraries.Add("ws2_32.lib");
 
-    } else if (UnrealTargetPlatform.Mac == Target.Platform) {
+    } else if (Target.Platform == UnrealTargetPlatform.Mac) {
       PublicAdditionalLibraries.Add(
           Path.Combine(LibrariesPath, "Mac", "libplay_cpp_sdk.a"));
-    } else if (UnrealTargetPlatform.Linux == Target.Platform) {
+    } else if (Target.Platform == UnrealTargetPlatform.Linux) {
       PublicAdditionalLibraries.Add(
           Path.Combine(LibrariesPath, "Linux", "libplay_cpp_sdk.a"));
+    } else if (Target.Platform == UnrealTargetPlatform.Android) {
+      PublicAdditionalLibraries.Add(
+          Path.Combine(LibrariesPath, "Android", "arm64-v8a", "libplay_cpp_sdk.a"));
+      PublicAdditionalLibraries.Add(
+          Path.Combine(LibrariesPath, "Android", "armeabi-v7a", "libplay_cpp_sdk.a"));
+      PublicAdditionalLibraries.Add(
+          Path.Combine(LibrariesPath, "Android", "x86_64", "libplay_cpp_sdk.a"));
     }
   }
 }

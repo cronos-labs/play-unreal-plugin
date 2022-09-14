@@ -1,7 +1,6 @@
 #pragma once
-#include "../../walletconnectcallback.h"
-#include "../../walletconnectcallback.h"
 #include "../../pay.h"
+#include "../../walletconnectcallback.h"
 #include <algorithm>
 #include <array>
 #include <cassert>
@@ -1028,7 +1027,7 @@ enum class QueryOption : ::std::uint8_t {
 /// WallnetConnect API
 struct WalletconnectClient final : public ::rust::Opaque {
   /// setup callback
-  void setup_callback(
+  void setup_callback_blocking(
       ::std::unique_ptr<::com::crypto::game_sdk::WalletConnectCallback>
           usercallback);
 
