@@ -1,5 +1,11 @@
 # Changelog
 
+## [v0.0.7-alpha] - 2022-09-16
+- Remove Blueprints Assets
+- Support Android (arm64-v8a, armeabi-v7a, and x86_64)
+- add erc20,721,1155 async api (transfer, approve)
+- add sendEthAmountAsync
+
 ## [v0.0.6-alpha] - 2022-08-17
 - Use QRCODE in play-cpp-sdk
 - Support Linux
