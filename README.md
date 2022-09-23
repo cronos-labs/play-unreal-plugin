@@ -1,52 +1,29 @@
-# Cronos Play for Unreal Engine
-Cronos Play for Unreal Engine is a plugin for Unreal Engine that allows interacting with
-blockchain networks in a self-custodial way.
-
-![Icon128.png](./Resources/Icon128.png)
-
-## Security Warning
-
-No security audits of this project have ever been performed yet.
-
-The project is still in development and is *alpha* quality.
-
-USE AT YOUR OWN RISK!
+# Cronos Play Unreal SDK Demo
+This repository contains a sample project that uses the Cronos Play Unreal SDK plugin.
+For more information, please see the [Cronos Play Unreal SDK plugin repository](https://github.com/crypto-com/play-unreal-plugin).
 
 ## Pre-requisites
-- Unreal Engine 4.27 and 5.0 are supported, i.e. one of them should be installed via the Epic
-  Games Launcher.
-- Windows: Visual Studio 2019 or newer
-- MacOS: Xcode 13.2.1
+Windows: Visual Studo 2019 or later
+Mac: XCODE 13.2.1
+Android: NDK 21.4.7075529
+Unreal Engine: 4.27 or 5.x
 
-## Building
+## Pre-built Release
+Download the release zip file in [Release](https://github.com/cronos-labs/play-unreal-demo/releases) page.
 
-### Step 1: Download the release zip file in [Release](https://github.com/cronos-labs/play-unreal-plugin/releases) page
-Skip this step if you prefer building from source.
+### `CronosPlayDemo.zip`
+- Assets: `./Content/CronosPlayUnreal/Blueprint`
+- `CronosPlayUnreal` Plugin: `./Plugins/play-unreal-plugin`
 
-### Step 2:  Install [play-cpp-sdk](https://github.com/cronos-labs/play-cpp-sdk)
-Skip this step if you prefer building from the release zip file.
+### `CronosPlayAssetPack.zip`
+- Assets: Blueprints, widgets etc
 
-- Step 2a: Clone this project
-- Step 2b: run `make` (mac) or run `install-play-cpp-sdk.bat` (windows) to setup [play-cpp-sdk](https://github.com/cronos-labs/play-cpp-sdk).
+## Setup Manually
+If you prefer configuring the project manually:
+1. Clone this project
+2. Under the project root and run `make` to setup `CronosPlayUnreal` plugin
+3. open `CronosPlayUnrealDemo.uproject`
+4. For android, you need to setup the key for signing, please check [here](https://docs.unrealengine.com/4.27/en-US/SharingAndReleasing/Mobile/Android/DistributionSigning/).
 
-### Step 3: Run RunUAT.bat[or RunUAT.sh] script to build the plugin
-``` bash
-Engine\Build\BatchFiles\RunUAT.bat[or RunUAT.sh] BuildPlugin -Plugin=[Path to .uplugin file, must be outside engine directory] -Package=[Output directory] -Rocket
-```
-
-### Windows
-Make sure you use Visual Studio 2019 or newer.
-
-If any compiling errors occur, try to disable 4583 and 4582 warnings with the following lines:
-```c++
-#pragma warning(disable:4583)
-#pragma warning(disable:4582)
-```
-
-###  macOS
-Make sure you use Xcode 13.2.1 (Xcode 13.3 or newer has unused variables errors when compiling
-the unreal source codes, until the issue is fixed by Epic Games).
-
-## More information about Cronos Play
-If you are a game developer, please visit [Cronos Play](https://cronos.org/play) or fill this
-[Contact Form](https://airtable.com/shrFiQnLrcpeBp2lS) for more information.
+### More information for Cronos Play
+If you are a game developer, please visit [Cronos Play](https://cronos.org/play) or fill this [Contact Form](https://airtable.com/shrFiQnLrcpeBp2lS) for more information.

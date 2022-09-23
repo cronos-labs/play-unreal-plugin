@@ -39,13 +39,11 @@ jobs:
       with:
         name: play-unreal-plugin
         path: /home/ue4/play-unreal-plugin
-
     - name: Install play-cpp-sdk
-      working-directory: /home/ue4/play-unreal-plugin
+      working-directory: /home/ue4/play-unreal-plugin/Plugins/play-unreal-plugin
       run: make
-
     - name: Build Plugin
-      working-directory: /home/ue4/play-unreal-plugin
+      working-directory: /home/ue4/play-unreal-plugin/Plugins/play-unreal-plugin
       env:
         HOME: /home/ue4
       run: make RunUAT

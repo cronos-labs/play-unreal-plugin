@@ -1,13 +1,3 @@
-Cronos Play Unreal SDK
-Copyright 2022, Cronos Labs. 
-
-This project contains portions of code derived from the following library:
-
-* QR Code generator library (C++)
- * Copyright: Copyright (c) 2022 Project Nayuki
- * License: MIT
- * Repository: https://github.com/nayuki/QR-Code-generator
-
 Cronos Play Unreal SDK uses Unreal® Engine.
 Unreal® is a trademark or registered trademark of Epic Games, Inc.
 in the United States of America and elsewhere.

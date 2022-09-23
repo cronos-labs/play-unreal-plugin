@@ -27,7 +27,10 @@ jobs:
       - name: Package For Windows,Mac
         run: |
           FILENAME="CronosPlayForUnrealEngine.zip"
+          cd Plugins/play-unreal-plugin
           zip -r ${FILENAME} Source Resources CronosPlayUnreal.uplugin
+          mv ${FILENAME} ../..
+          cd ../..
           sha256sum ${FILENAME} > "checksums.txt"
           echo "release_file=${FILENAME}" >> $GITHUB_ENV
           echo "checksum_file=checksums.txt" >> $GITHUB_ENV
