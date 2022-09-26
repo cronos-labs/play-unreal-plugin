@@ -204,7 +204,7 @@ class CRONOSPLAYUNREAL_API ADefiWalletCoreActor : public AActor {
   GENERATED_BODY()
 public:
   /**
-   * Restore wallet with mnemnonics.
+   * Restore wallet with mnemonics.
    * @param mnemonics mnemonics. to restore
    * @param password  salt in mnemonics restoration
    * @param output generated address (index=0)
@@ -218,7 +218,7 @@ public:
                         bool &success, FString &output_message);
 
   /**
-   * Restore wallet with mnemnonics.
+   * Restore wallet with mnemonics.
    * @param password  salt in mnemonics restoration
    * @param wordcount  mnemonics word count (12, 18, 24)
    * @param output generated address (index=0)
@@ -248,9 +248,9 @@ public:
                                FString &output_message);
 
   /**
-   * Restore wallet with mnemnonics.
-   * @param password  salt in mnemonics restoration
-   * @param wordcount  mnemonics word count (12, 18, 24)
+   * Generate mnemonics.
+   * @param password salt in mnemonics restoration
+   * @param wordcount mnemonics word count (12, 18, 24)
    * @param output generated mnemonics
    * @param success whether succeed or not
    * @param message error message, "" if succeed
@@ -296,7 +296,7 @@ public:
                   FString &output_message);
 
   /**
-   *    Cosmos get balance.
+   * Cosmos get balance.
    * @param success whether succeed or not
    * @param message error message, "" if succeed
    */
@@ -338,7 +338,7 @@ public:
                    FString &output_message);
 
   /**
-   * Cos get nft collection.
+   * Cosmos get nft collection.
    * @param mygrpc grpc url http://127.0.0.1:9090
    * @param denomid denom id
    * @param output cosmos nft collection
@@ -477,6 +477,9 @@ public:
                      FString gasPriceInWei, TArray<uint8> txdata,
                      FString &output, bool &success, FString &output_message);
 
+  /*
+   * TODO MISSING DOCS
+   * */
   UFUNCTION(BlueprintCallable,
             meta = (DisplayName = "SendEthAmountAsync", Keywords = "Wallet"),
             Category = "CronosPlayUnreal")
@@ -566,7 +569,7 @@ public:
    * @param message error message, "" if succeed
    */
   UFUNCTION(BlueprintCallable,
-            meta = (DisplayName = "Erc1155Balance", Keywords = "Wallet"),
+            meta = (DisplayName = "Erc1155BalanceOfBatch", Keywords = "Wallet"),
             Category = "CronosPlayUnreal")
   void Erc1155BalanceOfBatch(FString contractAddress,
                              TArray<FString> accountAddresses,
@@ -603,7 +606,7 @@ public:
   /**
    * Get erc-20 decimals\
    * @param contractAddress erc20 contract address
-   * @param decimals  get decimals
+   * @param decimals get decimals
    * @param success whether succeed or not
    * @param message error message, "" if succeed
    */
@@ -614,9 +617,9 @@ public:
                      FString &output_message);
 
   /**
-   * Get erc-20 total suppy
+   * Get erc-20 total supply
    * @param contractAddress erc20 contract address
-   * @param totalSuppy get total supply
+   * @param totalSupply get total supply
    * @param success whether succeed or not
    * @param message error message, "" if succeed
    */
@@ -730,7 +733,7 @@ public:
    * contract. Use along with totalSupply to enumerate all tokens.
    * @param contractAddress erc 721 contract address
    * @param erc721index which index
-   * @param token  a token ID at a given index
+   * @param token a token ID at a given index
    * @param success whether succeed or not
    * @param message error message, "" if succeed
    */
@@ -747,7 +750,7 @@ public:
    * @param contractAddress erc 721 contract address
    * @param erc721owner owner
    * @param erc721index which index
-   * @param token  a token ID at a given index
+   * @param token a token ID at a given index
    * @param success whether succeed or not
    * @param message error message, "" if succeed
    */
@@ -812,7 +815,7 @@ public:
    * allowance mechanism.
    * @param contractAddress erc20 contract
    * @param walletindex which index to use?
-   * @param fromAddress  from address to move
+   * @param fromAddress from address to move
    * @param toAddress to address
    * @param amount amount
    * @param result receipt
@@ -831,7 +834,7 @@ public:
    * times, up to the `amount` amount.
    * @param contractAddress erc20 contract
    * @param walletindex which index to use?
-   * @param approvedAddress  address to approve
+   * @param approvedAddress address to approve
    * @param result receipt
    *
    */
@@ -861,7 +864,7 @@ public:
    * allowance mechanism.
    * @param contractAddress erc20 contract
    * @param walletindex which index to use?
-   * @param fromAddress  from address to move
+   * @param fromAddress from address to move
    * @param toAddress to address
    * @param tokenid token id
    * @param result receipt
@@ -879,7 +882,7 @@ public:
    * Safely transfers `token_id` token from `from_address` to `to_address`.
    * @param contractAddress erc20 contract
    * @param walletindex which index to use?
-   * @param fromAddress  from address to move
+   * @param fromAddress from address to move
    * @param toAddress to address
    * @param tokenid token id
    * @param result receipt
@@ -899,7 +902,7 @@ public:
    * `additional_data`.
    * @param contractAddress erc20 contract
    * @param walletindex which index to use?
-   * @param fromAddress  from address to move
+   * @param fromAddress from address to move
    * @param toAddress to address
    * @param tokenid token id
    * @param result receipt
@@ -938,7 +941,7 @@ public:
    * allowance mechanism.
    * @param contractAddress erc20 contract
    * @param walletindex which index to use?
-   * @param fromAddress  from address to move
+   * @param fromAddress from address to move
    * @param toAddress to address
    * @param tokenid token id
    * @param amount  amount
@@ -961,7 +964,7 @@ public:
    * Batched version of safeTransferFrom.
    * @param contractAddress erc20 contract
    * @param walletindex which index to use?
-   * @param fromAddress  from address to move
+   * @param fromAddress from address to move
    * @param toAddress to address
    * @param tokenids token ids
    * @param amounts amounts
@@ -986,7 +989,7 @@ public:
    * times, up to the `amount` amount.
    * @param contractAddress erc20 contract
    * @param walletindex which index to use?
-   * @param approvedAddress  address to approve
+   * @param approvedAddress address to approve
    * @param approved approved or not
    * @param result receipt
    *
