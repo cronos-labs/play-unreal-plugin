@@ -122,7 +122,7 @@ public:
                                   FString &output_message);
 
   /**
-   * crono-scan api, get ercu721 transaction history
+   * crono-scan api, get erc721 transaction history
    *  returns the ERC721 transfers of a given address of a given contract.
    * (address can be empty if option is ByContract)
    * default option is by address
@@ -176,7 +176,7 @@ public:
   * (ref: https://cronos.org/explorer/testnet3/api-docs)
   * NOTE: QueryOption::ByContract is not supported by BlockScout
   * @param blockscoutBaseUrl the base url of the BlockScout API
-  * @param address  the account address to query
+  * @param address the account address to query
   * @param contractAddress the contract address to query
   * @param option the query option
   * @param output the output of the query
