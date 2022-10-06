@@ -862,7 +862,7 @@ public:
   /**
    * erc721 Moves `amount` tokens from `from_address` to `to_address` using the
    * allowance mechanism.
-   * @param contractAddress erc20 contract
+   * @param contractAddress erc721 contract
    * @param walletindex wallet index which starts from 0
    * @param fromAddress from address to move
    * @param toAddress to address
@@ -878,7 +878,7 @@ public:
 
   /**
    * Safely transfers `token_id` token from `from_address` to `to_address`.
-   * @param contractAddress erc20 contract
+   * @param contractAddress erc721 contract
    * @param walletindex wallet index which starts from 0
    * @param fromAddress from address to move
    * @param toAddress to address
@@ -896,7 +896,7 @@ public:
   /**
    * Safely transfers `token_id` token from `from_address` to `to_address` with
    * `additional_data`.
-   * @param contractAddress erc20 contract
+   * @param contractAddress erc721 contract
    * @param walletindex wallet index which starts from 0
    * @param fromAddress from address to move
    * @param toAddress to address
@@ -916,7 +916,7 @@ public:
   /**
    * erc721 Allows `approved_address` to withdraw from your account multiple
    * times, up to the `amount` amount.
-   * @param contractAddress erc20 contract
+   * @param contractAddress erc721 contract
    * @param walletindex wallet index which starts from 0
    * @param approvedAddress  address to approve
    * @param tokenid token id
