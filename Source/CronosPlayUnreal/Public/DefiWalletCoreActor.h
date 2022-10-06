@@ -204,9 +204,9 @@ class CRONOSPLAYUNREAL_API ADefiWalletCoreActor : public AActor {
   GENERATED_BODY()
 public:
   /**
-   * Restore wallet with mnemonics.
-   * @param mnemonics mnemonics. to restore
-   * @param password  salt in mnemonics restoration
+   * Restore wallet with mnemonics and password.
+   * @param mnemonics mnemonics to restore
+   * @param password salt in mnemonics restoration
    * @param output generated address (index=0)
    * @param success whether succeed or not
    * @param message error message, "" if succeed
@@ -218,9 +218,9 @@ public:
                         bool &success, FString &output_message);
 
   /**
-   * Restore wallet with mnemonics.
-   * @param password  salt in mnemonics restoration
-   * @param wordcount  mnemonics word count (12, 18, 24)
+   * Create a new wallet with password and wordcount.
+   * @param password salt in mnemonics restoration
+   * @param wordcount mnemonics word count (12, 18, 24)
    * @param output generated address (index=0)
    * @param success whether succeed or not
    * @param message error message, "" if succeed
@@ -266,9 +266,9 @@ public:
 
   /**
    * Cosmos send amount.
-   * @param walletIndex   address index which starts from 0
-   * @param fromaddress  sender address
-   * @param toaddress  receiver address
+   * @param walletIndex wallet index which starts from 0
+   * @param fromaddress sender address
+   * @param toaddress receiver address
    * @param amount amount to send
    * @param amountdenom   amount denom to send
    * @param output transaction hash
@@ -490,7 +490,7 @@ public:
 
   /**
    * Sign eth login
-   * @param walletIndex which wallet to use
+   * @param walletIndex wallet index which starts from 0
    * @param document document to sign
    * @param signature get signature
    * @param success whether succeed or not
@@ -604,7 +604,7 @@ public:
                    FString &output_message);
 
   /**
-   * Get erc-20 decimals\
+   * Get erc-20 decimals
    * @param contractAddress erc20 contract address
    * @param decimals get decimals
    * @param success whether succeed or not
@@ -764,7 +764,7 @@ public:
 
   /**
    * Get erc-1155 uri
-   * @param contractAddress erc 1155 contract address
+   * @param contractAddress erc1155 contract address
    * @param tokenID token ID
    * @param uri  get uri
    * @param success whether succeed or not
@@ -778,7 +778,7 @@ public:
 
   /**
    * Get erc-1155 IsApprovedForAll
-   * @param contractAddress erc721 contract address
+   * @param contractAddress erc1155 contract address
    * @param erc1155owner owner address
    * @param erc1155approvedaddress  approved address
    * @param result is approved for all
@@ -796,12 +796,10 @@ public:
   /**
    * erc20 Moves `amount` tokens from the caller’s account to `to_address`.
    * @param contractAddress erc20 contract
-   * @param walletindex which index to use?
+   * @param walletindex wallet index which starts from 0
    * @param toAddress to address
    * @param amount amount
-   * @param result receipt
-   * @param success whether succeed or not
-   * @param message error message, "" if succeed
+   * @param Out Erc20Transfer callback
    */
   UFUNCTION(BlueprintCallable,
             meta = (DisplayName = "Erc20Transfer", Keywords = "Wallet"),
@@ -814,13 +812,11 @@ public:
    * erc20 Moves `amount` tokens from `from_address` to `to_address` using the
    * allowance mechanism.
    * @param contractAddress erc20 contract
-   * @param walletindex which index to use?
+   * @param walletindex wallet index which starts from 0
    * @param fromAddress from address to move
    * @param toAddress to address
    * @param amount amount
-   * @param result receipt
-   * @param success whether succeed or not
-   * @param message error message, "" if succeed
+   * @param Out Erc20TransferFrom callback
    */
   UFUNCTION(BlueprintCallable,
             meta = (DisplayName = "Erc20TransferFrom", Keywords = "Wallet"),
@@ -833,9 +829,10 @@ public:
    * erc20 Allows `approved_address` to withdraw from your account multiple
    * times, up to the `amount` amount.
    * @param contractAddress erc20 contract
-   * @param walletindex which index to use?
+   * @param walletindex wallet index which starts from 0
    * @param approvedAddress address to approve
-   * @param result receipt
+   * @param amount amount
+   * @param Out Erc20Approve callback
    *
    */
   UFUNCTION(BlueprintCallable,
@@ -848,8 +845,11 @@ public:
   /**
    * Returns the amount of tokens in existence
    * @param contractAddress erc20 contract
-   * @param owner erc20 owner *@param spender erc20 spender *@param
+   * @param erc20owner erc20 owner
+   * @param erc20spender erc20 spender
    * @param result allowance
+   * @param success whether succeed or not
+   * @param message error message, "" if succeed
    */
 
   UFUNCTION(BlueprintCallable,
@@ -863,13 +863,11 @@ public:
    * erc721 Moves `amount` tokens from `from_address` to `to_address` using the
    * allowance mechanism.
    * @param contractAddress erc20 contract
-   * @param walletindex which index to use?
+   * @param walletindex wallet index which starts from 0
    * @param fromAddress from address to move
    * @param toAddress to address
    * @param tokenid token id
-   * @param result receipt
-   * @param success whether succeed or not
-   * @param message error message, "" if succeed
+   * @param Out Erc721TransferFrom callback
    */
   UFUNCTION(BlueprintCallable,
             meta = (DisplayName = "Erc721TransferFrom", Keywords = "Wallet"),
@@ -881,13 +879,11 @@ public:
   /**
    * Safely transfers `token_id` token from `from_address` to `to_address`.
    * @param contractAddress erc20 contract
-   * @param walletindex which index to use?
+   * @param walletindex wallet index which starts from 0
    * @param fromAddress from address to move
    * @param toAddress to address
    * @param tokenid token id
-   * @param result receipt
-   * @param success whether succeed or not
-   * @param message error message, "" if succeed
+   * @param Out Erc721SafeTransferFrom callback
    */
   UFUNCTION(BlueprintCallable,
             meta = (DisplayName = "Erc721SafeTransferFrom",
@@ -901,13 +897,11 @@ public:
    * Safely transfers `token_id` token from `from_address` to `to_address` with
    * `additional_data`.
    * @param contractAddress erc20 contract
-   * @param walletindex which index to use?
+   * @param walletindex wallet index which starts from 0
    * @param fromAddress from address to move
    * @param toAddress to address
    * @param tokenid token id
-   * @param result receipt
-   * @param success whether succeed or not
-   * @param message error message, "" if succeed
+   * @param Out Erc721SafeTransferFromWithData callback
    */
   UFUNCTION(BlueprintCallable,
             meta = (DisplayName = "Erc721SafeTransferFromWithData",
@@ -923,10 +917,10 @@ public:
    * erc721 Allows `approved_address` to withdraw from your account multiple
    * times, up to the `amount` amount.
    * @param contractAddress erc20 contract
-   * @param walletindex which index to use?
+   * @param walletindex wallet index which starts from 0
    * @param approvedAddress  address to approve
    * @param tokenid token id
-   * @param result receipt
+   * @param Out Erc721Approve callback
    *
    */
   UFUNCTION(BlueprintCallable,
@@ -939,16 +933,14 @@ public:
   /**
    * erc1155 Moves `amount` tokens from `from_address` to `to_address` using the
    * allowance mechanism.
-   * @param contractAddress erc20 contract
-   * @param walletindex which index to use?
+   * @param contractAddress erc1155 contract
+   * @param walletindex wallet index which starts from 0
    * @param fromAddress from address to move
    * @param toAddress to address
    * @param tokenid token id
-   * @param amount  amount
+   * @param amount amount
    * @param additionaldata additional data
-   * @param result receipt
-   * @param success whether succeed or not
-   * @param message error message, "" if succeed
+   * @param Out Erc1155SafeTransferFrom callback
    */
   UFUNCTION(BlueprintCallable,
             meta = (DisplayName = "Erc1155SafeTransferFrom",
@@ -962,16 +954,14 @@ public:
 
   /**
    * Batched version of safeTransferFrom.
-   * @param contractAddress erc20 contract
-   * @param walletindex which index to use?
+   * @param contractAddress erc1155 contract
+   * @param walletindex wallet index which starts from 0
    * @param fromAddress from address to move
    * @param toAddress to address
    * @param tokenids token ids
    * @param amounts amounts
    * @param additionaldata additional data
-   * @param result receipt
-   * @param success whether succeed or not
-   * @param message error message, "" if succeed
+   * @param Out Erc1155SafeBatchTransferFrom callback
    */
   UFUNCTION(BlueprintCallable,
             meta = (DisplayName = "Erc1155SafeBatchTransferFrom",
@@ -987,11 +977,11 @@ public:
   /**
    * erc1155 Allows `approved_address` to withdraw from your account multiple
    * times, up to the `amount` amount.
-   * @param contractAddress erc20 contract
-   * @param walletindex which index to use?
+   * @param contractAddress erc1155 contract
+   * @param walletindex wallet index which starts from 0
    * @param approvedAddress address to approve
    * @param approved approved or not
-   * @param result receipt
+   * @param Out Erc1155Approve callback
    *
    */
   UFUNCTION(BlueprintCallable,

@@ -150,7 +150,8 @@ public:
    * given the BlockScout REST API base url and the account address
    * (hexadecimal), it will return the list of all owned tokens (ref:
    * https://cronos.org/explorer/testnet3/api-docs)
-   * @param blockscoutBaseUrl the base url of the BlockScout API
+   * @param blockscoutBaseUrl the base url of the BlockScout API (e.g.
+   * https://cronos.org/explorer/api)
    * @param account_address the account address to query
    * @param output the output of the query
    * @param success   success of the query
@@ -175,7 +176,8 @@ public:
   * releases, also ERC1155)
   * (ref: https://cronos.org/explorer/testnet3/api-docs)
   * NOTE: QueryOption::ByContract is not supported by BlockScout
-  * @param blockscoutBaseUrl the base url of the BlockScout API
+  * @param blockscoutBaseUrl the base url of the BlockScout API (e.g.
+  * https://cronos.org/explorer/api)
   * @param address the account address to query
   * @param contractAddress the contract address to query
   * @param option the query option
