@@ -1,4 +1,6 @@
 # Changelog
+## [v0.0.8-alpha] - 2022-10-07
+- Fix documentations
 
 ## [v0.0.7-alpha] - 2022-09-16
 - Remove Blueprints Assets
