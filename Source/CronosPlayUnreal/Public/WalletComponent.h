@@ -7,7 +7,7 @@
 #include "PlayCppSdkLibrary/Include/defi-wallet-core-cpp/src/lib.rs.h"
 #include "WalletComponent.generated.h"
 
-/// wallet connect session state
+/// Describes what coin type to use (for HD derivation or address generation)
 UENUM(BlueprintType)
 enum class ECoinType : uint8 {
   /// Crypto.org Chain mainnet
@@ -36,8 +36,7 @@ public:
    * @param index wallet index which starts from 0
    * @param coin_type describes what coin type to use (for HD derivation or
    * address generation)
-   * @param output get eth address
-   * @param success whether succeed or not
+   * @param address get eth address
    * @param message error message, "" if succeed
    */
   UFUNCTION(BlueprintCallable,
@@ -79,8 +78,8 @@ public:
    * @param message error message, "" if succeed
    */
   UFUNCTION(BlueprintCallable,
-            meta = (DisplayName = "IntializeWallet", Keywords = "Wallet"),
+            meta = (DisplayName = "RestoreWallet", Keywords = "Wallet"),
             Category = "CronosPlayUnreal")
-  UWallet *InitializeWallet(FString mnemonics, FString password,
-                            FString &output_message);
+  UWallet *RestoreWallet(FString mnemonics, FString password,
+                         FString &output_message);
 };

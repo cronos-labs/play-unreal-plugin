@@ -31,8 +31,8 @@ void UWalletComponent::TickComponent(
   // ...
 }
 
-UWallet *UWalletComponent::InitializeWallet(FString mnemonics, FString password,
-                                            FString &output_message) {
+UWallet *UWalletComponent::RestoreWallet(FString mnemonics, FString password,
+                                         FString &output_message) {
   UWallet *wallet = NewObject<UWallet>();
   try {
     wallet->_coreWallet =
