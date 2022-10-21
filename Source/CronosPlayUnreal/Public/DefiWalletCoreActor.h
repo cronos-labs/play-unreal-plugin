@@ -177,7 +177,7 @@ struct FCosmosNFTIDCollection {
   TArray<FString> TokenIDs;
 };
 
-/// wallet connect session state
+/// Mnemonics Word Count
 UENUM(BlueprintType)
 enum class EMnemonicsWordCount : uint8 {
   Twelve UMETA(DisplayName = "12 mnemonics"),

@@ -408,10 +408,6 @@ void ADefiWalletCoreActor::InitializeNewDevelopmentOnlyWallet(
     rust::cxxbridge1::String result =
         _coreWallet->get_address(CoinType::CryptoOrgMainnet, 0);
     output = UTF8_TO_TCHAR(result.c_str());
-    // zeroize mnemonics
-
-    zeroize_buffer((char *)result.data(), 0, result.size());
-
     success = true;
   } catch (const rust::cxxbridge1::Error &e) {
     success = false;

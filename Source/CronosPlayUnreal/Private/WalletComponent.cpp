@@ -91,3 +91,44 @@ void UWallet::GetAddress(int32 index, ECoinType coin_type, FString &address,
                                      UTF8_TO_TCHAR(e.what()));
   }
 }
+
+/**
+ * CAUTION: use only for testing & development purpose
+ * storing mnemonics need caution, please not to expose user mnemonics for
+ * public such as github, logs, files , etc.
+ *
+ * WARNING!!!: never transfer menmonics to 3rd party library or networking, ipc,
+ * logs or any kind of remote and zeroize after copying
+ */
+UWallet *UWalletComponent::InitializeNewWallet(FString password,
+                                               EMnemonicsWordCount wordcount,
+                                               FString &output_message) {
+  UWallet *wallet = NewObject<UWallet>();
+  try {
+    ::org::defi_wallet_core::MnemonicWordCount mywordcount;
+    switch (wordcount) {
+    case EMnemonicsWordCount::Twelve:
+      mywordcount = ::org::defi_wallet_core::MnemonicWordCount::Twelve;
+      break;
+    case EMnemonicsWordCount::Eighteen:
+      mywordcount = ::org::defi_wallet_core::MnemonicWordCount::Eighteen;
+      break;
+    case EMnemonicsWordCount::TwentyFour:
+      mywordcount = ::org::defi_wallet_core::MnemonicWordCount::TwentyFour;
+      break;
+    default:
+      throw "Invalid Word Count";
+      break;
+    }
+    rust::cxxbridge1::Box<org::defi_wallet_core::Wallet> tmpWallet =
+        new_wallet(TCHAR_TO_UTF8(*password), mywordcount);
+    // ownership transferred
+    wallet->_coreWallet = tmpWallet.into_raw();
+
+  } catch (const rust::cxxbridge1::Error &e) {
+    output_message =
+        FString::Printf(TEXT("CronosPlayUnreal Error: %s"),
+                        UTF8_TO_TCHAR(e.what()));
+  }
+  return wallet;
+}

@@ -4,6 +4,7 @@
 
 #include "Components/ActorComponent.h"
 #include "CoreMinimal.h"
+#include "DefiWalletCoreActor.h"
 #include "PlayCppSdkLibrary/Include/defi-wallet-core-cpp/src/lib.rs.h"
 #include "WalletComponent.generated.h"
 
@@ -82,4 +83,19 @@ public:
             Category = "CronosPlayUnreal")
   UWallet *RestoreWallet(FString mnemonics, FString password,
                          FString &output_message);
+
+  /**
+   * Create a new wallet with password and wordcount.
+   * @param password salt in mnemonics restoration
+   * @param wordcount mnemonics word count (12, 18, 24)
+   * @param output generated address (index=0)
+   * @param success whether succeed or not
+   * @param message error message, "" if succeed
+   */
+  UFUNCTION(BlueprintCallable,
+            meta = (DisplayName = "InitializeNewDevelopmentOnlyWallet",
+                    Keywords = "Wallet"),
+            Category = "CronosPlayUnreal")
+  UWallet *InitializeNewWallet(FString password, EMnemonicsWordCount wordcount,
+                               FString &output_message);
 };
