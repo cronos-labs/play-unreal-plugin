@@ -6,6 +6,7 @@
 #include "CoreMinimal.h"
 #include "DefiWalletCoreActor.h"
 #include "PlayCppSdkLibrary/Include/defi-wallet-core-cpp/src/lib.rs.h"
+#include "UObject/Class.h"
 #include "WalletComponent.generated.h"
 
 /// Describes what coin type to use (for HD derivation or address generation)
@@ -38,13 +39,11 @@ public:
    * @param coin_type describes what coin type to use (for HD derivation or
    * address generation)
    * @param address get eth address
-   * @param message error message, "" if succeed
    */
   UFUNCTION(BlueprintCallable,
             meta = (DisplayName = "GetAddress", Keywords = "Wallet"),
             Category = "CronosPlayUnreal")
-  void GetAddress(int32 index, ECoinType coin_type, FString &address,
-                  FString &output_message);
+  void GetAddress(int32 index, ECoinType coin_type, FString &address);
 
   /**
    Opaque pointer to store wallet
@@ -74,28 +73,19 @@ public:
    * Restore wallet with mnemonics and password.
    * @param mnemonics mnemonics to restore
    * @param password salt in mnemonics restoration
-   * @param output generated address (index=0)
-   * @param success whether succeed or not
-   * @param message error message, "" if succeed
    */
   UFUNCTION(BlueprintCallable,
             meta = (DisplayName = "RestoreWallet", Keywords = "Wallet"),
             Category = "CronosPlayUnreal")
-  UWallet *RestoreWallet(FString mnemonics, FString password,
-                         FString &output_message);
+  UWallet *RestoreWallet(FString mnemonics, FString password);
 
   /**
    * Create a new wallet with password and wordcount.
    * @param password salt in mnemonics restoration
    * @param wordcount mnemonics word count (12, 18, 24)
-   * @param output generated address (index=0)
-   * @param success whether succeed or not
-   * @param message error message, "" if succeed
    */
   UFUNCTION(BlueprintCallable,
-            meta = (DisplayName = "InitializeNewDevelopmentOnlyWallet",
-                    Keywords = "Wallet"),
+            meta = (DisplayName = "InitializeNewWallet", Keywords = "Wallet"),
             Category = "CronosPlayUnreal")
-  UWallet *InitializeNewWallet(FString password, EMnemonicsWordCount wordcount,
-                               FString &output_message);
+  UWallet *InitializeNewWallet(FString password, EMnemonicsWordCount wordcount);
 };
