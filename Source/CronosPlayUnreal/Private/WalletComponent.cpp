@@ -83,6 +83,39 @@ UWallet *UWalletComponent::InitializeNewWallet(FString password,
   return wallet;
 }
 
+void UWalletComponent::GenerateMnemonics(FString password,
+                                         EMnemonicsWordCount wordcount,
+                                         FString &mnemonic_phrase) {
+  try {
+    ::org::defi_wallet_core::MnemonicWordCount mywordcount;
+    switch (wordcount) {
+    case EMnemonicsWordCount::Twelve:
+      mywordcount = ::org::defi_wallet_core::MnemonicWordCount::Twelve;
+      break;
+    case EMnemonicsWordCount::Eighteen:
+      mywordcount = ::org::defi_wallet_core::MnemonicWordCount::Eighteen;
+      break;
+    case EMnemonicsWordCount::TwentyFour:
+      mywordcount = ::org::defi_wallet_core::MnemonicWordCount::TwentyFour;
+      break;
+    default:
+      throw "Invalid Word Count";
+      break;
+    }
+    rust::String result =
+        generate_mnemonics(TCHAR_TO_UTF8(*password), mywordcount);
+
+    mnemonic_phrase = UTF8_TO_TCHAR(result.c_str());
+    // zeroize mnemonics
+    zeroize_buffer((char *)result.data(), 0, result.size());
+
+  } catch (const rust::cxxbridge1::Error &e) {
+    mnemonic_phrase = TEXT("");
+    UE_LOG(LogTemp, Error, TEXT("CronosPlayUnreal Error: %s"),
+           UTF8_TO_TCHAR(e.what()));
+  }
+}
+
 void UWallet::GetAddress(int32 index, ECoinType coin_type, FString &address) {
   try {
     switch (coin_type) {
@@ -124,6 +157,29 @@ void UWallet::GetAddress(int32 index, ECoinType coin_type, FString &address) {
     }
 
   } catch (const rust::cxxbridge1::Error &e) {
+    address = TEXT("");
+    UE_LOG(LogTemp, Error, TEXT("CronosPlayUnreal Error: %s"),
+           UTF8_TO_TCHAR(e.what()));
+  }
+}
+
+/**
+ * CAUTION: use only for testing & development purpose
+ * storing mnemonics need caution, please not to expose user mnemonics for
+ * public such as github, logs, files , etc.
+ *
+ * WARNING!!!: never transfer menmonics to 3rd party library or networking, ipc,
+ * logs or any kind of remote and zeroize after copying
+ */
+void UWallet::GetBackupMnemonicPhrase(FString &mnemonic_phrase) {
+
+  try {
+    rust::cxxbridge1::String result = _coreWallet->get_backup_mnemonic_phrase();
+    mnemonic_phrase = UTF8_TO_TCHAR(result.c_str());
+    // zeroize mnemonics
+    zeroize_buffer((char *)result.data(), 0, result.size());
+  } catch (const rust::cxxbridge1::Error &e) {
+    mnemonic_phrase = TEXT("");
     UE_LOG(LogTemp, Error, TEXT("CronosPlayUnreal Error: %s"),
            UTF8_TO_TCHAR(e.what()));
   }

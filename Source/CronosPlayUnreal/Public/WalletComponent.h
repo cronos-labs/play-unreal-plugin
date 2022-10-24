@@ -46,6 +46,15 @@ public:
   void GetAddress(int32 index, ECoinType coin_type, FString &address);
 
   /**
+   * Get backup mnemonic phrase.
+   * @param mnemonic_phrase backup mnemonics
+   */
+  UFUNCTION(BlueprintCallable,
+            meta = (DisplayName = "GetBackupMnemonicPhrase",
+                    Keywords = "Wallet"),
+            Category = "CronosPlayUnreal")
+  void GetBackupMnemonicPhrase(FString &mnemonic_phrase);
+  /**
    Opaque pointer to store wallet
    */
   org::defi_wallet_core::Wallet *_coreWallet;
@@ -88,4 +97,16 @@ public:
             meta = (DisplayName = "InitializeNewWallet", Keywords = "Wallet"),
             Category = "CronosPlayUnreal")
   UWallet *InitializeNewWallet(FString password, EMnemonicsWordCount wordcount);
+
+  /**
+   * Generate mnemonics.
+   * @param password salt in mnemonics restoration
+   * @param wordcount mnemonics word count (12, 18, 24)
+   * @param mnemonic_phrase generated mnemonics
+   */
+  UFUNCTION(BlueprintCallable,
+            meta = (DisplayName = "GenerateMnemonics", Keywords = "Wallet"),
+            Category = "CronosPlayUnreal")
+  void GenerateMnemonics(FString password, EMnemonicsWordCount wordcount,
+                         FString &mnemonic_phrase);
 };
