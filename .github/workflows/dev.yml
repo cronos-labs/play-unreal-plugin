@@ -35,6 +35,17 @@ jobs:
         username: gamefimachine
         password: ${{ secrets.PAT }}
     steps:
+      # TODO Update download-artifact to 3.0.1+
+      #
+      # Starting from 3.0.1, it generates permission error (set-ouput), due to the update of
+      # actions/core to 1.10.0
+      #
+      # See:
+      # - https://github.blog/changelog/2022-10-11-github-actions-deprecating-save-state-and-set-output-commands/
+      # - https://github.com/actions/download-artifact/commit/9782bd6a9848b53b110e712e20e42d89988822b7
+      #
+      # As we only download the artifacts, it is ok to keep using the old version - 3.0.0 to
+      # avoid the complicated permission error in container
     - uses: actions/download-artifact@v3.0.0
       with:
         name: play-unreal-plugin
