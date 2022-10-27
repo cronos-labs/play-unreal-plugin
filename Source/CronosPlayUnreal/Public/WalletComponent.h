@@ -5,6 +5,7 @@
 #include "Components/ActorComponent.h"
 #include "CoreMinimal.h"
 #include "DefiWalletCoreActor.h"
+#include "Error.h"
 #include "PlayCppSdkLibrary/Include/defi-wallet-core-cpp/src/lib.rs.h"
 #include "UObject/Class.h"
 #include "WalletComponent.generated.h"
@@ -39,21 +40,24 @@ public:
    * @param coin_type describes what coin type to use (for HD derivation or
    * address generation)
    * @param address get eth address
+   * @param error error struct
    */
   UFUNCTION(BlueprintCallable,
             meta = (DisplayName = "GetAddress", Keywords = "Wallet"),
             Category = "CronosPlayUnreal")
-  void GetAddress(int32 index, ECoinType coin_type, FString &address);
+  void GetAddress(int32 index, ECoinType coin_type, FString &address,
+                  FError &error);
 
   /**
    * Get backup mnemonic phrase.
    * @param mnemonic_phrase backup mnemonics
+   * @param error error struct
    */
   UFUNCTION(BlueprintCallable,
             meta = (DisplayName = "GetBackupMnemonicPhrase",
                     Keywords = "Wallet"),
             Category = "CronosPlayUnreal")
-  void GetBackupMnemonicPhrase(FString &mnemonic_phrase);
+  void GetBackupMnemonicPhrase(FString &mnemonic_phrase, FError &error);
   /**
    Opaque pointer to store wallet
    */
@@ -82,31 +86,35 @@ public:
    * Restore wallet with mnemonics and password.
    * @param mnemonics mnemonics to restore
    * @param password salt in mnemonics restoration
+   * @param error error struct
    */
   UFUNCTION(BlueprintCallable,
             meta = (DisplayName = "RestoreWallet", Keywords = "Wallet"),
             Category = "CronosPlayUnreal")
-  UWallet *RestoreWallet(FString mnemonics, FString password);
+  UWallet *RestoreWallet(FString mnemonics, FString password, FError &error);
 
   /**
    * Create a new wallet with password and wordcount.
    * @param password salt in mnemonics restoration
    * @param wordcount mnemonics word count (12, 18, 24)
+   * @param error error struct
    */
   UFUNCTION(BlueprintCallable,
             meta = (DisplayName = "InitializeNewWallet", Keywords = "Wallet"),
             Category = "CronosPlayUnreal")
-  UWallet *InitializeNewWallet(FString password, EMnemonicsWordCount wordcount);
+  UWallet *InitializeNewWallet(FString password, EMnemonicsWordCount wordcount,
+                               FError &error);
 
   /**
    * Generate mnemonics.
    * @param password salt in mnemonics restoration
    * @param wordcount mnemonics word count (12, 18, 24)
    * @param mnemonic_phrase generated mnemonics
+   * @param error error struct
    */
   UFUNCTION(BlueprintCallable,
             meta = (DisplayName = "GenerateMnemonics", Keywords = "Wallet"),
             Category = "CronosPlayUnreal")
   void GenerateMnemonics(FString password, EMnemonicsWordCount wordcount,
-                         FString &mnemonic_phrase);
+                         FString &mnemonic_phrase, FError &error);
 };
