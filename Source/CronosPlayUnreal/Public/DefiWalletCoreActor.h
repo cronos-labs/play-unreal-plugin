@@ -216,10 +216,10 @@ public:
    * @param message error message, "" if succeed
    */
   UFUNCTION(BlueprintCallable,
-            meta = (DisplayName = "IntializeWallet", Keywords = "Wallet"),
+            meta = (DisplayName = "RestoreWallet", Keywords = "Wallet"),
             Category = "CronosPlayUnreal")
-  void InitializeWallet(FString mnemonics, FString password, FString &output,
-                        bool &success, FString &output_message);
+  void RestoreWallet(FString mnemonics, FString password, FString &output,
+                     bool &success, FString &output_message);
 
   /**
    * Create a new wallet with password and wordcount.
@@ -230,13 +230,11 @@ public:
    * @param message error message, "" if succeed
    */
   UFUNCTION(BlueprintCallable,
-            meta = (DisplayName = "InitializeNewDevelopmentOnlyWallet",
-                    Keywords = "Wallet"),
+            meta = (DisplayName = "InitializeNewWallet", Keywords = "Wallet"),
             Category = "CronosPlayUnreal")
-  void InitializeNewDevelopmentOnlyWallet(FString password,
-                                          EMnemonicsWordCount wordcount,
-                                          FString &output, bool &success,
-                                          FString &output_message);
+  void InitializeNewWallet(FString password, EMnemonicsWordCount wordcount,
+                           FString &output, bool &success,
+                           FString &output_message);
 
   /**
    * Get backup mnemonic phrase.
@@ -260,13 +258,11 @@ public:
    * @param message error message, "" if succeed
    */
   UFUNCTION(BlueprintCallable,
-            meta = (DisplayName = "DevelopmentOnlyGenerateMnemonics",
-                    Keywords = "Wallet"),
+            meta = (DisplayName = "GenerateMnemonics", Keywords = "Wallet"),
             Category = "CronosPlayUnreal")
-  void DevelopmentOnlyGenerateMnemonics(FString password,
-                                        EMnemonicsWordCount wordcount,
-                                        FString &output, bool &success,
-                                        FString &output_message);
+  void GenerateMnemonics(FString password, EMnemonicsWordCount wordcount,
+                         FString &output, bool &success,
+                         FString &output_message);
 
   /**
    * Cosmos send amount.
@@ -480,9 +476,7 @@ public:
    * @param amount amount in eth decimal, eg. 0.1 means 0.1 eth
    * @param gasLimit gas limit, fee= gasLimit * gasPrice
    * @param gasPrice gas price in wei, eg. 1wei= 1/(10^18)eth  1wei=1/(10^9)gwei
-   * @param output transaction hash
-   * @param success whether succeed or not
-   * @param message error message, "" if succeed
+   * @param Out SendEthAmount callback
    */
   UFUNCTION(BlueprintCallable,
             meta = (DisplayName = "SendEthAmount", Keywords = "Wallet"),
@@ -490,18 +484,7 @@ public:
   void SendEthAmount(int32 walletIndex, FString fromaddress, FString toaddress,
                      FString amountInEthDecimal, FString gasLimit,
                      FString gasPriceInWei, TArray<uint8> txdata,
-                     FString &output, bool &success, FString &output_message);
-
-  /*
-   * TODO MISSING DOCS
-   * */
-  UFUNCTION(BlueprintCallable,
-            meta = (DisplayName = "SendEthAmountAsync", Keywords = "Wallet"),
-            Category = "CronosPlayUnreal")
-  void SendEthAmountAsync(int32 walletIndex, FString fromaddress,
-                          FString toaddress, FString amountinEthDecimal,
-                          FString gasLimit, FString gasPriceInWei,
-                          TArray<uint8> txdata, FSendEthTransferDelegate Out);
+                     FSendEthTransferDelegate Out);
 
   /**
    * Sign eth login

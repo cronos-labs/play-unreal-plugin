@@ -345,9 +345,9 @@ void ADefiWalletCoreActor::CreateWallet(FString mnemonics, FString password) {
   }
 }
 
-void ADefiWalletCoreActor::InitializeWallet(FString mnemonics, FString password,
-                                            FString &output, bool &success,
-                                            FString &output_message) {
+void ADefiWalletCoreActor::RestoreWallet(FString mnemonics, FString password,
+                                         FString &output, bool &success,
+                                         FString &output_message) {
   try {
     if (NULL != _coreWallet) {
       success = false;
@@ -378,9 +378,10 @@ void ADefiWalletCoreActor::InitializeWallet(FString mnemonics, FString password,
  * WARNING!!!: never transfer menmonics to 3rd party library or networking, ipc,
  * logs or any kind of remote and zeroize after copying
  */
-void ADefiWalletCoreActor::InitializeNewDevelopmentOnlyWallet(
-    FString password, EMnemonicsWordCount wordcount, FString &output,
-    bool &success, FString &output_message) {
+void ADefiWalletCoreActor::InitializeNewWallet(FString password,
+                                               EMnemonicsWordCount wordcount,
+                                               FString &output, bool &success,
+                                               FString &output_message) {
   try {
     if (NULL != _coreWallet) {
       success = false;
@@ -461,9 +462,10 @@ void ADefiWalletCoreActor::GetBackupMnemonicPhrase(FString &output,
   }
 }
 
-void ADefiWalletCoreActor::DevelopmentOnlyGenerateMnemonics(
-    FString password, EMnemonicsWordCount wordcount, FString &output,
-    bool &success, FString &output_message) {
+void ADefiWalletCoreActor::GenerateMnemonics(FString password,
+                                             EMnemonicsWordCount wordcount,
+                                             FString &output, bool &success,
+                                             FString &output_message) {
   try {
 
     ::org::defi_wallet_core::MnemonicWordCount mywordcount;
@@ -701,7 +703,7 @@ bool isSameAddress(std::string address1, std::string address2) {
   return toLower(address1) == toLower(address2);
 }
 
-void ADefiWalletCoreActor::SendEthAmountAsync(
+void ADefiWalletCoreActor::SendEthAmount(
     int32 walletIndex, FString fromaddress, FString toaddress,
     FString amountInEthDecimal, FString gasLimit, FString gasPriceInWei,
     TArray<uint8> txdata, FSendEthTransferDelegate Out) {
