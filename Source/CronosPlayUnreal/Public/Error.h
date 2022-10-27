@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright 2022, Cronos Labs. All Rights Reserved
 
 #pragma once
 
@@ -13,7 +13,7 @@ enum class EErrorCategory : uint8 {
 };
 
 /**
- *
+ * Error struct
  */
 USTRUCT(BlueprintType)
 struct FError {

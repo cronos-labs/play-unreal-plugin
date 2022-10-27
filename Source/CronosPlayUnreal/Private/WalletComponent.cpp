@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright 2022, Cronos Labs. All Rights Reserved
 
 #include "WalletComponent.h"
 
@@ -31,6 +31,9 @@ void UWalletComponent::TickComponent(
   // ...
 }
 
+/**
+ * CAUTION: use only for testing & development purpose
+ */
 UWallet *UWalletComponent::RestoreWallet(FString mnemonics, FString password,
                                          FError &error) {
   UWallet *wallet = NewObject<UWallet>();
@@ -91,6 +94,14 @@ UWallet *UWalletComponent::InitializeNewWallet(FString password,
   return wallet;
 }
 
+/**
+ * CAUTION: use only for testing & development purpose
+ * storing mnemonics need caution, please not to expose user mnemonics for
+ * public such as github, logs, files , etc.
+ *
+ * WARNING!!!: never transfer menmonics to 3rd party library or networking, ipc,
+ * logs or any kind of remote and zeroize after copying
+ */
 void UWalletComponent::GenerateMnemonics(FString password,
                                          EMnemonicsWordCount wordcount,
                                          FString &mnemonic_phrase,
@@ -126,6 +137,9 @@ void UWalletComponent::GenerateMnemonics(FString password,
   }
 }
 
+/**
+ * CAUTION: use only for testing & development purpose
+ */
 void UWallet::GetAddress(int32 index, ECoinType coin_type, FString &address,
                          FError &error) {
   try {
