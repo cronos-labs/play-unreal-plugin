@@ -5,9 +5,11 @@
 #include <iostream>
 #include <sstream>
 
-#include "TxBuilder.h"
+#include "PlayCppSdkBPLibrary.h"
 #include "PlayCppSdkLibrary/Include/defi-wallet-core-cpp/src/lib.rs.h"
 #include "PlayCppSdkLibrary/Include/rust/cxx.h"
+#include "TxBuilder.h"
+
 using namespace std;
 using namespace org::defi_wallet_core;
 const int EthCoinType = 60;
@@ -49,6 +51,8 @@ ADefiWalletCoreActor::ADefiWalletCoreActor()
   PrimaryActorTick.bCanEverTick = false;
 
   _coreWallet = NULL;
+
+  UPlayCppSdkBPLibrary::SetupUserAgent("CronosPlay-UnrealEngine-Agent");
 }
 
 // Called when the game starts or when spawned
