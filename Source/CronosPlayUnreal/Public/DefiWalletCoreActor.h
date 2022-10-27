@@ -77,6 +77,10 @@ DECLARE_DYNAMIC_DELEGATE_TwoParams(FSendEthTransferDelegate,
                                    FCronosTransactionReceiptRaw, TxResult,
                                    FString, Result);
 
+/// callback of tx broadcast
+DECLARE_DYNAMIC_DELEGATE_TwoParams(FWalletBroadcastDelegate, FString, TXHash,
+                                   FString, Result);
+
 // erc 1155
 DECLARE_DYNAMIC_DELEGATE_TwoParams(FErc1155TransferFromDelegate,
                                    FCronosTransactionReceiptRaw, TxResult,
@@ -435,6 +439,17 @@ public:
             Category = "CronosPlayUnreal")
   void GetEthBalance(FString address, FString &output, bool &success,
                      FString &output_message);
+
+  /**
+   * Broadcast signed eth tx
+   * @param Out  event delegate which is triggered after tx is broadcasted
+   * @param signedtx signed tx as bytes
+   * @param rpc cronos rpc server url
+   */
+  UFUNCTION(BlueprintCallable, Category = "CronosPlayUnreal",
+            meta = (DisplayName = "BroadcastEthTxAsync", Keywords = "Wallet"))
+  static void BroadcastEthTxAsync(FWalletBroadcastDelegate Out,
+                                  TArray<uint8> signedtx, FString rpc);
 
   /**
    * Sign eth amount
