@@ -336,6 +336,14 @@ void ADefiWalletCoreActor::DestroyWallet() {
   }
 }
 
+/**
+ * CAUTION: use only for testing & development purpose
+ * storing mnemonics need caution, please not to expose user mnemonics for
+ * public such as github, logs, files , etc.
+ *
+ * WARNING!!!: never transfer menmonics to 3rd party library or networking, ipc,
+ * logs or any kind of remote and zeroize after copying
+ */
 void ADefiWalletCoreActor::CreateWallet(FString mnemonics, FString password) {
   if (NULL == _coreWallet) {
     rust::cxxbridge1::Box<org::defi_wallet_core::Wallet> tmpWallet =
@@ -345,6 +353,14 @@ void ADefiWalletCoreActor::CreateWallet(FString mnemonics, FString password) {
   }
 }
 
+/**
+ * CAUTION: use only for testing & development purpose
+ * storing mnemonics need caution, please not to expose user mnemonics for
+ * public such as github, logs, files , etc.
+ *
+ * WARNING!!!: never transfer menmonics to 3rd party library or networking, ipc,
+ * logs or any kind of remote and zeroize after copying
+ */
 void ADefiWalletCoreActor::RestoreWallet(FString mnemonics, FString password,
                                          FString &output, bool &success,
                                          FString &output_message) {
@@ -462,6 +478,14 @@ void ADefiWalletCoreActor::GetBackupMnemonicPhrase(FString &output,
   }
 }
 
+/**
+ * CAUTION: use only for testing & development purpose
+ * storing mnemonics need caution, please not to expose user mnemonics for
+ * public such as github, logs, files , etc.
+ *
+ * WARNING!!!: never transfer menmonics to 3rd party library or networking, ipc,
+ * logs or any kind of remote and zeroize after copying
+ */
 void ADefiWalletCoreActor::GenerateMnemonics(FString password,
                                              EMnemonicsWordCount wordcount,
                                              FString &output, bool &success,
