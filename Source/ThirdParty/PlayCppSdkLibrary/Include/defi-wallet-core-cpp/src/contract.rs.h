@@ -679,7 +679,7 @@ struct Erc20 final {
   /// # Examples
   /// ```
   /// Erc20 erc20 = new_erc20("0xf0307093f23311FE6776a7742dB619EB3df62969",
-  ///    "https://cronos-testnet-3.crypto.org:8545", 383)
+  ///    "https://evm-dev-t3.cronos.org", 338)
   ///  .legacy();
   /// U256 = erc20.balance_of("0xf0307093f23311FE6776a7742dB619EB3df62969");
   /// cout << balance.to_string() << endl;
@@ -690,7 +690,7 @@ struct Erc20 final {
   /// Returns the name of the token
   /// ```
   /// Erc20 erc20 = new_erc20("0xf0307093f23311FE6776a7742dB619EB3df62969",
-  ///    "https://cronos-testnet-3.crypto.org:8545", 383);
+  ///    "https://evm-dev-t3.cronos.org", 338);
   /// String name = erc20.name();
   /// assert(name == "USDC");
   /// ```
@@ -699,7 +699,7 @@ struct Erc20 final {
   /// Returns the symbol of the token
   /// ```
   /// Erc20 erc20 = new_erc20("0xf0307093f23311FE6776a7742dB619EB3df62969",
-  ///    "https://cronos-testnet-3.crypto.org:8545", 383);
+  ///    "https://evm-dev-t3.cronos.org", 338);
   /// String symbol = erc20.symbol();
   /// assert(symbol == "USDC");
   /// ```
@@ -708,7 +708,7 @@ struct Erc20 final {
   /// Returns the number of decimals the token uses
   /// ```
   /// Erc20 erc20 = new_erc20("0xf0307093f23311FE6776a7742dB619EB3df62969",
-  ///    "https://cronos-testnet-3.crypto.org:8545", 383)
+  ///    "https://evm-dev-t3.cronos.org", 338)
   ///  .legacy();
   /// uint8_t decimals = erc20.decimals();
   /// assert(decimals == 6);
@@ -718,7 +718,7 @@ struct Erc20 final {
   /// Makes a legacy transaction instead of an EIP-1559 one
   /// ```
   /// Erc20 erc20 = new_erc20("0xf0307093f23311FE6776a7742dB619EB3df62969",
-  ///    "https://cronos-testnet-3.crypto.org:8545", 383);
+  ///    "https://evm-dev-t3.cronos.org", 338);
   /// erc20 = erc20.legacy();
   /// ```
   ::org::defi_wallet_core::Erc20 legacy() noexcept;
@@ -727,7 +727,7 @@ struct Erc20 final {
   /// transactions
   /// ```
   /// Erc20 erc20 = new_erc20("0xf0307093f23311FE6776a7742dB619EB3df62969",
-  ///    "https://cronos-testnet-3.crypto.org:8545", 383);
+  ///    "https://evm-dev-t3.cronos.org", 338);
   /// erc20 = erc20.interval(3000);
   /// ```
   ::org::defi_wallet_core::Erc20
@@ -835,7 +835,7 @@ struct Erc20 final {
   /// Returns the amount of tokens in existence.
   /// ```
   /// Erc20 erc20 = new_erc20("0xf0307093f23311FE6776a7742dB619EB3df62969",
-  ///                         "https://cronos-testnet-3.crypto.org:8545", 383)
+  ///                         "https://evm-dev-t3.cronos.org", 338)
   ///                 .legacy();
   /// U256 total_supply = erc20.total_supply();
   /// ```
@@ -1004,7 +1004,7 @@ struct Erc1155 final {
 /// Construct an Erc20 struct
 /// ```
 /// Erc20 erc20 = new_erc20("0xf0307093f23311FE6776a7742dB619EB3df62969",
-///    "https://cronos-testnet-3.crypto.org:8545", 383);
+///    "https://evm-dev-t3.cronos.org", 338);
 /// ```
 ::org::defi_wallet_core::Erc20 new_erc20(::rust::String address,
                                          ::rust::String web3api_url,

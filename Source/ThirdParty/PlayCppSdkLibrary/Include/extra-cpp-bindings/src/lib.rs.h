@@ -1,6 +1,7 @@
 #pragma once
-#include "../../pay.h"
 #include "../../walletconnectcallback.h"
+#include "../../walletconnectcallback.h"
+#include "../../pay.h"
 #include <algorithm>
 #include <array>
 #include <cassert>
@@ -850,11 +851,20 @@ template <typename T> std::size_t align_of() { return layout::align_of<T>(); }
 namespace com {
 namespace crypto {
 namespace game_sdk {
+struct WalletConnectTransactionReceiptRaw;
 using WalletConnectCallback = ::com::crypto::game_sdk::WalletConnectCallback;
 using WalletConnectSessionInfo =
     ::com::crypto::game_sdk::WalletConnectSessionInfo;
 struct WalletQrcode;
-struct WalletConnectTxLegacy;
+struct WalletConnectTxCommon;
+struct WalletConnectTxEip155;
+struct WalletConnectErc20Transfer;
+struct WalletConnectErc721Transfer;
+struct WalletConnectErc1155Transfer;
+struct WalletConnectErc1155Batch;
+struct WalletConnectErc20Approve;
+struct WalletConnectErc721Approve;
+struct WalletConnectErc1155Approve;
 struct WalletConnectAddress;
 struct WalletConnectEnsureSessionResult;
 struct CryptoComPaymentResponse;
@@ -871,6 +881,28 @@ using OptionalArguments = ::com::crypto::game_sdk::OptionalArguments;
 namespace com {
 namespace crypto {
 namespace game_sdk {
+#ifndef CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectTransactionReceiptRaw
+#define CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectTransactionReceiptRaw
+struct WalletConnectTransactionReceiptRaw final {
+  ::rust::Vec<::std::uint8_t> transaction_hash;
+  ::rust::String transaction_index;
+  ::rust::Vec<::std::uint8_t> block_hash;
+  ::rust::String block_number;
+  ::rust::String cumulative_gas_used;
+  ::rust::String gas_used;
+  ::rust::String contract_address;
+  ::rust::Vec<::rust::String> logs;
+  /// Status: either 1 (success) or 0 (failure)
+  ::rust::String status;
+  ::rust::Vec<::std::uint8_t> root;
+  ::rust::Vec<::std::uint8_t> logs_bloom;
+  ::rust::String transaction_type;
+  ::rust::String effective_gas_price;
+
+  using IsRelocatable = ::std::true_type;
+};
+#endif // CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectTransactionReceiptRaw
+
 #ifndef CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletQrcode
 #define CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletQrcode
 struct WalletQrcode final {
@@ -882,20 +914,128 @@ struct WalletQrcode final {
 };
 #endif // CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletQrcode
 
-#ifndef CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectTxLegacy
-#define CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectTxLegacy
-/// wallet connect cronos(eth) legacy-tx signing info
-struct WalletConnectTxLegacy final {
-  ::rust::String to;
-  ::rust::String gas;
+#ifndef CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectTxCommon
+#define CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectTxCommon
+struct WalletConnectTxCommon final {
+  ::rust::String gas_limit;
   ::rust::String gas_price;
-  ::rust::String value;
-  ::rust::Vec<::std::uint8_t> data;
   ::rust::String nonce;
+  ::std::uint64_t chainid;
+  ::rust::String web3api_url;
 
   using IsRelocatable = ::std::true_type;
 };
-#endif // CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectTxLegacy
+#endif // CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectTxCommon
+
+#ifndef CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectTxEip155
+#define CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectTxEip155
+/// wallet connect cronos(eth) eip155-tx signing info
+struct WalletConnectTxEip155 final {
+  ::rust::String to;
+  ::rust::String value;
+  ::rust::Vec<::std::uint8_t> data;
+  ::com::crypto::game_sdk::WalletConnectTxCommon common;
+
+  using IsRelocatable = ::std::true_type;
+};
+#endif // CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectTxEip155
+
+#ifndef CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectErc20Transfer
+#define CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectErc20Transfer
+/// wallet connect cronos(eth) erc20-tx signing info
+struct WalletConnectErc20Transfer final {
+  ::rust::String contract_address;
+  ::rust::String from_address;
+  ::rust::String to_address;
+  ::rust::String amount;
+  ::com::crypto::game_sdk::WalletConnectTxCommon common;
+
+  using IsRelocatable = ::std::true_type;
+};
+#endif // CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectErc20Transfer
+
+#ifndef CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectErc721Transfer
+#define CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectErc721Transfer
+/// wallet connect cronos(eth) erc721-tx signing info
+struct WalletConnectErc721Transfer final {
+  ::rust::String contract_address;
+  ::rust::String from_address;
+  ::rust::String to_address;
+  ::rust::String token_id;
+  ::com::crypto::game_sdk::WalletConnectTxCommon common;
+
+  using IsRelocatable = ::std::true_type;
+};
+#endif // CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectErc721Transfer
+
+#ifndef CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectErc1155Transfer
+#define CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectErc1155Transfer
+struct WalletConnectErc1155Transfer final {
+  ::rust::String contract_address;
+  ::rust::String from_address;
+  ::rust::String to_address;
+  ::rust::String token_id;
+  ::rust::String amount;
+  ::rust::Vec<::std::uint8_t> additional_data;
+  ::com::crypto::game_sdk::WalletConnectTxCommon common;
+
+  using IsRelocatable = ::std::true_type;
+};
+#endif // CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectErc1155Transfer
+
+#ifndef CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectErc1155Batch
+#define CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectErc1155Batch
+struct WalletConnectErc1155Batch final {
+  ::rust::String contract_address;
+  ::rust::String from_address;
+  ::rust::String to_address;
+  ::rust::Vec<::rust::String> token_ids;
+  ::rust::Vec<::rust::String> amounts;
+  ::rust::Vec<::std::uint8_t> additional_data;
+  ::com::crypto::game_sdk::WalletConnectTxCommon common;
+
+  using IsRelocatable = ::std::true_type;
+};
+#endif // CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectErc1155Batch
+
+#ifndef CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectErc20Approve
+#define CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectErc20Approve
+struct WalletConnectErc20Approve final {
+  ::rust::String contract_address;
+  ::rust::String from_address;
+  ::rust::String approved_address;
+  ::rust::String amount;
+  ::com::crypto::game_sdk::WalletConnectTxCommon common;
+
+  using IsRelocatable = ::std::true_type;
+};
+#endif // CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectErc20Approve
+
+#ifndef CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectErc721Approve
+#define CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectErc721Approve
+struct WalletConnectErc721Approve final {
+  ::rust::String contract_address;
+  ::rust::String from_address;
+  ::rust::String approved_address;
+  ::rust::String token_id;
+  ::com::crypto::game_sdk::WalletConnectTxCommon common;
+
+  using IsRelocatable = ::std::true_type;
+};
+#endif // CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectErc721Approve
+
+#ifndef CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectErc1155Approve
+#define CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectErc1155Approve
+struct WalletConnectErc1155Approve final {
+  ::rust::String contract_address;
+  ::rust::String from_address;
+  ::rust::String approved_address;
+  bool approved;
+  ::com::crypto::game_sdk::WalletConnectTxCommon common;
+
+  using IsRelocatable = ::std::true_type;
+};
+#endif // CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectErc1155Approve
 
 #ifndef CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectAddress
 #define CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectAddress
@@ -1050,9 +1190,24 @@ struct WalletconnectClient final : public ::rust::Opaque {
   sign_personal_blocking(::rust::String message,
                          ::std::array<::std::uint8_t, 20> address);
 
-  /// sign cronos(eth) legacy transaction
-  ::rust::Vec<::std::uint8_t> sign_legacy_transaction_blocking(
-      const ::com::crypto::game_sdk::WalletConnectTxLegacy &info,
+  ::rust::Vec<::std::uint8_t> erc20_transfer(
+      const ::com::crypto::game_sdk::WalletConnectErc20Transfer &info);
+  ::rust::Vec<::std::uint8_t> erc721_transfer(
+      const ::com::crypto::game_sdk::WalletConnectErc721Transfer &info);
+  ::rust::Vec<::std::uint8_t> erc1155_transfer(
+      const ::com::crypto::game_sdk::WalletConnectErc1155Transfer &info);
+  ::rust::Vec<::std::uint8_t> erc1155_transfer_batch(
+      const ::com::crypto::game_sdk::WalletConnectErc1155Batch &info);
+  ::rust::Vec<::std::uint8_t>
+  erc20_approve(const ::com::crypto::game_sdk::WalletConnectErc20Approve &info);
+  ::rust::Vec<::std::uint8_t> erc721_approve(
+      const ::com::crypto::game_sdk::WalletConnectErc721Approve &info);
+  ::rust::Vec<::std::uint8_t> erc1155_approve(
+      const ::com::crypto::game_sdk::WalletConnectErc1155Approve &info);
+
+  /// build cronos(eth) eip155 transaction
+  ::rust::Vec<::std::uint8_t> sign_eip155_transaction_blocking(
+      const ::com::crypto::game_sdk::WalletConnectTxEip155 &info,
       ::std::array<::std::uint8_t, 20> address);
 
   ~WalletconnectClient() = delete;
@@ -1074,10 +1229,12 @@ generate_qrcode(::rust::String qrcodestring);
 walletconnect_restore_client(::rust::String session_info);
 
 /// create walletconnect-session
+/// the chain id (if 0, retrived and decided by wallet, if > 0, decided by the
+/// client)
 ::rust::Box<::com::crypto::game_sdk::WalletconnectClient>
 walletconnect_new_client(::rust::String description, ::rust::String url,
                          ::rust::Vec<::rust::String> icon_urls,
-                         ::rust::String name);
+                         ::rust::String name, ::std::uint64_t chain_id);
 
 /// returns the transactions of a given address.
 /// The API key can be obtained from https://cronoscan.com
