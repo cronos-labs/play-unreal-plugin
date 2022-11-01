@@ -1,4 +1,15 @@
 # Changelog
+## [v0.0.9-alpha] - 2022-11-01
+- Rename the following Functions
+  - `InitializeWallet` -> `RestoreWallet`
+  - `InitializeNewDevelopmentOnlyWallet` -> `InitializeNewWallet`
+  - `DevelopmentOnlyGenerateMnemonics` -> `GenerateMnemonics`
+  - `SendEthAmountAsync` -> `SendEthAmount`
+- Setup Default User Agent in `DefiWalletCoreActor`
+- Move `BroadcastEthTxAsync` to `DefiWalletCoreActor`
+- Fix DocsURL
+- Use play-cpp-sdk [v0.0.9-alpha](https://github.com/cronos-labs/play-cpp-sdk/releases/tag/v0.0.9-alpha)
+
 ## [v0.0.8-alpha] - 2022-10-07
 - Fix documentations
 
