@@ -208,7 +208,8 @@ class CRONOSPLAYUNREAL_API ADefiWalletCoreActor : public AActor {
   GENERATED_BODY()
 public:
   /**
-   * Restore wallet with mnemonics and password.
+   * Restore wallet with mnemonics and password (Only for testing &
+   * development purpose).
    * @param mnemonics mnemonics to restore
    * @param password salt in mnemonics restoration
    * @param output generated address (index=0)
@@ -222,7 +223,8 @@ public:
                      bool &success, FString &output_message);
 
   /**
-   * Create a new wallet with password and wordcount.
+   * Create a new wallet with password and wordcount (Only for testing &
+   * development purpose).
    * @param password salt in mnemonics restoration
    * @param wordcount mnemonics word count (12, 18, 24)
    * @param output generated address (index=0)
@@ -237,7 +239,8 @@ public:
                            FString &output_message);
 
   /**
-   * Get backup mnemonic phrase.
+   * Get backup mnemonic phrase (Only for testing &
+   * development purpose).
    * @param output backup mnemonics
    * @param success whether succeed or not
    * @param message error message, "" if succeed
@@ -250,7 +253,8 @@ public:
                                FString &output_message);
 
   /**
-   * Generate mnemonics.
+   * Generate mnemonics (Only for testing &
+   * development purpose).
    * @param password salt in mnemonics restoration
    * @param wordcount mnemonics word count (12, 18, 24)
    * @param output generated mnemonics
