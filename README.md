@@ -37,12 +37,6 @@ Engine\Build\BatchFiles\RunUAT.bat[or RunUAT.sh] BuildPlugin -Plugin=[Path to .u
 ### Windows
 Make sure you use Visual Studio 2019 or newer.
 
-If any compiling errors occur, try to disable 4583 and 4582 warnings with the following lines:
-```c++
-#pragma warning(disable:4583)
-#pragma warning(disable:4582)
-```
-
 ###  macOS
 Make sure you use Xcode 13.2.1 (Xcode 13.3 or newer has unused variables errors when compiling
 the unreal source codes, until the issue is fixed by Epic Games).

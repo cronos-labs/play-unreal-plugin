@@ -336,6 +336,14 @@ void ADefiWalletCoreActor::DestroyWallet() {
   }
 }
 
+/**
+ * CAUTION: use only for testing & development purpose
+ * storing mnemonics need caution, please not to expose user mnemonics for
+ * public such as github, logs, files , etc.
+ *
+ * WARNING!!!: never transfer menmonics to 3rd party library or networking, ipc,
+ * logs or any kind of remote and zeroize after copying
+ */
 void ADefiWalletCoreActor::CreateWallet(FString mnemonics, FString password) {
   if (NULL == _coreWallet) {
     rust::cxxbridge1::Box<org::defi_wallet_core::Wallet> tmpWallet =
@@ -345,9 +353,17 @@ void ADefiWalletCoreActor::CreateWallet(FString mnemonics, FString password) {
   }
 }
 
-void ADefiWalletCoreActor::InitializeWallet(FString mnemonics, FString password,
-                                            FString &output, bool &success,
-                                            FString &output_message) {
+/**
+ * CAUTION: use only for testing & development purpose
+ * storing mnemonics need caution, please not to expose user mnemonics for
+ * public such as github, logs, files , etc.
+ *
+ * WARNING!!!: never transfer menmonics to 3rd party library or networking, ipc,
+ * logs or any kind of remote and zeroize after copying
+ */
+void ADefiWalletCoreActor::RestoreWallet(FString mnemonics, FString password,
+                                         FString &output, bool &success,
+                                         FString &output_message) {
   try {
     if (NULL != _coreWallet) {
       success = false;
@@ -378,9 +394,10 @@ void ADefiWalletCoreActor::InitializeWallet(FString mnemonics, FString password,
  * WARNING!!!: never transfer menmonics to 3rd party library or networking, ipc,
  * logs or any kind of remote and zeroize after copying
  */
-void ADefiWalletCoreActor::InitializeNewDevelopmentOnlyWallet(
-    FString password, EMnemonicsWordCount wordcount, FString &output,
-    bool &success, FString &output_message) {
+void ADefiWalletCoreActor::InitializeNewWallet(FString password,
+                                               EMnemonicsWordCount wordcount,
+                                               FString &output, bool &success,
+                                               FString &output_message) {
   try {
     if (NULL != _coreWallet) {
       success = false;
@@ -461,9 +478,18 @@ void ADefiWalletCoreActor::GetBackupMnemonicPhrase(FString &output,
   }
 }
 
-void ADefiWalletCoreActor::DevelopmentOnlyGenerateMnemonics(
-    FString password, EMnemonicsWordCount wordcount, FString &output,
-    bool &success, FString &output_message) {
+/**
+ * CAUTION: use only for testing & development purpose
+ * storing mnemonics need caution, please not to expose user mnemonics for
+ * public such as github, logs, files , etc.
+ *
+ * WARNING!!!: never transfer menmonics to 3rd party library or networking, ipc,
+ * logs or any kind of remote and zeroize after copying
+ */
+void ADefiWalletCoreActor::GenerateMnemonics(FString password,
+                                             EMnemonicsWordCount wordcount,
+                                             FString &output, bool &success,
+                                             FString &output_message) {
   try {
 
     ::org::defi_wallet_core::MnemonicWordCount mywordcount;
@@ -629,68 +655,6 @@ void ADefiWalletCoreActor::BroadcastEthTxAsync(FWalletBroadcastDelegate Out,
             });
 }
 
-void ADefiWalletCoreActor::SendEthAmount(
-    int32 walletIndex, FString fromaddress, FString toaddress,
-    FString amountInEthDecimal, FString gasLimit, FString gasPriceInWei,
-    TArray<uint8> txdata, FString &output, bool &success,
-    FString &output_message) {
-  try {
-    if (NULL == _coreWallet) {
-      success = false;
-      output_message = TEXT("Invalid Wallet");
-      return;
-    }
-
-    std::string mycronosrpc = TCHAR_TO_UTF8(*myCronosRpc); /* 8545 port */
-
-    rust::cxxbridge1::String myfromaddress =
-        _coreWallet->get_eth_address(walletIndex);
-    if (!isSameAddress(myfromaddress.c_str(), TCHAR_TO_UTF8(*fromaddress))) {
-      success = false;
-      output_message = TEXT("Invalid From Address");
-      return;
-    }
-    rust::cxxbridge1::String mytoaddress = TCHAR_TO_UTF8(*toaddress);
-    rust::cxxbridge1::String nonce1 =
-        get_eth_nonce(myfromaddress.c_str(), mycronosrpc);
-    char hdpath[100];
-    snprintf(hdpath, sizeof(hdpath), "m/44'/%d'/0'/0/%d", EthCoinType,
-             walletIndex);
-    rust::cxxbridge1::Box<PrivateKey> privatekey = _coreWallet->get_key(hdpath);
-    rust::cxxbridge1::Vec<uint8_t> data;
-    org::defi_wallet_core::EthTxInfoRaw eth_tx_info = new_eth_tx_info();
-    eth_tx_info.to_address = mytoaddress.c_str();
-    eth_tx_info.nonce = nonce1;
-    eth_tx_info.gas_limit = TCHAR_TO_UTF8(*gasLimit);
-    eth_tx_info.gas_price = TCHAR_TO_UTF8(*gasPriceInWei);
-
-    eth_tx_info.amount = TCHAR_TO_UTF8(*amountInEthDecimal);
-    eth_tx_info.amount_unit = org::defi_wallet_core::EthAmount::EthDecimal;
-
-    // data
-    eth_tx_info.data.clear();
-    for (int i = 0; i < txdata.Num(); i++) {
-      eth_tx_info.data.push_back(txdata[i]);
-    }
-    assert(eth_tx_info.data.size() == txdata.Num());
-
-    rust::Vec<::std::uint8_t> signedtx = build_eth_signed_tx(
-        eth_tx_info, (uint64)myCronosChainID, false, *privatekey);
-    ::org::defi_wallet_core::CronosTransactionReceiptRaw receipt =
-        broadcast_eth_signed_raw_tx(signedtx, mycronosrpc, 1000);
-
-    std::string txhash = to_hex(receipt.transaction_hash.data(),
-                                receipt.transaction_hash.size());
-
-    success = true;
-    output = UTF8_TO_TCHAR(txhash.c_str());
-  } catch (const rust::cxxbridge1::Error &e) {
-    success = false;
-    output_message = FString::Printf(
-        TEXT("CronosPlayUnreal SendAmount Error: %s"), UTF8_TO_TCHAR(e.what()));
-  }
-}
-
 std::string toLower(std::string strToConvert) {
   std::transform(strToConvert.begin(), strToConvert.end(), strToConvert.begin(),
                  ::tolower);
@@ -701,7 +665,7 @@ bool isSameAddress(std::string address1, std::string address2) {
   return toLower(address1) == toLower(address2);
 }
 
-void ADefiWalletCoreActor::SendEthAmountAsync(
+void ADefiWalletCoreActor::SendEthAmount(
     int32 walletIndex, FString fromaddress, FString toaddress,
     FString amountInEthDecimal, FString gasLimit, FString gasPriceInWei,
     TArray<uint8> txdata, FSendEthTransferDelegate Out) {
