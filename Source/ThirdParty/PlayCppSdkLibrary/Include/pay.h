@@ -12,8 +12,8 @@ struct OptionalArguments {
   /// An arbitrary string attached to the object.
   rust::String description;
   /// Set of key-value pairs that you can attach to an object. This can be
-  /// useful for storing additional information about the object in a structured
-  /// format.
+  /// useful for storing additional information about the object in a
+  /// structured format.
   rust::String metadata;
   /// Merchant provided order ID for this payment.
   rust::String order_id;

@@ -73,10 +73,11 @@ void APlayCppSdkActor::Destroyed() {
 
 void APlayCppSdkActor::InitializeWalletConnect(
     FString description, FString url, TArray<FString> icon_urls, FString name,
-    FInitializeWalletConnectBlockingDelegate Out) {
+    int64 chain_id, FInitializeWalletConnectBlockingDelegate Out) {
 
   AsyncTask(ENamedThreads::AnyHiPriThreadNormalTask, [this, Out, description,
-                                                      url, icon_urls, name]() {
+                                                      url, icon_urls, name, chain_id]() {
+
     FWalletConnectEnsureSessionResult output;
     bool success = false;
     FString message;
@@ -91,8 +92,8 @@ void APlayCppSdkActor::InitializeWalletConnect(
 
       std::string myname = TCHAR_TO_UTF8(*name);
 
-      Box<WalletconnectClient> tmpClient =
-          walletconnect_new_client(mydescription, myurl, myiconurls, myname);
+      Box<WalletconnectClient> tmpClient = walletconnect_new_client(
+          mydescription, myurl, myiconurls, myname, (uint64)chain_id);
       _coreClient = tmpClient.into_raw();
       assert(_coreClient != NULL);
 
@@ -288,15 +289,15 @@ void APlayCppSdkActor::SignPersonalBlocking(FString usermessage,
   }
 }
 
-void APlayCppSdkActor::SignLegacyTransactionBlocking(
-    FWalletConnectTxLegacy info, TArray<uint8> address,
-    FWalletconnectSignLegacyTransactionDelegate Out) {
+void APlayCppSdkActor::SignEip155TransactionBlocking(
+    FWalletConnectTxEip155 info, TArray<uint8> address,
+    FWalletconnectSignEip155TransactionDelegate Out) {
 
   ::com::crypto::game_sdk::WalletconnectClient *coreclient = _coreClient;
   assert(coreclient != NULL);
   AsyncTask(ENamedThreads::AnyHiPriThreadNormalTask, [Out, coreclient, address,
                                                       info, this]() {
-    FWalletSignTXLegayResult output;
+    FWalletSignTXEip155Result output;
 
     try {
 
@@ -306,28 +307,28 @@ void APlayCppSdkActor::SignLegacyTransactionBlocking(
         dstaddress[i] = address[i];
       }
 
-      WalletConnectTxLegacy myinfo;
+      WalletConnectTxEip155 myinfo;
       myinfo.to = TCHAR_TO_UTF8(*info.to);
-      myinfo.gas = TCHAR_TO_UTF8(*info.gas);
-      myinfo.gas_price = TCHAR_TO_UTF8(*info.gas_price);
+      myinfo.common.gas_limit = TCHAR_TO_UTF8(*info.gas);
+      myinfo.common.gas_price = TCHAR_TO_UTF8(*info.gas_price);
       myinfo.value = TCHAR_TO_UTF8(*info.value);
       copyTArrayToVec(info.data, myinfo.data);
-      myinfo.nonce = TCHAR_TO_UTF8(*info.nonce);
+      myinfo.common.nonce = TCHAR_TO_UTF8(*info.nonce);
       if (_coreClient != NULL) {
 
         Vec<uint8_t> sig1 =
-            _coreClient->sign_legacy_transaction_blocking(myinfo, dstaddress);
+            _coreClient->sign_eip155_transaction_blocking(myinfo, dstaddress);
 
         copyVecToTArray(sig1, output.signature);
         assert(sig1.size() == output.Num());
       } else {
         output.result = FString::Printf(
-            TEXT("PlayCppSdk SignLegacyTransactionBlocking Invalid Client"));
+            TEXT("PlayCppSdk SignEip155TransactionBlocking Invalid Client"));
       }
 
     } catch (const rust::cxxbridge1::Error &e) {
       output.result = FString::Printf(
-          TEXT("PlayCppSdk SignLegacyTransactionBlocking Error: %s"),
+          TEXT("PlayCppSdk SignEip155TransactionBlocking Error: %s"),
           UTF8_TO_TCHAR(e.what()));
     }
 

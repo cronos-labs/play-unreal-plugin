@@ -1169,8 +1169,7 @@ struct CppLoginInfo final : public ::rust::Opaque {
   /// needs (e.g. verify chain-id, nonce, uri + possibly fetch additional data
   /// associated with the given Ethereum address, such as
   /// ERC-20/ERC-721/ERC-1155 asset ownership)
-  ::rust::Vec<::std::uint8_t>
-  verify_logininfo(::rust::Slice<const ::std::uint8_t> signature) const;
+  void verify_logininfo(::rust::Slice<const ::std::uint8_t> signature) const;
 
   ~CppLoginInfo() = delete;
 
@@ -1354,8 +1353,7 @@ org$defi_wallet_core$cxxbridge1$CppLoginInfo$sign_logininfo(
 ::rust::repr::PtrLen
 org$defi_wallet_core$cxxbridge1$CppLoginInfo$verify_logininfo(
     const ::org::defi_wallet_core::CppLoginInfo &self,
-    ::rust::Slice<const ::std::uint8_t> signature,
-    ::rust::Vec<::std::uint8_t> *return$) noexcept;
+    ::rust::Slice<const ::std::uint8_t> signature) noexcept;
 
 void org$defi_wallet_core$cxxbridge1$new_eth_tx_info(
     ::org::defi_wallet_core::EthTxInfoRaw *return$) noexcept;
@@ -1812,16 +1810,14 @@ new_logininfo(::rust::String msg) {
   return ::std::move(return$.value);
 }
 
-::rust::Vec<::std::uint8_t> CppLoginInfo::verify_logininfo(
+void CppLoginInfo::verify_logininfo(
     ::rust::Slice<const ::std::uint8_t> signature) const {
-  ::rust::MaybeUninit<::rust::Vec<::std::uint8_t>> return$;
   ::rust::repr::PtrLen error$ =
-      org$defi_wallet_core$cxxbridge1$CppLoginInfo$verify_logininfo(
-          *this, signature, &return$.value);
+      org$defi_wallet_core$cxxbridge1$CppLoginInfo$verify_logininfo(*this,
+                                                                    signature);
   if (error$.ptr) {
     throw ::rust::impl<::rust::Error>::error(error$);
   }
-  return ::std::move(return$.value);
 }
 
 /// create cronos tx info to sign

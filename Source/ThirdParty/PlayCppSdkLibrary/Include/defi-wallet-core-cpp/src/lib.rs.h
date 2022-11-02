@@ -1073,8 +1073,7 @@ struct CppLoginInfo final : public ::rust::Opaque {
   /// needs (e.g. verify chain-id, nonce, uri + possibly fetch additional data
   /// associated with the given Ethereum address, such as
   /// ERC-20/ERC-721/ERC-1155 asset ownership)
-  ::rust::Vec<::std::uint8_t>
-  verify_logininfo(::rust::Slice<const ::std::uint8_t> signature) const;
+  void verify_logininfo(::rust::Slice<const ::std::uint8_t> signature) const;
 
   ~CppLoginInfo() = delete;
 
