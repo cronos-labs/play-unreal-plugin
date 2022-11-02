@@ -1,10 +1,17 @@
 # Changelog
 ## [v0.0.9-alpha] - 2022-11-01
+!!! Please notice: This version introduces some breaking changes !!!
+- Add `chain_id` for function `InitializeWalletConnect`
 - Rename the following Functions
   - `InitializeWallet` -> `RestoreWallet`
   - `InitializeNewDevelopmentOnlyWallet` -> `InitializeNewWallet`
   - `DevelopmentOnlyGenerateMnemonics` -> `GenerateMnemonics`
   - `SendEthAmountAsync` -> `SendEthAmount`
+  - `SignLegacyTransactionBlocking` -> `SignEip155TransactionBlocking`
+- Rename the following Variables
+  - `FWalletConnectTxLegacy` ->`FWalletConnectTxEip155`
+  - `FWalletSignTXLegayResult` -> `FWalletSignTXEip155Result`
+  - `FWalletconnectSignLegacyTransactionDelegate` -> `FWalletconnectSignEip155TransactionDelegate`
 - Setup Default User Agent in `DefiWalletCoreActor`
 - Move `BroadcastEthTxAsync` to `DefiWalletCoreActor`
 - Fix DocsURL

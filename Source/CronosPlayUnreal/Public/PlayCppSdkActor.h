@@ -106,7 +106,7 @@ struct FWalletConnectEnsureSessionResult {
 
 /// wallet connect sign tx result
 USTRUCT(BlueprintType)
-struct FWalletSignTXLegayResult {
+struct FWalletSignTXEip155Result {
   GENERATED_USTRUCT_BODY()
 
   /// signature, 65 bytes, if successful
@@ -118,9 +118,9 @@ struct FWalletSignTXLegayResult {
   FString result;
 };
 
-/// sign legacy tx callback
-DECLARE_DYNAMIC_DELEGATE_OneParam(FWalletconnectSignLegacyTransactionDelegate,
-                                  FWalletSignTXLegayResult, SigningResult);
+/// sign eip155 tx callback
+DECLARE_DYNAMIC_DELEGATE_OneParam(FWalletconnectSignEip155TransactionDelegate,
+                                  FWalletSignTXEip155Result, SigningResult);
 
 /// initialize wallet connect callback
 DECLARE_DYNAMIC_DELEGATE_TwoParams(FInitializeWalletConnectBlockingDelegate,
@@ -136,7 +136,7 @@ DECLARE_DYNAMIC_DELEGATE_TwoParams(FEnsureSessionBlockingDelegate,
 
 /// wallet connect tx legacy information
 USTRUCT(BlueprintType)
-struct FWalletConnectTxLegacy {
+struct FWalletConnectTxEip155 {
   GENERATED_USTRUCT_BODY()
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayCppSdk")
   FString to;
@@ -201,6 +201,7 @@ public:
             Category = "PlayCppSdk")
   void InitializeWalletConnect(FString description, FString url,
                                TArray<FString> icon_urls, FString name,
+                               int64 chain_id,
                                FInitializeWalletConnectBlockingDelegate Out);
 
   /**
@@ -283,19 +284,19 @@ public:
                             FString &output_message);
 
   /**
-   * sign legacy tx
-   * @param info legacy tx information
+   * sign EIP155 tx
+   * @param info EIP 155 tx information
    * @param address address to sign
    * @param Out sign legacy tx result callback
    *
    */
   UFUNCTION(BlueprintCallable,
-            meta = (DisplayName = "SignLegacyTransactionBlocking",
+            meta = (DisplayName = "SignEip155TransactionBlocking",
                     Keywords = "PlayCppSdk"),
             Category = "PlayCppSdk")
-  void SignLegacyTransactionBlocking(
-      FWalletConnectTxLegacy info, TArray<uint8> address,
-      FWalletconnectSignLegacyTransactionDelegate Out);
+  void SignEip155TransactionBlocking(
+      FWalletConnectTxEip155 info, TArray<uint8> address,
+      FWalletconnectSignEip155TransactionDelegate Out);
 
   /**
    * WalletConnect Session Information callback
