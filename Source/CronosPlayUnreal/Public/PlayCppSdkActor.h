@@ -27,6 +27,22 @@
 
 #include "PlayCppSdkActor.generated.h"
 
+/**
+ Cronos Signed Transaction
+ */
+USTRUCT(BlueprintType)
+struct FCronosSignedTransactionRaw {
+  GENERATED_BODY()
+
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CronosPlayUnreal")
+  TArray<uint8> SignedTx;
+};
+
+// build signed-tx
+DECLARE_DYNAMIC_DELEGATE_TwoParams(FCronosSignedTransactionDelegate,
+                                   FCronosSignedTransactionRaw, TxResult,
+                                   FString, Result);
+
 /// wallet connect session state
 UENUM(BlueprintType)
 enum class EWalletconnectSessionState : uint8 {
@@ -184,6 +200,22 @@ protected:
   virtual void Destroyed() override;
 
 public:
+  /**
+   *  Cronos rpc address
+   *  for example , devnet:  http://127.0.0.1:8545
+   * testnet: https://evm-dev-t3.cronos.org
+   */
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CronosPlayUnreal")
+  FString myCronosRpc;
+
+  /**
+   * Cronos chain-id
+   * for example, devnet: 777
+   * testnet: 338
+   */
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CronosPlayUnreal")
+  int32 myCronosChainID;
+
   // Called every frame
   virtual void Tick(float DeltaTime) override;
 
@@ -329,4 +361,29 @@ public:
   void sendEvent(const FWalletConnectSessionInfo &);
 
   static void destroyCoreClient();
+
+  /**
+   * Safely transfers `token_id` token from `from_address` to `to_address`.
+   * @param contractAddress erc721 contract
+   * @param fromAddress from address to move
+   * @param toAddress to address
+   * @param tokenid token id
+   * @param gasLimit gas limit
+   * @param gasPrice gas price
+   * @param Out Erc721SafeTransferFrom callback
+   */
+  UFUNCTION(BlueprintCallable,
+            meta = (DisplayName = "Erc721SafeTransferFrom",
+                    Keywords = "Wallet"),
+            Category = "CronosPlayUnreal")
+  void Erc721SafeTransferFrom(FString contractAddress, FString fromAddress,
+                              FString toAddress, FString tokenid,
+                              FString gasLimit, FString gasPrice,
+                              FCronosSignedTransactionDelegate Out);
+
+  UFUNCTION(BlueprintCallable,
+            meta = (DisplayName = "WalletConnectHelloWorld",
+                    Keywords = "Wallet"),
+            Category = "CronosPlayUnreal")
+  static void WalletConnectHelloWorld(FString message, FString &output);
 };

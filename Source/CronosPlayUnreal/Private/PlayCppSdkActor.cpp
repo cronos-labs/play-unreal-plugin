@@ -316,6 +316,7 @@ void APlayCppSdkActor::SignEip155Transaction(
       myinfo.to = TCHAR_TO_UTF8(*info.to);
       myinfo.common.gas_limit = TCHAR_TO_UTF8(*info.gas);
       myinfo.common.gas_price = TCHAR_TO_UTF8(*info.gas_price);
+      myinfo.common.chainid = myCronosChainID;
       myinfo.value = TCHAR_TO_UTF8(*info.value);
       copyTArrayToVec(info.data, myinfo.data);
       myinfo.common.nonce = TCHAR_TO_UTF8(*info.nonce);
@@ -408,3 +409,63 @@ void APlayCppSdkActor::destroyCoreClient() {
 }
 
 void StopWalletConnect() { APlayCppSdkActor::destroyCoreClient(); }
+
+void APlayCppSdkActor::Erc721SafeTransferFrom(
+    FString contractAddress, FString fromAddress, FString toAddress,
+    FString tokenid, FString gasLimit, FString gasPrice,
+    FCronosSignedTransactionDelegate Out) {
+
+  AsyncTask(ENamedThreads::AnyHiPriThreadNormalTask,
+            [this, Out, contractAddress, fromAddress, toAddress, tokenid,
+             gasLimit, gasPrice]() {
+              FString result;
+              FCronosSignedTransactionRaw txresult;
+              try {
+                if (NULL == _coreClient) {
+                  result = TEXT("Invalid Walletconnect");
+                } else {
+
+                  std::string mycontractaddress =
+                      TCHAR_TO_UTF8(*contractAddress);
+                  std::string myfromaddress = TCHAR_TO_UTF8(*fromAddress);
+                  std::string mytoaddress = TCHAR_TO_UTF8(*toAddress);
+                  std::string mycronosrpc = TCHAR_TO_UTF8(*myCronosRpc);
+                  std::string mytokenid = TCHAR_TO_UTF8(*tokenid);
+                  std::string mygaslimit = TCHAR_TO_UTF8(*gasLimit);
+                  std::string mygasprice = TCHAR_TO_UTF8(*gasPrice);
+                  // get nonce
+                  std::string mynonce = org::defi_wallet_core::get_eth_nonce(
+                                            myfromaddress.c_str(), mycronosrpc)
+                                            .c_str();
+
+                  WalletConnectErc721Transfer info;
+                  info.contract_address = mycontractaddress;
+                  info.from_address = myfromaddress;
+                  info.to_address = mytoaddress;
+                  info.token_id = mytokenid;
+                  info.common.nonce = mynonce;
+                  info.common.gas_limit = mygaslimit;
+                  info.common.gas_price = mygasprice;
+                  info.common.chainid = myCronosChainID;
+                  info.common.web3api_url = mycronosrpc.c_str();
+     
+                  Vec<uint8_t> rawtx = _coreClient->erc721_transfer(info);
+                  copyVecToTArray(rawtx, txresult.SignedTx);
+                }
+
+              } catch (const rust::cxxbridge1::Error &e) {
+                result = FString::Printf(
+                    TEXT("CronosPlayUnreal Erc721SafeTransferFrom Error: %s"),
+                    UTF8_TO_TCHAR(e.what()));
+              }
+
+              AsyncTask(ENamedThreads::GameThread, [Out, txresult, result]() {
+                Out.ExecuteIfBound(txresult, result);
+              });
+            });
+}
+
+void APlayCppSdkActor::WalletConnectHelloWorld(FString message,
+                                               FString &output) {
+  output = FString::Printf(TEXT("WalletConnectHelloWorld %s"), *message);
+}
