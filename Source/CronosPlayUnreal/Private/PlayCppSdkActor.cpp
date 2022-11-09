@@ -2,10 +2,13 @@
 
 #include "PlayCppSdkActor.h"
 
+#include "Async/TaskGraphInterfaces.h"
+#include "GenericPlatform/GenericPlatformHttp.h"
 #include "PlayCppSdkLibrary/Include/extra-cpp-bindings/src/lib.rs.h"
 #include "PlayCppSdkLibrary/Include/rust/cxx.h"
 #include <iostream>
 #include <memory>
+
 using namespace std;
 using namespace rust;
 using namespace com::crypto::game_sdk;
@@ -73,44 +76,43 @@ void APlayCppSdkActor::Destroyed() {
 
 void APlayCppSdkActor::InitializeWalletConnect(
     FString description, FString url, TArray<FString> icon_urls, FString name,
-    int64 chain_id, FInitializeWalletConnectBlockingDelegate Out) {
+    int64 chain_id, FInitializeWalletConnectDelegate Out) {
 
-  AsyncTask(ENamedThreads::AnyHiPriThreadNormalTask, [this, Out, description,
-                                                      url, icon_urls, name, chain_id]() {
+  AsyncTask(ENamedThreads::AnyHiPriThreadNormalTask,
+            [this, Out, description, url, icon_urls, name, chain_id]() {
+              FWalletConnectEnsureSessionResult output;
+              bool success = false;
+              FString message;
+              try {
 
-    FWalletConnectEnsureSessionResult output;
-    bool success = false;
-    FString message;
-    try {
+                std::string mydescription = TCHAR_TO_UTF8(*description);
+                std::string myurl = TCHAR_TO_UTF8(*url);
+                Vec<String> myiconurls;
+                for (int i = 0; i < icon_urls.Num(); i++) {
+                  myiconurls.push_back(TCHAR_TO_UTF8(*icon_urls[i]));
+                }
 
-      std::string mydescription = TCHAR_TO_UTF8(*description);
-      std::string myurl = TCHAR_TO_UTF8(*url);
-      Vec<String> myiconurls;
-      for (int i = 0; i < icon_urls.Num(); i++) {
-        myiconurls.push_back(TCHAR_TO_UTF8(*icon_urls[i]));
-      }
+                std::string myname = TCHAR_TO_UTF8(*name);
 
-      std::string myname = TCHAR_TO_UTF8(*name);
+                Box<WalletconnectClient> tmpClient = walletconnect_new_client(
+                    mydescription, myurl, myiconurls, myname, (uint64)chain_id);
+                _coreClient = tmpClient.into_raw();
+                assert(_coreClient != NULL);
 
-      Box<WalletconnectClient> tmpClient = walletconnect_new_client(
-          mydescription, myurl, myiconurls, myname, (uint64)chain_id);
-      _coreClient = tmpClient.into_raw();
-      assert(_coreClient != NULL);
+                success = true;
 
-      success = true;
+              } catch (const rust::cxxbridge1::Error &e) {
 
-    } catch (const rust::cxxbridge1::Error &e) {
+                success = false;
+                message = FString::Printf(
+                    TEXT("PlayCppSdk InitializeWalletConnect Error: %s"),
+                    UTF8_TO_TCHAR(e.what()));
+              }
 
-      success = false;
-      message =
-          FString::Printf(TEXT("PlayCppSdk InitializeWalletConnect Error: %s"),
-                          UTF8_TO_TCHAR(e.what()));
-    }
-
-    AsyncTask(ENamedThreads::GameThread, [Out, success, message]() {
-      Out.ExecuteIfBound(success, message);
-    });
-  });
+              AsyncTask(ENamedThreads::GameThread, [Out, success, message]() {
+                Out.ExecuteIfBound(success, message);
+              });
+            });
 }
 
 void APlayCppSdkActor::RestoreClient(FString jsondata, bool &success,
@@ -136,8 +138,7 @@ void APlayCppSdkActor::RestoreClient(FString jsondata, bool &success,
   }
 }
 
-void APlayCppSdkActor::EnsureSessionBlocking(
-    FEnsureSessionBlockingDelegate Out) {
+void APlayCppSdkActor::EnsureSession(FEnsureSessionDelegate Out) {
 
   AsyncTask(ENamedThreads::AnyHiPriThreadNormalTask, [this, Out]() {
     FWalletConnectEnsureSessionResult output;
@@ -164,13 +165,12 @@ void APlayCppSdkActor::EnsureSessionBlocking(
         output.chain_id = sessionresult.chain_id;
       } else {
         result = FString::Printf(
-            TEXT("PlayCppSdk EnsureSessionBlocking Error Invalid Client"));
+            TEXT("PlayCppSdk EnsureSession Error Invalid Client"));
       }
 
     } catch (const rust::cxxbridge1::Error &e) {
-      result =
-          FString::Printf(TEXT("PlayCppSdk EnsureSessionBlocking Error: %s"),
-                          UTF8_TO_TCHAR(e.what()));
+      result = FString::Printf(TEXT("PlayCppSdk EnsureSession Error: %s"),
+                               UTF8_TO_TCHAR(e.what()));
     }
 
     AsyncTask(ENamedThreads::GameThread,
@@ -198,9 +198,8 @@ void APlayCppSdkActor::SetupCallback(
     success = true;
   } catch (const rust::cxxbridge1::Error &e) {
     success = false;
-    output_message =
-        FString::Printf(TEXT("PlayCppSdk EnsureSessionBlocking Error: %s"),
-                        UTF8_TO_TCHAR(e.what()));
+    output_message = FString::Printf(TEXT("PlayCppSdk EnsureSession Error: %s"),
+                                     UTF8_TO_TCHAR(e.what()));
   }
 }
 
@@ -221,6 +220,13 @@ void APlayCppSdkActor::GetConnectionString(FString &output, bool &success,
     output_message = FString::Printf(TEXT("PlayCppSdk GetQrcode Error: %s"),
                                      UTF8_TO_TCHAR(e.what()));
   }
+}
+
+FString APlayCppSdkActor::GetCryptoWalletUrl(FString uri) {
+  FString temp = FGenericPlatformHttp::UrlEncode(uri);
+  FString url = FString::Printf(TEXT("cryptowallet://wc?uri=%s"), *temp);
+  // UE_LOG(LogTemp, Display, TEXT("THE URI is: %s"), *uri)
+  return url;
 }
 
 void APlayCppSdkActor::SaveClient(FString &output, bool &success,
@@ -257,39 +263,38 @@ void copyVecToTArray(const Vec<uint8_t> &src, TArray<uint8> &dst) {
   assert(dst.Num() == src.size());
 }
 
-void APlayCppSdkActor::SignPersonalBlocking(FString usermessage,
-                                            TArray<uint8> address,
-                                            TArray<uint8> &output,
-                                            bool &success,
-                                            FString &output_message) {
-  try {
-    if (NULL == _coreClient) {
-      success = false;
-      output_message = TEXT("Invalid Client");
-      return;
-    }
+void APlayCppSdkActor::SignPersonal(FString user_message, TArray<uint8> address,
+                                    FWalletconnectSignPersonalDelegate Out) {
+  ::com::crypto::game_sdk::WalletconnectClient *coreclient = _coreClient;
+  assert(coreclient != NULL);
+  AsyncTask(ENamedThreads::AnyHiPriThreadNormalTask,
+            [Out, coreclient, user_message, address, this]() {
+              FWalletSignTXEip155Result output;
+              try {
 
-    assert(20 == address.Num());
-    ::std::array<::std::uint8_t, 20> dstaddress;
-    for (int i = 0; i < address.Num(); i++) {
-      dstaddress[i] = address[i];
-    }
-    Vec<uint8_t> sig1 = _coreClient->sign_personal_blocking(
-        TCHAR_TO_UTF8(*usermessage), dstaddress);
+                assert(20 == address.Num());
+                ::std::array<::std::uint8_t, 20> dstaddress;
+                for (int i = 0; i < address.Num(); i++) {
+                  dstaddress[i] = address[i];
+                }
+                Vec<uint8_t> sig1 = _coreClient->sign_personal_blocking(
+                    TCHAR_TO_UTF8(*user_message), dstaddress);
 
-    copyVecToTArray(sig1, output);
-    assert(sig1.size() == output.Num());
+                copyVecToTArray(sig1, output.signature);
+                assert(sig1.size() == output.Num());
 
-    success = true;
-  } catch (const rust::cxxbridge1::Error &e) {
-    success = false;
-    output_message =
-        FString::Printf(TEXT("PlayCppSdk SignPersonalBlocking Error: %s"),
-                        UTF8_TO_TCHAR(e.what()));
-  }
+              } catch (const rust::cxxbridge1::Error &e) {
+                output.result =
+                    FString::Printf(TEXT("PlayCppSdk SignPersonal Error: %s"),
+                                    UTF8_TO_TCHAR(e.what()));
+              }
+
+              AsyncTask(ENamedThreads::GameThread,
+                        [Out, output]() { Out.ExecuteIfBound(output); });
+            });
 }
 
-void APlayCppSdkActor::SignEip155TransactionBlocking(
+void APlayCppSdkActor::SignEip155Transaction(
     FWalletConnectTxEip155 info, TArray<uint8> address,
     FWalletconnectSignEip155TransactionDelegate Out) {
 
@@ -314,6 +319,7 @@ void APlayCppSdkActor::SignEip155TransactionBlocking(
       myinfo.value = TCHAR_TO_UTF8(*info.value);
       copyTArrayToVec(info.data, myinfo.data);
       myinfo.common.nonce = TCHAR_TO_UTF8(*info.nonce);
+      myinfo.common.chainid = (uint64)info.chain_id;
       if (_coreClient != NULL) {
 
         Vec<uint8_t> sig1 =
@@ -323,13 +329,13 @@ void APlayCppSdkActor::SignEip155TransactionBlocking(
         assert(sig1.size() == output.Num());
       } else {
         output.result = FString::Printf(
-            TEXT("PlayCppSdk SignEip155TransactionBlocking Invalid Client"));
+            TEXT("PlayCppSdk SignEip155Transaction Invalid Client"));
       }
 
     } catch (const rust::cxxbridge1::Error &e) {
-      output.result = FString::Printf(
-          TEXT("PlayCppSdk SignEip155TransactionBlocking Error: %s"),
-          UTF8_TO_TCHAR(e.what()));
+      output.result =
+          FString::Printf(TEXT("PlayCppSdk SignEip155Transaction Error: %s"),
+                          UTF8_TO_TCHAR(e.what()));
     }
 
     AsyncTask(ENamedThreads::GameThread,

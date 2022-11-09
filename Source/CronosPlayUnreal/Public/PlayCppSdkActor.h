@@ -122,34 +122,44 @@ struct FWalletSignTXEip155Result {
 DECLARE_DYNAMIC_DELEGATE_OneParam(FWalletconnectSignEip155TransactionDelegate,
                                   FWalletSignTXEip155Result, SigningResult);
 
+/// sign personal callback
+DECLARE_DYNAMIC_DELEGATE_OneParam(FWalletconnectSignPersonalDelegate,
+                                  FWalletSignTXEip155Result, SigningResult);
+
 /// initialize wallet connect callback
-DECLARE_DYNAMIC_DELEGATE_TwoParams(FInitializeWalletConnectBlockingDelegate,
-                                   bool,
-                                   Succeed,           // 1st parameter
-                                   FString, message); // 2nd parameter
+DECLARE_DYNAMIC_DELEGATE_TwoParams(FInitializeWalletConnectDelegate, bool,
+                                   Succeed, FString, message);
 
 /// wallet connect ensure sssion callback
-DECLARE_DYNAMIC_DELEGATE_TwoParams(FEnsureSessionBlockingDelegate,
+DECLARE_DYNAMIC_DELEGATE_TwoParams(FEnsureSessionDelegate,
                                    FWalletConnectEnsureSessionResult,
-                                   SessionResult,    // 1st parameter
-                                   FString, Result); // 2nd parameter
+                                   SessionResult, FString, Result);
 
-/// wallet connect tx legacy information
+/// wallet connect eip155 tx information
 USTRUCT(BlueprintType)
 struct FWalletConnectTxEip155 {
   GENERATED_USTRUCT_BODY()
+  /** hexstring, "0x..." */
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayCppSdk")
   FString to;
+  /** gas limit in decimal string */
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayCppSdk")
   FString gas;
+  /** gas price in decimal string */
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayCppSdk")
   FString gas_price;
+  /** decimal string, in wei units */
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayCppSdk")
   FString value;
+  /** data, as bytes */
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayCppSdk")
   TArray<uint8> data;
+  /** nonce in decimal string */
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayCppSdk")
   FString nonce;
+  /** chain_id */
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayCppSdk")
+  int64 chain_id;
 };
 
 /// facade for wallet connect
@@ -202,17 +212,16 @@ public:
   void InitializeWalletConnect(FString description, FString url,
                                TArray<FString> icon_urls, FString name,
                                int64 chain_id,
-                               FInitializeWalletConnectBlockingDelegate Out);
+                               FInitializeWalletConnectDelegate Out);
 
   /**
    * create session or restore ession, ensure session
    * @param Out EnsureSession callback
    */
   UFUNCTION(BlueprintCallable,
-            meta = (DisplayName = "EnsureSessionBlocking",
-                    Keywords = "PlayCppSdk"),
+            meta = (DisplayName = "EnsureSession", Keywords = "PlayCppSdk"),
             Category = "PlayCppSdk")
-  void EnsureSessionBlocking(FEnsureSessionBlockingDelegate Out);
+  void EnsureSession(FEnsureSessionDelegate Out);
 
   /**
    * setup callback to receive event
@@ -243,6 +252,17 @@ public:
                            FString &output_message);
 
   /**
+   * get crypto wallet url
+   * @param uri WalletConnect uri
+   * @return url starts with cryptowallet://
+   *
+   */
+  UFUNCTION(BlueprintCallable,
+            meta = (DisplayName = "GetCryptoWalletUrl",
+                    Keywords = "PlayCppSdk"),
+            Category = "PlayCppSdk")
+  FString GetCryptoWalletUrl(FString uri);
+  /**
    * save session information as string
    * @param output session information string
    * @param success succeed or fail
@@ -268,20 +288,18 @@ public:
 
   /**
    * sign general message
-   * @param usermessage user message to sign
+   * @param user_message user message to sign
    * @param address address to sign
-   * @param output signature string
+   * @param signature signature byte arrays
    * @param success succeed or fail
    * @param output_message  error message
    *
    */
   UFUNCTION(BlueprintCallable,
-            meta = (DisplayName = "SignPersonalBlocking",
-                    Keywords = "PlayCppSdk"),
+            meta = (DisplayName = "SignPersonal", Keywords = "PlayCppSdk"),
             Category = "PlayCppSdk")
-  void SignPersonalBlocking(FString usermessage, TArray<uint8> address,
-                            TArray<uint8> &output, bool &success,
-                            FString &output_message);
+  void SignPersonal(FString user_message, TArray<uint8> address,
+                    FWalletconnectSignPersonalDelegate Out);
 
   /**
    * sign EIP155 tx
@@ -291,12 +309,11 @@ public:
    *
    */
   UFUNCTION(BlueprintCallable,
-            meta = (DisplayName = "SignEip155TransactionBlocking",
+            meta = (DisplayName = "SignEip155Transaction",
                     Keywords = "PlayCppSdk"),
             Category = "PlayCppSdk")
-  void SignEip155TransactionBlocking(
-      FWalletConnectTxEip155 info, TArray<uint8> address,
-      FWalletconnectSignEip155TransactionDelegate Out);
+  void SignEip155Transaction(FWalletConnectTxEip155 info, TArray<uint8> address,
+                             FWalletconnectSignEip155TransactionDelegate Out);
 
   /**
    * WalletConnect Session Information callback
