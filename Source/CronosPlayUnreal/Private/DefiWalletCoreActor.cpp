@@ -936,13 +936,13 @@ void ADefiWalletCoreActor::Erc721Balance(FString contractAddress,
 }
 
 void ADefiWalletCoreActor::Erc1155Balance(FString contractAddress,
-                                          FString accountAdress,
+                                          FString accountAddress,
                                           FString tokenID, FString &balance,
                                           bool &success,
                                           FString &output_message) {
   try {
     std::string mycontractaddress = TCHAR_TO_UTF8(*contractAddress);
-    std::string myaccountaddress = TCHAR_TO_UTF8(*accountAdress);
+    std::string myaccountaddress = TCHAR_TO_UTF8(*accountAddress);
     std::string mytokenid = TCHAR_TO_UTF8(*tokenID);
     std::string mycronosrpc = TCHAR_TO_UTF8(*myCronosRpc);
     Erc1155 erc1155 =

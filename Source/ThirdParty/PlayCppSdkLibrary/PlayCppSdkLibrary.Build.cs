@@ -52,6 +52,9 @@ public class PlayCppSdkLibrary : ModuleRules {
           Path.Combine(LibrariesPath, "Android", "armeabi-v7a", "libplay_cpp_sdk.a"));
       PublicAdditionalLibraries.Add(
           Path.Combine(LibrariesPath, "Android", "x86_64", "libplay_cpp_sdk.a"));
+    } else if (Target.Platform == UnrealTargetPlatform.IOS) {
+        PublicAdditionalLibraries.Add(
+            Path.Combine(LibrariesPath, "iOS", "arm64", "libplay_cpp_sdk.a"));
     }
   }
 }
