@@ -210,7 +210,8 @@ void UPlayCppSdkBPLibrary::SetupUserAgent(FString UserAgent) {
   try {
     ::org::defi_wallet_core::set_cronos_httpagent(TCHAR_TO_UTF8(*UserAgent));
   } catch (const rust::cxxbridge1::Error &e) {
-    UE_LOG(LogTemp, Error, TEXT("PlayCppSdk SetupUserAgent Already Setup: %s"),
+    // This captured exception only means the user agent is already set, instead of an error
+    UE_LOG(LogTemp, Display, TEXT("PlayCppSdk SetupUserAgent Already Setup: %s"),
            UTF8_TO_TCHAR(e.what()));
   }
 }
