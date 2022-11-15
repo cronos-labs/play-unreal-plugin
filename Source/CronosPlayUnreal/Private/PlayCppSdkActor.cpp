@@ -4,6 +4,7 @@
 
 #include "Async/TaskGraphInterfaces.h"
 #include "GenericPlatform/GenericPlatformHttp.h"
+#include "Kismet/GameplayStatics.h"
 #include "PlayCppSdkLibrary/Include/extra-cpp-bindings/src/lib.rs.h"
 #include "PlayCppSdkLibrary/Include/rust/cxx.h"
 #include <iostream>
@@ -224,9 +225,19 @@ void APlayCppSdkActor::GetConnectionString(FString &output, bool &success,
 
 FString APlayCppSdkActor::GetCryptoWalletUrl(FString uri) {
   FString temp = FGenericPlatformHttp::UrlEncode(uri);
-  FString url = FString::Printf(TEXT("cryptowallet://wc?uri=%s"), *temp);
-  // UE_LOG(LogTemp, Display, TEXT("THE URI is: %s"), *uri)
-  return url;
+  FString platform = UGameplayStatics::GetPlatformName();
+  if (platform == TEXT("IOS")) {
+    // Use universal link on ios
+    FString url =
+        FString::Printf(TEXT("https://wallet.crypto.com/wc?uri=%s"), *temp);
+    // UE_LOG(LogTemp, Display, TEXT("THE URI is: %s"), *uri)
+    return url;
+  } else {
+    // Use deep link on non-ios
+    FString url = FString::Printf(TEXT("cryptowallet://wc?uri=%s"), *temp);
+    // UE_LOG(LogTemp, Display, TEXT("THE URI is: %s"), *uri)
+    return url;
+  }
 }
 
 void APlayCppSdkActor::SaveClient(FString &output, bool &success,
