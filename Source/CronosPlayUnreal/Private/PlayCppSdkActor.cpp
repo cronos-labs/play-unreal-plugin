@@ -223,10 +223,21 @@ void APlayCppSdkActor::GetConnectionString(FString &output, bool &success,
 }
 
 FString APlayCppSdkActor::GetCryptoWalletUrl(FString uri) {
+#if PLATFORM_IOS
+  // Use universal link on ios
+  FString temp = FGenericPlatformHttp::UrlEncode(uri);
+  FString url =
+      FString::Printf(TEXT("https://wallet.crypto.com/wc?uri=%s"), *temp);
+  return url;
+#elif PLATFORM_ANDROID
+  // Android simply needs uri
+  return uri;
+#else
+  // Use deep link on other os
   FString temp = FGenericPlatformHttp::UrlEncode(uri);
   FString url = FString::Printf(TEXT("cryptowallet://wc?uri=%s"), *temp);
-  // UE_LOG(LogTemp, Display, TEXT("THE URI is: %s"), *uri)
   return url;
+#endif
 }
 
 void APlayCppSdkActor::SaveClient(FString &output, bool &success,
