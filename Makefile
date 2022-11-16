@@ -95,7 +95,7 @@ uncompress: prepare
 	tar xvf install/android/arm64-v8a/$(ARM64_V8A_FILE) -C ./Source/ThirdParty/PlayCppSdkLibrary/Lib/Android/arm64-v8a --strip-components=2 sdk/lib/libplay_cpp_sdk.a
 	tar xvf install/android/armeabi-v7a/$(ARMEABI_V7A_FILE) -C ./Source/ThirdParty/PlayCppSdkLibrary/Lib/Android/armeabi-v7a --strip-components=2 sdk/lib/libplay_cpp_sdk.a
 	tar xvf install/android/x86_64/$(X86_64_FILE) -C ./Source/ThirdParty/PlayCppSdkLibrary/Lib/Android/x86_64 --strip-components=2 sdk/lib/libplay_cpp_sdk.a
-	tar xvf install/ios/$(IOS_FILE) -C ./Source/ThirdParty/PlayCppSdkLibrary/Lib/iOS --strip-components=2 sdk/lib/libplay_cpp_sdk.a
+	tar xvf install/ios/$(IOS_FILE) -C ./Source/ThirdParty/PlayCppSdkLibrary/Lib/iOS/arm64 --strip-components=2 sdk/lib/libplay_cpp_sdk.a
 
 
 # FIXME Build Android/IOS with RunUAT.sh
