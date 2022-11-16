@@ -4,7 +4,6 @@
 
 #include "Async/TaskGraphInterfaces.h"
 #include "GenericPlatform/GenericPlatformHttp.h"
-#include "Kismet/GameplayStatics.h"
 #include "PlayCppSdkLibrary/Include/extra-cpp-bindings/src/lib.rs.h"
 #include "PlayCppSdkLibrary/Include/rust/cxx.h"
 #include <iostream>
@@ -224,22 +223,21 @@ void APlayCppSdkActor::GetConnectionString(FString &output, bool &success,
 }
 
 FString APlayCppSdkActor::GetCryptoWalletUrl(FString uri) {
-  FString platform = UGameplayStatics::GetPlatformName();
-  if (platform == TEXT("IOS")) {
-    // Use universal link on ios
-    FString temp = FGenericPlatformHttp::UrlEncode(uri);
-    FString url =
-        FString::Printf(TEXT("https://wallet.crypto.com/wc?uri=%s"), *temp);
-    return url;
-  } else if (platform == TEXT("Android")) {
-    // Android simply needs uri
-    return uri;
-  } else {
-    // Use deep link on other os
-    FString temp = FGenericPlatformHttp::UrlEncode(uri);
-    FString url = FString::Printf(TEXT("cryptowallet://wc?uri=%s"), *temp);
-    return url;
-  }
+#if PLATFORM_IOS
+  // Use universal link on ios
+  FString temp = FGenericPlatformHttp::UrlEncode(uri);
+  FString url =
+      FString::Printf(TEXT("https://wallet.crypto.com/wc?uri=%s"), *temp);
+  return url;
+#elif PLATFORM_ANDROID
+  // Android simply needs uri
+  return uri;
+#else
+  // Use deep link on other os
+  FString temp = FGenericPlatformHttp::UrlEncode(uri);
+  FString url = FString::Printf(TEXT("cryptowallet://wc?uri=%s"), *temp);
+  return url;
+#endif
 }
 
 void APlayCppSdkActor::SaveClient(FString &output, bool &success,
