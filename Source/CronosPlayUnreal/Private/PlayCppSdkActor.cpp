@@ -1,11 +1,10 @@
 // Copyright 2022, Cronos Labs. All Rights Reserved
-
-#include "PlayCppSdkActor.h"
-
+#include "PlayCppSdkActor.h" // clang-diagnostic-error: false postive, can be ignored
 #include "Async/TaskGraphInterfaces.h"
 #include "GenericPlatform/GenericPlatformHttp.h"
 #include "PlayCppSdkLibrary/Include/extra-cpp-bindings/src/lib.rs.h"
 #include "PlayCppSdkLibrary/Include/rust/cxx.h"
+
 #include <iostream>
 #include <memory>
 
@@ -13,21 +12,35 @@ using namespace std;
 using namespace rust;
 using namespace com::crypto::game_sdk;
 
+FWalletConnectSessionInfo::FWalletConnectSessionInfo() {
+
+  sessionstate = EWalletconnectSessionState::
+      StateDisconnected; // NOLINT : by unreal engine macro, can be ignored
+  connected = false;
+  accounts.Empty();
+  chain_id.Empty();
+  bridge.Empty();
+  key.Empty();
+  client_id.Empty();
+  client_meta.Empty();
+  peer_id.Empty();
+  peer_meta.Empty();
+  handshake_topic.Empty();
+}
+
 ::com::crypto::game_sdk::WalletconnectClient *APlayCppSdkActor::_coreClient =
     NULL;
-APlayCppSdkActor *APlayCppSdkActor::_sdk = NULL;
+const APlayCppSdkActor *APlayCppSdkActor::_sdk = NULL;
 
 class UserWalletConnectCallback : public WalletConnectCallback {
 public:
-  UserWalletConnectCallback() {}
-  virtual ~UserWalletConnectCallback() {}
   void onConnected(const WalletConnectSessionInfo &sessioninfo) const;
   void onDisconnected(const WalletConnectSessionInfo &sessioninfo) const;
   void onConnecting(const WalletConnectSessionInfo &sessioninfo) const;
   void onUpdated(const WalletConnectSessionInfo &sessioninfo) const;
 };
 
-APlayCppSdkActor *APlayCppSdkActor::getInstance() { return _sdk; }
+const APlayCppSdkActor *APlayCppSdkActor::getInstance() { return _sdk; }
 
 // Sets default values
 APlayCppSdkActor::APlayCppSdkActor() {
@@ -41,8 +54,13 @@ APlayCppSdkActor::APlayCppSdkActor() {
 // Called when the game starts or when spawned
 void APlayCppSdkActor::BeginPlay() { Super::BeginPlay(); }
 
-void convertSession(::com::crypto::game_sdk::WalletConnectSessionInfo src,
-                    FWalletConnectSessionInfo &dst) {
+auto convertSession(::com::crypto::game_sdk::WalletConnectSessionInfo src,
+                    EWalletconnectSessionState sessionstate)
+    -> FWalletConnectSessionInfo {
+  FWalletConnectSessionInfo dst =  // NOLINT
+      FWalletConnectSessionInfo(); // NOLINT : by unreal engine macro, can be
+                                   // ignored
+  dst.sessionstate = sessionstate;
   dst.connected = src.connected;
   dst.accounts.Empty();
   for (int i = 0; i < src.accounts.size(); i++) {
@@ -58,6 +76,7 @@ void convertSession(::com::crypto::game_sdk::WalletConnectSessionInfo src,
   dst.peer_id = UTF8_TO_TCHAR(src.peer_id.c_str());
   dst.peer_meta = UTF8_TO_TCHAR(src.peer_meta.c_str());
   dst.handshake_topic = UTF8_TO_TCHAR(src.handshake_topic.c_str());
+  return dst;
 }
 // Called every frame
 void APlayCppSdkActor::Tick(float DeltaTime) { Super::Tick(DeltaTime); }
@@ -327,6 +346,7 @@ void APlayCppSdkActor::SignEip155Transaction(
       myinfo.to = TCHAR_TO_UTF8(*info.to);
       myinfo.common.gas_limit = TCHAR_TO_UTF8(*info.gas);
       myinfo.common.gas_price = TCHAR_TO_UTF8(*info.gas_price);
+      myinfo.common.chainid = (uint64)myCronosChainID;
       myinfo.value = TCHAR_TO_UTF8(*info.value);
       copyTArrayToVec(info.data, myinfo.data);
       myinfo.common.nonce = TCHAR_TO_UTF8(*info.nonce);
@@ -354,53 +374,58 @@ void APlayCppSdkActor::SignEip155Transaction(
   });
 }
 
-void APlayCppSdkActor::sendEvent(const FWalletConnectSessionInfo &info) {
+void APlayCppSdkActor::sendEvent(FWalletConnectSessionInfo info) const {
 
   AsyncTask(ENamedThreads::GameThread, [this, info]() {
     this->OnReceiveWalletconnectSessionInfoDelegate.ExecuteIfBound(info);
   });
 }
 
-void UserWalletConnectCallback::onConnected(
+void UserWalletConnectCallback::onConnected( // NOLINT : flase positive, virtual
+                                             // function cannot be static
     const WalletConnectSessionInfo &sessioninfo) const {
   UE_LOG(LogTemp, Log, TEXT("user c++ onConnected"));
   if (APlayCppSdkActor::getInstance()) {
-    FWalletConnectSessionInfo output;
-    convertSession(sessioninfo, output);
-    output.sessionstate = EWalletconnectSessionState::StateConnected;
+    FWalletConnectSessionInfo
+        output = // NOLINT : by unreal engine macro, can be ignored
+        convertSession(sessioninfo, EWalletconnectSessionState::StateConnected);
     APlayCppSdkActor::getInstance()->sendEvent(output);
   }
 }
-void UserWalletConnectCallback::onDisconnected(
+void UserWalletConnectCallback::onDisconnected( // NOLINT : flase positive,
+                                                // virtual function cannot be
+                                                // static
     const WalletConnectSessionInfo &sessioninfo) const {
   UE_LOG(LogTemp, Log, TEXT("user c++ onDisconnected"));
   if (APlayCppSdkActor::getInstance()) {
-    FWalletConnectSessionInfo output;
-    convertSession(sessioninfo, output);
-    output.sessionstate = EWalletconnectSessionState::StateDisconnected;
+    FWalletConnectSessionInfo output = // NOLINT
+        convertSession( // NOLINT : by unreal engine macro, can be ignored
+            sessioninfo, EWalletconnectSessionState::StateDisconnected);
 
     APlayCppSdkActor::getInstance()->sendEvent(output);
   }
 }
-void UserWalletConnectCallback::onConnecting(
-    const WalletConnectSessionInfo &sessioninfo) const {
+void UserWalletConnectCallback::
+    onConnecting( // NOLINT : flase positive, virtual function cannot be static
+        const WalletConnectSessionInfo &sessioninfo) const {
   UE_LOG(LogTemp, Log, TEXT("user c++ onConnecting"));
   if (APlayCppSdkActor::getInstance()) {
-    FWalletConnectSessionInfo output;
-    convertSession(sessioninfo, output);
-    output.sessionstate = EWalletconnectSessionState::StateConnecting;
+    FWalletConnectSessionInfo output = // NOLINT
+        convertSession( // NOLINT : by unreal engine macro, can be ignored
+            sessioninfo, EWalletconnectSessionState::StateConnecting);
 
     APlayCppSdkActor::getInstance()->sendEvent(output);
   }
 }
-void UserWalletConnectCallback::onUpdated(
+void UserWalletConnectCallback::onUpdated( // NOLINT : flase positive, virtual
+                                           // function cannot be static
     const WalletConnectSessionInfo &sessioninfo) const {
 
   UE_LOG(LogTemp, Log, TEXT("user c++ onUpdated"));
   if (APlayCppSdkActor::getInstance()) {
-    FWalletConnectSessionInfo output;
-    convertSession(sessioninfo, output);
-    output.sessionstate = EWalletconnectSessionState::StateUpdated;
+    FWalletConnectSessionInfo
+        output = // NOLINT : by unreal engine macro, can be ignored
+        convertSession(sessioninfo, EWalletconnectSessionState::StateUpdated);
 
     APlayCppSdkActor::getInstance()->sendEvent(output);
   }
@@ -419,3 +444,258 @@ void APlayCppSdkActor::destroyCoreClient() {
 }
 
 void StopWalletConnect() { APlayCppSdkActor::destroyCoreClient(); }
+
+void APlayCppSdkActor::Erc721TransferFrom(
+    FString contractAddress, FString fromAddress, FString toAddress,
+    FString tokenId, FString gasLimit, FString gasPrice,
+    FCronosSignedTransactionDelegate Out) {
+
+  AsyncTask(ENamedThreads::AnyHiPriThreadNormalTask,
+            [this, Out, contractAddress, fromAddress, toAddress, tokenId,
+             gasLimit, gasPrice]() {
+              FString result;
+              FCronosSignedTransactionRaw txresult;
+              try {
+                if (NULL == _coreClient) {
+                  result = TEXT("Invalid Walletconnect");
+                } else {
+
+                  WalletConnectErc721Transfer info;
+                  info.contract_address = TCHAR_TO_UTF8(*contractAddress);
+                  info.from_address = TCHAR_TO_UTF8(*fromAddress);
+                  info.to_address = TCHAR_TO_UTF8(*toAddress);
+                  info.token_id = TCHAR_TO_UTF8(*tokenId);
+
+                  setCommon(info.common, fromAddress, gasLimit, gasPrice);
+
+                  Vec<uint8_t> rawtx = _coreClient->erc721_transfer(info);
+                  copyVecToTArray(rawtx, txresult.SignedTx);
+                }
+
+              } catch (const rust::cxxbridge1::Error &e) {
+                result = FString::Printf(
+                    TEXT("CronosPlayUnreal Erc721SafeTransferFrom Error: %s"),
+                    UTF8_TO_TCHAR(e.what()));
+              }
+
+              AsyncTask(ENamedThreads::GameThread, [Out, txresult, result]() {
+                Out.ExecuteIfBound(txresult, result);
+              });
+            });
+}
+
+void APlayCppSdkActor::Erc721Approve(FString contractAddress,
+                                     FString fromAddress,
+                                     FString approvedAddress, FString tokenId,
+                                     FString gasLimit, FString gasPrice,
+                                     FCronosSignedTransactionDelegate Out) {
+  AsyncTask(ENamedThreads::AnyHiPriThreadNormalTask,
+            [this, Out, contractAddress, fromAddress, approvedAddress, tokenId,
+             gasLimit, gasPrice]() {
+              FString result;
+              FCronosSignedTransactionRaw txresult;
+              try {
+                if (NULL == _coreClient) {
+                  result = TEXT("Invalid Walletconnect");
+                } else {
+
+                  WalletConnectErc721Approve info;
+                  info.contract_address = TCHAR_TO_UTF8(*contractAddress);
+                  info.from_address = TCHAR_TO_UTF8(*fromAddress);
+                  info.approved_address = TCHAR_TO_UTF8(*approvedAddress);
+                  info.token_id = TCHAR_TO_UTF8(*tokenId);
+
+                  setCommon(info.common, fromAddress, gasLimit, gasPrice);
+
+                  copyVecToTArray(_coreClient->erc721_approve(info),
+                                  txresult.SignedTx);
+                }
+
+              } catch (const rust::cxxbridge1::Error &e) {
+                result = FString::Printf(
+                    TEXT("CronosPlayUnreal Erc721SafeTransferFrom Error: %s"),
+                    UTF8_TO_TCHAR(e.what()));
+              }
+
+              AsyncTask(ENamedThreads::GameThread, [Out, txresult, result]() {
+                Out.ExecuteIfBound(txresult, result);
+              });
+            });
+}
+
+void APlayCppSdkActor::Erc1155SafeTransferFrom(
+    FString contractAddress, FString fromAddress, FString toAddress,
+    FString tokenId, FString amount, TArray<uint8> additionalData,
+    FString gasLimit, FString gasPrice, FCronosSignedTransactionDelegate Out) {
+  AsyncTask(ENamedThreads::AnyHiPriThreadNormalTask,
+            [this, Out, contractAddress, fromAddress, toAddress, tokenId,
+             amount, gasLimit, gasPrice]() {
+              FString result;
+              FCronosSignedTransactionRaw txresult;
+              try {
+                if (NULL == _coreClient) {
+                  result = TEXT("Invalid Walletconnect");
+                } else {
+
+                  WalletConnectErc1155Transfer info;
+                  info.contract_address = TCHAR_TO_UTF8(*contractAddress);
+                  info.from_address = TCHAR_TO_UTF8(*fromAddress);
+                  info.to_address = TCHAR_TO_UTF8(*toAddress);
+                  info.token_id = TCHAR_TO_UTF8(*tokenId);
+                  info.amount = TCHAR_TO_UTF8(*amount);
+
+                  setCommon(info.common, fromAddress, gasLimit, gasPrice);
+
+                  Vec<uint8_t> rawtx = _coreClient->erc1155_transfer(info);
+                  copyVecToTArray(rawtx, txresult.SignedTx);
+                }
+
+              } catch (const rust::cxxbridge1::Error &e) {
+                result = FString::Printf(
+                    TEXT("CronosPlayUnreal Erc1155SafeTransferFrom Error: %s"),
+                    UTF8_TO_TCHAR(e.what()));
+              }
+
+              AsyncTask(ENamedThreads::GameThread, [Out, txresult, result]() {
+                Out.ExecuteIfBound(txresult, result);
+              });
+            });
+}
+
+void APlayCppSdkActor::Erc1155Approve(FString contractAddress,
+                                      FString fromAddress,
+                                      FString approvedAddress, bool approved,
+                                      FString gasLimit, FString gasPrice,
+                                      FCronosSignedTransactionDelegate Out) {
+  AsyncTask(ENamedThreads::AnyHiPriThreadNormalTask,
+            [this, Out, contractAddress, fromAddress, approvedAddress, approved,
+             gasLimit, gasPrice]() {
+              FString result;
+              FCronosSignedTransactionRaw txresult;
+              try {
+                if (NULL == _coreClient) {
+                  result = TEXT("Invalid Walletconnect");
+                } else {
+
+                  WalletConnectErc1155Approve info;
+                  info.contract_address = TCHAR_TO_UTF8(*contractAddress);
+                  info.from_address = TCHAR_TO_UTF8(*fromAddress);
+                  info.approved_address = TCHAR_TO_UTF8(*approvedAddress);
+                  info.approved = approved;
+
+                  setCommon(info.common, fromAddress, gasLimit, gasPrice);
+
+                  copyVecToTArray(_coreClient->erc1155_approve(info),
+                                  txresult.SignedTx);
+                }
+
+              } catch (const rust::cxxbridge1::Error &e) {
+                result = FString::Printf(
+                    TEXT("CronosPlayUnreal Erc1155Approve Error: %s"),
+                    UTF8_TO_TCHAR(e.what()));
+              }
+
+              AsyncTask(ENamedThreads::GameThread, [Out, txresult, result]() {
+                Out.ExecuteIfBound(txresult, result);
+              });
+            });
+}
+
+void APlayCppSdkActor::Erc20TransferFrom(FString contractAddress,
+                                         FString fromAddress, FString toAddress,
+                                         FString amount, FString gasLimit,
+                                         FString gasPrice,
+                                         FCronosSignedTransactionDelegate Out) {
+
+  AsyncTask(ENamedThreads::AnyHiPriThreadNormalTask,
+            [this, Out, contractAddress, fromAddress, toAddress, amount,
+             gasLimit, gasPrice]() {
+              FString result;
+              FCronosSignedTransactionRaw txresult;
+              try {
+                if (NULL == _coreClient) {
+                  result = TEXT("Invalid Walletconnect");
+                } else {
+
+                  std::string mycontractaddress =
+                      TCHAR_TO_UTF8(*contractAddress);
+                  WalletConnectErc20Transfer info;
+                  info.contract_address = mycontractaddress;
+                  info.from_address = TCHAR_TO_UTF8(*fromAddress);
+                  info.to_address = TCHAR_TO_UTF8(*toAddress);
+                  info.amount = TCHAR_TO_UTF8(*amount);
+
+                  setCommon(info.common, fromAddress, gasLimit, gasPrice);
+
+                  copyVecToTArray(_coreClient->erc20_transfer(info),
+                                  txresult.SignedTx);
+                }
+
+              } catch (const rust::cxxbridge1::Error &e) {
+                result = FString::Printf(
+                    TEXT("CronosPlayUnreal Erc1155SafeTransferFrom Error: %s"),
+                    UTF8_TO_TCHAR(e.what()));
+              }
+
+              AsyncTask(ENamedThreads::GameThread, [Out, txresult, result]() {
+                Out.ExecuteIfBound(txresult, result);
+              });
+            });
+}
+
+void APlayCppSdkActor::setCommon(WalletConnectTxCommon &common,
+                                 FString fromaddress, FString gaslimit,
+                                 FString gasprice) {
+  std::string mycronosrpc = TCHAR_TO_UTF8(*myCronosRpc);
+  std::string myfromaddress = TCHAR_TO_UTF8(*fromaddress);
+  // get nonce
+  std::string mynonce =
+      org::defi_wallet_core::get_eth_nonce(myfromaddress.c_str(), mycronosrpc)
+          .c_str();
+
+  common.web3api_url = mycronosrpc.c_str();
+  common.chainid = myCronosChainID;
+  common.gas_limit = TCHAR_TO_UTF8(*gaslimit);
+  common.gas_price = TCHAR_TO_UTF8(*gasprice);
+  common.nonce = mynonce;
+}
+
+void APlayCppSdkActor::Erc20Approve(FString contractAddress,
+                                    FString fromAddress,
+                                    FString approvedAddress, FString amount,
+                                    FString gasLimit, FString gasPrice,
+                                    FCronosSignedTransactionDelegate Out) {
+
+  AsyncTask(ENamedThreads::AnyHiPriThreadNormalTask,
+            [this, Out, contractAddress, fromAddress, approvedAddress, amount,
+             gasLimit, gasPrice]() {
+              FString result;
+              FCronosSignedTransactionRaw txresult;
+              try {
+                if (NULL == _coreClient) {
+                  result = TEXT("Invalid Walletconnect");
+                } else {
+
+                  WalletConnectErc20Approve info;
+                  info.contract_address = TCHAR_TO_UTF8(*contractAddress);
+                  info.from_address = TCHAR_TO_UTF8(*fromAddress);
+                  info.approved_address = TCHAR_TO_UTF8(*approvedAddress);
+                  info.amount = TCHAR_TO_UTF8(*amount);
+
+                  setCommon(info.common, fromAddress, gasLimit, gasPrice);
+
+                  copyVecToTArray(_coreClient->erc20_approve(info),
+                                  txresult.SignedTx);
+                }
+
+              } catch (const rust::cxxbridge1::Error &e) {
+                result = FString::Printf(
+                    TEXT("CronosPlayUnreal Erc1155Approve Error: %s"),
+                    UTF8_TO_TCHAR(e.what()));
+              }
+
+              AsyncTask(ENamedThreads::GameThread, [Out, txresult, result]() {
+                Out.ExecuteIfBound(txresult, result);
+              });
+            });
+}
