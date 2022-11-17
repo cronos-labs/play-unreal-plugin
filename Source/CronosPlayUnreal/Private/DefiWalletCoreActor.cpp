@@ -61,7 +61,7 @@ ADefiWalletCoreActor::ADefiWalletCoreActor()
                                *UKismetSystemLibrary::GetEngineVersion(),
                                *UGameplayStatics::GetPlatformName(),
                                *Plugin->GetDescriptor().VersionName);
-  UE_LOG(LogTemp, Display, TEXT("User Agent: %s"), *ua);
+  // UE_LOG(LogTemp, Display, TEXT("User Agent: %s"), *ua);
   UPlayCppSdkBPLibrary::SetupUserAgent(ua);
 }
 
