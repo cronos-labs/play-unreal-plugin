@@ -26,7 +26,7 @@ public class CronosPlayUnreal : ModuleRules {
         new string[] { "Core", "Json", "JsonUtilities", "HTTP" });
 
     PrivateDependencyModuleNames.AddRange(
-        new string[] { "CoreUObject", "Engine", "Slate", "SlateCore",
+        new string[] { "CoreUObject", "Engine", "Slate", "SlateCore", "Projects",
                        "PlayCppSdkLibrary" });
 
     DynamicallyLoadedModuleNames.AddRange(new string[] {});
