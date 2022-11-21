@@ -317,7 +317,7 @@ public:
   UFUNCTION(BlueprintCallable,
             meta = (DisplayName = "RestoreClient", Keywords = "PlayCppSdk"),
             Category = "PlayCppSdk")
-  void RestoreClient(FString jsondata, bool &success, FString &output_message);
+  void RestoreClient(FString &jsondata, bool &success, FString &output_message);
 
   /**
    * sign general message

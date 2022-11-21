@@ -2,6 +2,8 @@
 #include "PlayCppSdkActor.h" // clang-diagnostic-error: false postive, can be ignored
 #include "Async/TaskGraphInterfaces.h"
 #include "GenericPlatform/GenericPlatformHttp.h"
+#include "Misc/FileHelper.h"
+#include "Misc/Paths.h"
 #include "PlayCppSdkLibrary/Include/extra-cpp-bindings/src/lib.rs.h"
 #include "PlayCppSdkLibrary/Include/rust/cxx.h"
 
@@ -134,7 +136,7 @@ void APlayCppSdkActor::InitializeWalletConnect(
             });
 }
 
-void APlayCppSdkActor::RestoreClient(FString jsondata, bool &success,
+void APlayCppSdkActor::RestoreClient(FString &jsondata, bool &success,
                                      FString &output_message) {
   try {
     if (NULL != _coreClient) {
@@ -142,6 +144,15 @@ void APlayCppSdkActor::RestoreClient(FString jsondata, bool &success,
       output_message = TEXT("Client Already Exists");
       return;
     }
+
+    success = FFileHelper::LoadFileToString(
+        jsondata, *(FPaths::ProjectDir() + "sessioninfo.json"));
+    // if load file failed, return
+    if (!success)
+      return;
+    // if nothing in session file, return
+    if (jsondata == "")
+      return;
 
     std::string sessioninfostring = TCHAR_TO_UTF8(*jsondata);
     Box<WalletconnectClient> tmpClient =
@@ -270,7 +281,11 @@ void APlayCppSdkActor::SaveClient(FString &output, bool &success,
 
     String sessioninfo = _coreClient->save_client();
     output = UTF8_TO_TCHAR(sessioninfo.c_str());
-    success = true;
+    success = FFileHelper::SaveStringToFile(
+        output, *(FPaths::ProjectDir() + "sessioninfo.json"),
+        FFileHelper::EEncodingOptions::ForceUTF8);
+    // UE_LOG(LogTemp, Display, TEXT("sessioninfo.json: %s"),
+    //        *(FPaths::ProjectDir() + "sessioninfo.json"));
   } catch (const rust::cxxbridge1::Error &e) {
     success = false;
     output_message = FString::Printf(TEXT("PlayCppSdk SaveClient Error: %s"),
