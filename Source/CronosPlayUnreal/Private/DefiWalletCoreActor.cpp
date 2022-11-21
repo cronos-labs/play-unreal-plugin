@@ -5,6 +5,7 @@
 #include <iostream>
 #include <sstream>
 
+#include "GenericPlatform/GenericPlatformHttp.h"
 #include "Interfaces/IPluginManager.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -57,9 +58,8 @@ ADefiWalletCoreActor::ADefiWalletCoreActor()
 
   IPluginManager &PluginManager = IPluginManager::Get();
   TSharedPtr<IPlugin> Plugin = PluginManager.FindPlugin("CronosPlayUnreal");
-  FString ua = FString::Printf(TEXT("UnrealEngine/%s Platform/%s CronosPlayUnreal/%s"),
-                               *UKismetSystemLibrary::GetEngineVersion(),
-                               *UGameplayStatics::GetPlatformName(),
+  FString ua = FString::Printf(TEXT("%s CronosPlayUnreal/%s"),
+                               *FGenericPlatformHttp::GetDefaultUserAgent(),
                                *Plugin->GetDescriptor().VersionName);
   // UE_LOG(LogTemp, Display, TEXT("User Agent: %s"), *ua);
   UPlayCppSdkBPLibrary::SetupUserAgent(ua);
