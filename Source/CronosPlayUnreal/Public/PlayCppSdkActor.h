@@ -248,8 +248,7 @@ public:
                                FInitializeWalletConnectDelegate Out);
 
   /**
-   * Ensure session for waiting connecting. Once connects, callback Out is
-   * called
+   * Create session or restore ession, ensure session
    * @param Out EnsureSession callback
    */
   UFUNCTION(BlueprintCallable,
