@@ -146,7 +146,7 @@ void APlayCppSdkActor::RestoreClient(FString &jsondata, bool &success,
     }
 
     success = FFileHelper::LoadFileToString(
-        jsondata, *(FPaths::ProjectDir() + "sessioninfo.json"));
+        jsondata, *(FPaths::ProjectSavedDir() + "sessioninfo.json"));
     // if load file failed, return
     if (!success)
       return;
@@ -282,7 +282,7 @@ void APlayCppSdkActor::SaveClient(FString &output, bool &success,
     String sessioninfo = _coreClient->save_client();
     output = UTF8_TO_TCHAR(sessioninfo.c_str());
     success = FFileHelper::SaveStringToFile(
-        output, *(FPaths::ProjectDir() + "sessioninfo.json"),
+        output, *(FPaths::ProjectSavedDir() + "sessioninfo.json"),
         FFileHelper::EEncodingOptions::ForceUTF8);
     // UE_LOG(LogTemp, Display, TEXT("sessioninfo.json: %s"),
     //        *(FPaths::ProjectDir() + "sessioninfo.json"));
