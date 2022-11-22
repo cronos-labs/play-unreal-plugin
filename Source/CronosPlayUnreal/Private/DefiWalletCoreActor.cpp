@@ -58,11 +58,12 @@ ADefiWalletCoreActor::ADefiWalletCoreActor()
 
   IPluginManager &PluginManager = IPluginManager::Get();
   TSharedPtr<IPlugin> Plugin = PluginManager.FindPlugin("CronosPlayUnreal");
-  FString ua = FString::Printf(TEXT("%s CronosPlayUnreal/%s"),
-                               *FGenericPlatformHttp::GetDefaultUserAgent(),
-                               *Plugin->GetDescriptor().VersionName);
+  FString useragentinfo =
+      FString::Printf(TEXT("%s CronosPlayUnreal/%s"),
+                      *FGenericPlatformHttp::GetDefaultUserAgent(),
+                      *Plugin->GetDescriptor().VersionName);
   // UE_LOG(LogTemp, Display, TEXT("User Agent: %s"), *ua);
-  UPlayCppSdkBPLibrary::SetupUserAgent(ua);
+  UPlayCppSdkBPLibrary::SetupUserAgent(useragentinfo);
 }
 
 // Called when the game starts or when spawned
