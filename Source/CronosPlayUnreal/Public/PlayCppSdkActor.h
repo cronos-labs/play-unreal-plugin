@@ -248,13 +248,23 @@ public:
                                FInitializeWalletConnectDelegate Out);
 
   /**
-   * create session or restore ession, ensure session
+   * Ensure session for waiting connecting. Once connects, callback Out is
+   * called
    * @param Out EnsureSession callback
    */
   UFUNCTION(BlueprintCallable,
             meta = (DisplayName = "EnsureSession", Keywords = "PlayCppSdk"),
             Category = "PlayCppSdk")
   void EnsureSession(FEnsureSessionDelegate Out);
+
+  /**
+   * Clear Session
+   * @param Out EnsureSession callback
+   */
+  UFUNCTION(BlueprintCallable,
+            meta = (DisplayName = "ClearSession", Keywords = "PlayCppSdk"),
+            Category = "PlayCppSdk")
+  void ClearSession(bool &success);
 
   /**
    * setup callback to receive event

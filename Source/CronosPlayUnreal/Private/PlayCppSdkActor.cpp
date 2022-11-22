@@ -2,6 +2,7 @@
 #include "PlayCppSdkActor.h" // clang-diagnostic-error: false postive, can be ignored
 #include "Async/TaskGraphInterfaces.h"
 #include "GenericPlatform/GenericPlatformHttp.h"
+#include "HAL/FileManager.h"
 #include "Misc/FileHelper.h"
 #include "Misc/Paths.h"
 #include "PlayCppSdkLibrary/Include/extra-cpp-bindings/src/lib.rs.h"
@@ -206,6 +207,13 @@ void APlayCppSdkActor::EnsureSession(FEnsureSessionDelegate Out) {
     AsyncTask(ENamedThreads::GameThread,
               [Out, output, result]() { Out.ExecuteIfBound(output, result); });
   });
+}
+
+void APlayCppSdkActor::ClearSession(bool &success) {
+  IFileManager &FileManager = IFileManager::Get();
+  success =
+      FileManager.Delete(*(FPaths::ProjectSavedDir() + "sessioninfo.json"));
+  _coreClient = NULL;
 }
 
 void APlayCppSdkActor::SetupCallback(
