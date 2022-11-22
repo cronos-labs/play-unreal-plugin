@@ -5,6 +5,10 @@
 #include <iostream>
 #include <sstream>
 
+#include "GenericPlatform/GenericPlatformHttp.h"
+#include "Interfaces/IPluginManager.h"
+#include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "PlayCppSdkBPLibrary.h"
 #include "PlayCppSdkLibrary/Include/defi-wallet-core-cpp/src/lib.rs.h"
 #include "PlayCppSdkLibrary/Include/rust/cxx.h"
@@ -52,7 +56,14 @@ ADefiWalletCoreActor::ADefiWalletCoreActor()
 
   _coreWallet = NULL;
 
-  UPlayCppSdkBPLibrary::SetupUserAgent("CronosPlay-UnrealEngine-Agent");
+  IPluginManager &PluginManager = IPluginManager::Get();
+  TSharedPtr<IPlugin> Plugin = PluginManager.FindPlugin("CronosPlayUnreal");
+  FString useragentinfo =
+      FString::Printf(TEXT("%s CronosPlayUnreal/%s"),
+                      *FGenericPlatformHttp::GetDefaultUserAgent(),
+                      *Plugin->GetDescriptor().VersionName);
+  // UE_LOG(LogTemp, Display, TEXT("User Agent: %s"), *ua);
+  UPlayCppSdkBPLibrary::SetupUserAgent(useragentinfo);
 }
 
 // Called when the game starts or when spawned
