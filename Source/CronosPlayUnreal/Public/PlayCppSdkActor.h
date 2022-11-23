@@ -183,9 +183,17 @@ class CRONOSPLAYUNREAL_API APlayCppSdkActor : public AActor {
   GENERATED_BODY()
 
 private:
-  // for ue4 async
   static ::com::crypto::game_sdk::WalletconnectClient *_coreClient;
+
   static const APlayCppSdkActor *_sdk;
+
+  // Internal address, it will be set after walletconnect session creates or
+  // retores
+  TArray<uint8> _address;
+
+  // Internal chain_id, it will be set after walletconnect session creates or
+  // retores
+  int64 _chain_id;
 
 public:
   static const APlayCppSdkActor *getInstance();
@@ -230,7 +238,8 @@ public:
   void DestroyClient();
 
   /**
-   * Connect with walletconnect
+   * Connect wallet client with walletconnect (Only Crypto.com Defi Wallet is
+   * suppported at this moment)
    *
    */
   UFUNCTION(BlueprintCallable,
@@ -238,8 +247,8 @@ public:
                     Keywords = "PlayCppSdk"),
             Category = "PlayCppSdk")
   void ConnectWalletConnect(FString description, FString url,
-                                   TArray<FString> icon_urls, FString name,
-                                   int64 chain_id);
+                            TArray<FString> icon_urls, FString name,
+                            int64 chain_id);
 
   /**
    * intialize wallet-connect client
@@ -281,7 +290,7 @@ public:
 
   UFUNCTION()
   void OnRestoreSession(FWalletConnectEnsureSessionResult SessionResult,
-                       FString Result);
+                        FString Result);
 
   /**
    * Clear Session
@@ -379,6 +388,21 @@ public:
             Category = "PlayCppSdk")
   void SignPersonal(FString user_message, TArray<uint8> address,
                     FWalletconnectSignPersonalDelegate Out);
+
+  FWalletconnectSignPersonalDelegate OnWalletconnectSignPersonalDelegate;
+
+  UFUNCTION()
+  void OnWalletconnectSignPersonal(FWalletSignTXEip155Result SigningResult);
+
+  /**
+   * A simple version of `SignPersonal`
+   * @param user_message user message to sign
+   *
+   */
+  UFUNCTION(BlueprintCallable,
+            meta = (DisplayName = "SignPersonalSim", Keywords = "PlayCppSdk"),
+            Category = "PlayCppSdk")
+  void SignPersonalSim(FString user_message);
 
   /**
    * sign EIP155 tx

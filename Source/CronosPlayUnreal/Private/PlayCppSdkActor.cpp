@@ -212,6 +212,7 @@ void APlayCppSdkActor::OnInitializeWalletConnect(bool succeed,
   }
 }
 
+// TODO Turn into AsyncTask
 void APlayCppSdkActor::RestoreClient(FString &Jsondata, bool &success,
                                      FString &output_message) {
   try {
@@ -290,6 +291,10 @@ void APlayCppSdkActor::OnRestoreSession(
          TEXT("Restore Session Succeeded: Account[0]: %s, Chain id: %d"),
          *UUtlis::ToHex(SessionResult.addresses[0].address),
          SessionResult.chain_id);
+
+  _address = SessionResult.addresses[0].address;
+  _chain_id = SessionResult.chain_id;
+
 }
 
 void APlayCppSdkActor::OnNewSession(
@@ -298,6 +303,10 @@ void APlayCppSdkActor::OnNewSession(
          TEXT("Create Session Succeeded: Account[0]: %s, Chain id: %d"),
          *UUtlis::ToHex(SessionResult.addresses[0].address),
          SessionResult.chain_id);
+
+  _address = SessionResult.addresses[0].address;
+  _chain_id = SessionResult.chain_id;
+
   FString output;
   bool success;
   FString output_message;
@@ -445,6 +454,21 @@ void APlayCppSdkActor::SignPersonal(FString user_message, TArray<uint8> address,
               AsyncTask(ENamedThreads::GameThread,
                         [Out, output]() { Out.ExecuteIfBound(output); });
             });
+}
+
+void APlayCppSdkActor::SignPersonalSim(FString user_message) {
+  if (_address.Num() != 0) {
+    OnWalletconnectSignPersonalDelegate.BindDynamic(
+        this, &APlayCppSdkActor::OnWalletconnectSignPersonal);
+    SignPersonal(user_message, _address, OnWalletconnectSignPersonalDelegate);
+  } else {
+    // TODO Ask users connect with wallet connect first
+  }
+}
+
+void APlayCppSdkActor::OnWalletconnectSignPersonal(
+    FWalletSignTXEip155Result SigningResult) {
+//TODO
 }
 
 void APlayCppSdkActor::SignEip155Transaction(
