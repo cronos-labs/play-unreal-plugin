@@ -3,10 +3,13 @@
 #include "Async/TaskGraphInterfaces.h"
 #include "GenericPlatform/GenericPlatformHttp.h"
 #include "HAL/FileManager.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "Misc/FileHelper.h"
 #include "Misc/Paths.h"
 #include "PlayCppSdkLibrary/Include/extra-cpp-bindings/src/lib.rs.h"
 #include "PlayCppSdkLibrary/Include/rust/cxx.h"
+#include "Utils.h"
+#include "Utlis.h"
 
 #include <iostream>
 #include <memory>
@@ -96,6 +99,39 @@ void APlayCppSdkActor::Destroyed() {
   assert(NULL == _sdk);
 }
 
+void APlayCppSdkActor::ConnectWalletConnect(FString description, FString url,
+                                            TArray<FString> icon_urls,
+                                            FString name, int64 chain_id) {
+  FString Jsondata;
+  bool IsRetored;
+  FString RestoreClientOutputMessage;
+  RestoreClient(Jsondata, IsRetored, RestoreClientOutputMessage);
+  if (IsRetored) {
+    // Setup Callback
+    bool IsSetupCallback;
+    FString SetupCallbackOutputMessage;
+    OnReceiveWalletconnectSessionInfoDelegate.BindDynamic(
+        this, &APlayCppSdkActor::OnWalletconnectSessionInfo);
+    SetupCallback(OnReceiveWalletconnectSessionInfoDelegate, IsSetupCallback,
+                  SetupCallbackOutputMessage);
+    if (IsSetupCallback) {
+      // Ensure session
+      OnEnsureSessionDelegate.BindDynamic(this,
+                                          &APlayCppSdkActor::OnRestoreSession);
+      EnsureSession(OnEnsureSessionDelegate);
+    } else {
+      // TODO
+    }
+  } else {
+    OnInitializeWalletConnectDelegate.BindDynamic(
+        this, &APlayCppSdkActor::OnInitializeWalletConnect);
+
+    InitializeWalletConnect(description, url, icon_urls, name, chain_id,
+                            OnInitializeWalletConnectDelegate);
+
+  }
+}
+
 void APlayCppSdkActor::InitializeWalletConnect(
     FString description, FString url, TArray<FString> icon_urls, FString name,
     int64 chain_id, FInitializeWalletConnectDelegate Out) {
@@ -137,7 +173,46 @@ void APlayCppSdkActor::InitializeWalletConnect(
             });
 }
 
-void APlayCppSdkActor::RestoreClient(FString &jsondata, bool &success,
+void APlayCppSdkActor::OnInitializeWalletConnect(bool succeed,
+                                                 FString message) {
+  FString succeed_result = succeed ? "true" : "false";
+  UE_LOG(LogTemp, Log, TEXT("Initialize Wallet Connect: %s %s"),
+         *succeed_result, *message);
+
+  // Setup Callback
+  bool IsSetupCallback;
+  FString SetupCallbackOutputMessage;
+  OnReceiveWalletconnectSessionInfoDelegate.BindDynamic(
+      this, &APlayCppSdkActor::OnWalletconnectSessionInfo);
+  SetupCallback(OnReceiveWalletconnectSessionInfoDelegate, IsSetupCallback,
+                SetupCallbackOutputMessage);
+  if (IsSetupCallback) {
+    FString GetConnectionStringOutput;
+    bool IsGetConnectionString;
+    FString GetConnectionStringOutputMessage;
+    GetConnectionString(GetConnectionStringOutput, IsGetConnectionString,
+                        GetConnectionStringOutputMessage);
+    if (IsGetConnectionString) {
+      UE_LOG(LogTemp, Log, TEXT("Connection String: "),
+             *GetConnectionStringOutput);
+      // Launch Crypto Wallet
+      UKismetSystemLibrary::LaunchURL(
+          GetCryptoWalletUrl(GetConnectionStringOutput));
+
+      // Ensure session
+      OnEnsureSessionDelegate.BindDynamic(this,
+                                          &APlayCppSdkActor::OnNewSession);
+      EnsureSession(OnEnsureSessionDelegate);
+
+    } else {
+      // TODO
+    }
+  } else {
+    // TODO
+  }
+}
+
+void APlayCppSdkActor::RestoreClient(FString &Jsondata, bool &success,
                                      FString &output_message) {
   try {
     if (NULL != _coreClient) {
@@ -147,15 +222,15 @@ void APlayCppSdkActor::RestoreClient(FString &jsondata, bool &success,
     }
 
     success = FFileHelper::LoadFileToString(
-        jsondata, *(FPaths::ProjectSavedDir() + "sessioninfo.json"));
+        Jsondata, *(FPaths::ProjectSavedDir() + "sessioninfo.json"));
     // if load file failed, return
     if (!success)
       return;
     // if nothing in session file, return
-    if (jsondata == "")
+    if (Jsondata.IsEmpty())
       return;
 
-    std::string sessioninfostring = TCHAR_TO_UTF8(*jsondata);
+    std::string sessioninfostring = TCHAR_TO_UTF8(*Jsondata);
     Box<WalletconnectClient> tmpClient =
         walletconnect_restore_client(sessioninfostring);
     _coreClient = tmpClient.into_raw();
@@ -209,6 +284,26 @@ void APlayCppSdkActor::EnsureSession(FEnsureSessionDelegate Out) {
   });
 }
 
+void APlayCppSdkActor::OnRestoreSession(
+    FWalletConnectEnsureSessionResult SessionResult, FString Result) {
+  UE_LOG(LogTemp, Log,
+         TEXT("Restore Session Succeeded: Account[0]: %s, Chain id: %d"),
+         *UUtlis::ToHex(SessionResult.addresses[0].address),
+         SessionResult.chain_id);
+}
+
+void APlayCppSdkActor::OnNewSession(
+    FWalletConnectEnsureSessionResult SessionResult, FString Result) {
+  UE_LOG(LogTemp, Log,
+         TEXT("Create Session Succeeded: Account[0]: %s, Chain id: %d"),
+         *UUtlis::ToHex(SessionResult.addresses[0].address),
+         SessionResult.chain_id);
+  FString output;
+  bool success;
+  FString output_message;
+  SaveClient(output, success, output_message);
+}
+
 void APlayCppSdkActor::ClearSession(bool &success) {
   IFileManager &FileManager = IFileManager::Get();
   success =
@@ -239,6 +334,11 @@ void APlayCppSdkActor::SetupCallback(
     output_message = FString::Printf(TEXT("PlayCppSdk EnsureSession Error: %s"),
                                      UTF8_TO_TCHAR(e.what()));
   }
+}
+
+void APlayCppSdkActor::OnWalletconnectSessionInfo(
+    FWalletConnectSessionInfo SessionInfo) {
+  // TODO
 }
 
 void APlayCppSdkActor::GetConnectionString(FString &output, bool &success,
@@ -292,8 +392,8 @@ void APlayCppSdkActor::SaveClient(FString &output, bool &success,
     success = FFileHelper::SaveStringToFile(
         output, *(FPaths::ProjectSavedDir() + "sessioninfo.json"),
         FFileHelper::EEncodingOptions::ForceUTF8);
-    // UE_LOG(LogTemp, Display, TEXT("sessioninfo.json: %s"),
-    //        *(FPaths::ProjectDir() + "sessioninfo.json"));
+    UE_LOG(LogTemp, Log, TEXT("Saved sessioninfo.json to: %s"),
+           *(FPaths::ProjectSavedDir() + "sessioninfo.json"));
   } catch (const rust::cxxbridge1::Error &e) {
     success = false;
     output_message = FString::Printf(TEXT("PlayCppSdk SaveClient Error: %s"),

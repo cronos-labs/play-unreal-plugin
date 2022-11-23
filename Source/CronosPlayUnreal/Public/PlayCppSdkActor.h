@@ -133,19 +133,19 @@ struct FWalletSignTXEip155Result {
   FString result;
 };
 
-/// sign eip155 tx callback
+/// sign eip155 tx delegate
 DECLARE_DYNAMIC_DELEGATE_OneParam(FWalletconnectSignEip155TransactionDelegate,
                                   FWalletSignTXEip155Result, SigningResult);
 
-/// sign personal callback
+/// sign personal delegate
 DECLARE_DYNAMIC_DELEGATE_OneParam(FWalletconnectSignPersonalDelegate,
                                   FWalletSignTXEip155Result, SigningResult);
 
-/// initialize wallet connect callback
+/// initialize wallet connect delegate
 DECLARE_DYNAMIC_DELEGATE_TwoParams(FInitializeWalletConnectDelegate, bool,
                                    Succeed, FString, message);
 
-/// wallet connect ensure sssion callback
+/// wallet connect ensure session delegate
 DECLARE_DYNAMIC_DELEGATE_TwoParams(FEnsureSessionDelegate,
                                    FWalletConnectEnsureSessionResult,
                                    SessionResult, FString, Result);
@@ -230,6 +230,18 @@ public:
   void DestroyClient();
 
   /**
+   * Connect with walletconnect
+   *
+   */
+  UFUNCTION(BlueprintCallable,
+            meta = (DisplayName = "ConnectWalletConnect",
+                    Keywords = "PlayCppSdk"),
+            Category = "PlayCppSdk")
+  void ConnectWalletConnect(FString description, FString url,
+                                   TArray<FString> icon_urls, FString name,
+                                   int64 chain_id);
+
+  /**
    * intialize wallet-connect client
    * @param description wallet-connect client description
    * @param url wallet-connect server url
@@ -247,6 +259,11 @@ public:
                                int64 chain_id,
                                FInitializeWalletConnectDelegate Out);
 
+  FInitializeWalletConnectDelegate OnInitializeWalletConnectDelegate;
+
+  UFUNCTION()
+  void OnInitializeWalletConnect(bool succeed, FString message);
+
   /**
    * Create session or restore ession, ensure session
    * @param Out EnsureSession callback
@@ -255,6 +272,16 @@ public:
             meta = (DisplayName = "EnsureSession", Keywords = "PlayCppSdk"),
             Category = "PlayCppSdk")
   void EnsureSession(FEnsureSessionDelegate Out);
+
+  FEnsureSessionDelegate OnEnsureSessionDelegate;
+
+  UFUNCTION()
+  void OnNewSession(FWalletConnectEnsureSessionResult SessionResult,
+                    FString Result);
+
+  UFUNCTION()
+  void OnRestoreSession(FWalletConnectEnsureSessionResult SessionResult,
+                       FString Result);
 
   /**
    * Clear Session
@@ -278,6 +305,16 @@ public:
   void
   SetupCallback(const FWalletconnectSessionInfoDelegate &sessioninfodelegate,
                 bool &success, FString &output_message);
+
+  /**
+   * WalletConnect Session Information delegate
+   *
+   */
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayCppSdk")
+  FWalletconnectSessionInfoDelegate OnReceiveWalletconnectSessionInfoDelegate;
+
+  UFUNCTION()
+  void OnWalletconnectSessionInfo(FWalletConnectSessionInfo SessionInfo);
 
   /**
    * get qr code string
@@ -356,13 +393,6 @@ public:
             Category = "PlayCppSdk")
   void SignEip155Transaction(FWalletConnectTxEip155 info, TArray<uint8> address,
                              FWalletconnectSignEip155TransactionDelegate Out);
-
-  /**
-   * WalletConnect Session Information callback
-   *
-   */
-  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayCppSdk")
-  FWalletconnectSessionInfoDelegate OnReceiveWalletconnectSessionInfoDelegate;
 
   /**
    * send wallet-connect information to unreal game thread
@@ -475,8 +505,8 @@ public:
                          FCronosSignedTransactionDelegate Out);
 
   /**
-   * Allows `approved_address` to withdraw from your account multiple times, up
-   * to the `amount` amount.
+   * Allows `approved_address` to withdraw from your account multiple times,
+   * up to the `amount` amount.
    * @param contractAddress erc20 contract
    * @param fromAddress from address to approve
    * @param approvedAddress address to approve
