@@ -464,11 +464,12 @@ void APlayCppSdkActor::SignEip155Transaction(
   if (coreclient == nullptr)
     return;
   TArray<uint8> address = GetAddress();
+  int64 chain_id = (uint64)GetChainId();
   // if no address, return
-  if (address.Num() == 0)
+  if (address.Num() == 0 || chain_id == 0)
     return;
   AsyncTask(ENamedThreads::AnyHiPriThreadNormalTask, [Out, coreclient, address,
-                                                      info, this]() {
+                                                      chain_id, info, this]() {
     FWalletSignTXEip155Result output;
 
     try {
@@ -487,7 +488,7 @@ void APlayCppSdkActor::SignEip155Transaction(
       myinfo.value = TCHAR_TO_UTF8(*info.value);
       copyTArrayToVec(info.data, myinfo.data);
       myinfo.common.nonce = TCHAR_TO_UTF8(*info.nonce);
-      myinfo.common.chainid = (uint64)info.chain_id;
+      myinfo.common.chainid = chain_id;
       if (_coreClient != NULL) {
 
         Vec<uint8_t> sig1 =

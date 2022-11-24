@@ -112,8 +112,7 @@ USTRUCT(BlueprintType)
 struct FWalletConnectEnsureSessionResult {
   GENERATED_USTRUCT_BODY()
   FWalletConnectEnsureSessionResult()
-      : addresses(TArray<FWalletConnectAddress>{}),
-        chain_id(0) {}
+      : addresses(TArray<FWalletConnectAddress>{}), chain_id(0) {}
 
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayCppSdk")
   TArray<FWalletConnectAddress> addresses;
@@ -175,9 +174,6 @@ struct FWalletConnectTxEip155 {
   /** nonce in decimal string */
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayCppSdk")
   FString nonce;
-  /** chain_id */
-  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayCppSdk")
-  int64 chain_id;
 };
 
 /// facade for wallet connect
@@ -207,6 +203,14 @@ public:
   void SetWalletConnectEnsureSessionResult(
       FWalletConnectEnsureSessionResult InWalletConnectEnsureSessionResult) {
     _session_result = InWalletConnectEnsureSessionResult;
+  }
+
+  UFUNCTION(BlueprintCallable,
+            meta = (DisplayName = "GetWalletConnectEnsureSessionResult",
+                    Keywords = "PlayCppSdk"),
+            Category = "PlayCppSdk")
+  FWalletConnectEnsureSessionResult GetWalletConnectEnsureSessionResult() {
+    return _session_result;
   }
 
   const TArray<uint8> GetAddress() const {
