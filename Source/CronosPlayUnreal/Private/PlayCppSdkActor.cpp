@@ -311,7 +311,7 @@ void APlayCppSdkActor::ClearSession(bool &success) {
       FileManager.Delete(*(FPaths::ProjectSavedDir() + "sessioninfo.json"));
   _coreClient = NULL;
   FWalletConnectEnsureSessionResult session_result;
-  _session_result = FWalletConnectEnsureSessionResult;
+  _session_result = session_result;
 }
 
 void APlayCppSdkActor::SetupCallback(
