@@ -311,7 +311,7 @@ void APlayCppSdkActor::ClearSession(bool &success) {
       FileManager.Delete(*(FPaths::ProjectSavedDir() + "sessioninfo.json"));
   _coreClient = NULL;
   FWalletConnectEnsureSessionResult session_result;
-  _session_result = session_result;
+  _session_result = FWalletConnectEnsureSessionResult;
 }
 
 void APlayCppSdkActor::SetupCallback(
@@ -341,7 +341,19 @@ void APlayCppSdkActor::SetupCallback(
 
 void APlayCppSdkActor::OnWalletconnectSessionInfo(
     FWalletConnectSessionInfo SessionInfo) {
-  // TODO
+  switch (SessionInfo.sessionstate) {
+    case EWalletconnectSessionState::StateDisconnected:
+      bool success;
+      this->ClearSession(success);
+      // TODO
+      if (success) {
+      } else {
+      }
+      break;
+      // TODO
+    default:
+      break;
+  }
 }
 
 void APlayCppSdkActor::GetConnectionString(FString &output, bool &success,
@@ -542,12 +554,6 @@ void UserWalletConnectCallback::onDisconnected( // NOLINT : flase positive,
 
     APlayCppSdkActor::getInstance()->sendEvent(output);
 
-    bool success;
-    APlayCppSdkActor::ClearSession(success);
-    // TODO
-    if (success) {
-    } else {
-    }
   }
 }
 void UserWalletConnectCallback::
