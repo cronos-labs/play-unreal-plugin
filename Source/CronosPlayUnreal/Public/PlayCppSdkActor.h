@@ -187,13 +187,9 @@ private:
 
   static const APlayCppSdkActor *_sdk;
 
-  // Internal address, it will be set after walletconnect session creates or
-  // retores
-  TArray<uint8> _address;
-
-  // Internal chain_id, it will be set after walletconnect session creates or
-  // retores
-  int64 _chain_id;
+  // Internal session result, it will be set after successfully calling
+  // `EnsureSession`
+  FWalletConnectEnsureSessionResult _session_result;
 
 public:
   static const APlayCppSdkActor *getInstance();
@@ -202,12 +198,18 @@ public:
   APlayCppSdkActor();
 
   ::com::crypto::game_sdk::WalletconnectClient *GetClient() const {
-    assert(coreclient != NULL); // TODO
     return _coreClient;
   };
 
-  const TArray<uint8> &GetAddress() const { return _address; }
-  const int64 GetChainId() const { return _chain_id; }
+  void SetWalletConnectEnsureSessionResult(
+      FWalletConnectEnsureSessionResult InWalletConnectEnsureSessionResult) {
+    _session_result = InWalletConnectEnsureSessionResult;
+  }
+
+  const TArray<uint8> GetAddress() const {
+    return _session_result.addresses[0].address;
+  }
+  const int64 GetChainId() const { return _session_result.chain_id; }
 
 protected:
   // Called when the game starts or when spawned
@@ -376,7 +378,6 @@ public:
   /**
    * sign general message
    * @param user_message user message to sign
-   * @param address address to sign
    * @param signature signature byte arrays
    * @param success succeed or fail
    * @param output_message  error message
@@ -384,20 +385,19 @@ public:
   UFUNCTION(BlueprintCallable,
             meta = (DisplayName = "SignPersonal", Keywords = "PlayCppSdk"),
             Category = "PlayCppSdk")
-  void SignPersonal(FString user_message, TArray<uint8> address,
+  void SignPersonal(FString user_message,
                     FWalletconnectSignPersonalDelegate Out);
 
   /**
    * sign EIP155 tx
    * @param info EIP 155 tx information
-   * @param address address to sign
    * @param Out sign legacy tx result callback
    */
   UFUNCTION(BlueprintCallable,
             meta = (DisplayName = "SignEip155Transaction",
                     Keywords = "PlayCppSdk"),
             Category = "PlayCppSdk")
-  void SignEip155Transaction(FWalletConnectTxEip155 info, TArray<uint8> address,
+  void SignEip155Transaction(FWalletConnectTxEip155 info,
                              FWalletconnectSignEip155TransactionDelegate Out);
 
   /**
@@ -410,7 +410,6 @@ public:
   /**
    * Transfers `token_id` token from `from_address` to `to_address`.
    * @param contractAddress erc721 contract
-   * @param fromAddress from address to move
    * @param toAddress to address
    * @param tokenId token id
    * @param gasLimit gas limit
@@ -421,9 +420,8 @@ public:
             meta = (DisplayName = "Erc721TransferFrom",
                     Keywords = "PlayCppSdk"),
             Category = "PlayCppSdk")
-  void Erc721TransferFrom(FString contractAddress, FString fromAddress,
-                          FString toAddress, FString tokenId, FString gasLimit,
-                          FString gasPrice,
+  void Erc721TransferFrom(FString contractAddress, FString toAddress,
+                          FString tokenId, FString gasLimit, FString gasPrice,
                           FCronosSignedTransactionDelegate Out);
 
   /**
@@ -434,7 +432,6 @@ public:
    * approved at a time, so approving the zero address clears previous
    approvals.
    * @param contractAddress erc721 contract
-   * @param fromAddress from address
    * @param approvedAddress  address to approve
    * @param tokenId token id
    * @param gasLimit gas limit
@@ -444,15 +441,14 @@ public:
   UFUNCTION(BlueprintCallable,
             meta = (DisplayName = "Erc721Approve", Keywords = "PlayCppSdk"),
             Category = "PlayCppSdk")
-  void Erc721Approve(FString contractAddress, FString fromAddress,
-                     FString approvedAddress, FString tokenId, FString gasLimit,
-                     FString gasPrice, FCronosSignedTransactionDelegate Out);
+  void Erc721Approve(FString contractAddress, FString approvedAddress,
+                     FString tokenId, FString gasLimit, FString gasPrice,
+                     FCronosSignedTransactionDelegate Out);
 
   /**
    * Transfers `amount` tokens of `token_id` from
    * `from_address` to `to_address` with `additional_data`
    * @param contractAddress erc1155 contract
-   * @param fromAddress from address to move
    * @param toAddress to address
    * @param tokenId token id
    * @param amount amount
@@ -465,17 +461,16 @@ public:
             meta = (DisplayName = "Erc1155SafeTransferFrom",
                     Keywords = "PlayCppSdk"),
             Category = "PlayCppSdk")
-  void Erc1155SafeTransferFrom(FString contractAddress, FString fromAddress,
-                               FString toAddress, FString tokenId,
-                               FString amount, TArray<uint8> additionalData,
-                               FString gasLimit, FString gasPrice,
+  void Erc1155SafeTransferFrom(FString contractAddress, FString toAddress,
+                               FString tokenId, FString amount,
+                               TArray<uint8> additionalData, FString gasLimit,
+                               FString gasPrice,
                                FCronosSignedTransactionDelegate Out);
 
   /**
    * Enable or disable approval for a third party `approved_address` to manage
    * all of sender's assets
    * @param contractAddress erc1155 contract
-   * @param fromAddress from address
    * @param approvedAddress address to approve
    * @param approved approved or not
    * @param gasLimit gas limit
@@ -485,14 +480,13 @@ public:
   UFUNCTION(BlueprintCallable,
             meta = (DisplayName = "Erc1155Approve", Keywords = "PlayCppSdk"),
             Category = "PlayCppSdk")
-  void Erc1155Approve(FString contractAddress, FString fromAddress,
-                      FString approvedAddress, bool approved, FString gasLimit,
-                      FString gasPrice, FCronosSignedTransactionDelegate Out);
+  void Erc1155Approve(FString contractAddress, FString approvedAddress,
+                      bool approved, FString gasLimit, FString gasPrice,
+                      FCronosSignedTransactionDelegate Out);
 
   /**
    * Moves `amount` tokens from the caller’s account to `to_address`.
    * @param contractAddress erc20 contract
-   * @param fromAddress from address to move
    * @param toAddress to address
    * @param amount amount
    * @param gasLimit gas limit
@@ -502,16 +496,14 @@ public:
   UFUNCTION(BlueprintCallable,
             meta = (DisplayName = "Erc20TransferFrom", Keywords = "PlayCppSdk"),
             Category = "PlayCppSdk")
-  void Erc20TransferFrom(FString contractAddress, FString fromAddress,
-                         FString toAddress, FString amount, FString gasLimit,
-                         FString gasPrice,
+  void Erc20TransferFrom(FString contractAddress, FString toAddress,
+                         FString amount, FString gasLimit, FString gasPrice,
                          FCronosSignedTransactionDelegate Out);
 
   /**
    * Allows `approved_address` to withdraw from your account multiple times,
    * up to the `amount` amount.
    * @param contractAddress erc20 contract
-   * @param fromAddress from address to approve
    * @param approvedAddress address to approve
    * @param amount amount
    * @param gasLimit gas limit
@@ -521,7 +513,7 @@ public:
   UFUNCTION(BlueprintCallable,
             meta = (DisplayName = "Erc20Approve", Keywords = "PlayCppSdk"),
             Category = "PlayCppSdk")
-  void Erc20Approve(FString contractAddress, FString fromAddress,
-                    FString approvedAddress, FString amount, FString gasLimit,
-                    FString gasPrice, FCronosSignedTransactionDelegate Out);
+  void Erc20Approve(FString contractAddress, FString approvedAddress,
+                    FString amount, FString gasLimit, FString gasPrice,
+                    FCronosSignedTransactionDelegate Out);
 };

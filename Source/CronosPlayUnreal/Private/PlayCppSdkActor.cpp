@@ -268,6 +268,7 @@ void APlayCppSdkActor::EnsureSession(FEnsureSessionDelegate Out) {
         }
         assert(output.addresses.Num() == sessionresult.addresses.size());
         output.chain_id = sessionresult.chain_id;
+        SetWalletConnectEnsureSessionResult(output);
       } else {
         result = FString::Printf(
             TEXT("PlayCppSdk EnsureSession Error Invalid Client"));
@@ -289,9 +290,6 @@ void APlayCppSdkActor::OnRestoreSession(
          TEXT("Restore Session Succeeded: Account[0]: %s, Chain id: %d"),
          *UUtlis::ToHex(SessionResult.addresses[0].address),
          SessionResult.chain_id);
-
-  _address = SessionResult.addresses[0].address;
-  _chain_id = SessionResult.chain_id;
 }
 
 void APlayCppSdkActor::OnNewSession(
@@ -300,9 +298,6 @@ void APlayCppSdkActor::OnNewSession(
          TEXT("Create Session Succeeded: Account[0]: %s, Chain id: %d"),
          *UUtlis::ToHex(SessionResult.addresses[0].address),
          SessionResult.chain_id);
-
-  _address = SessionResult.addresses[0].address;
-  _chain_id = SessionResult.chain_id;
 
   FString output;
   bool success;
@@ -422,11 +417,16 @@ void copyVecToTArray(const Vec<uint8_t> &src, TArray<uint8> &dst) {
   assert(dst.Num() == src.size());
 }
 
-void APlayCppSdkActor::SignPersonal(FString user_message, TArray<uint8> address,
+void APlayCppSdkActor::SignPersonal(FString user_message,
                                     FWalletconnectSignPersonalDelegate Out) {
   ::com::crypto::game_sdk::WalletconnectClient *coreclient = GetClient();
+  // if no walletconnect session, return
+  if (coreclient == nullptr)
+    return;
+  TArray<uint8> address = GetAddress();
+  // if no address, return
   if (address.Num() == 0)
-    address = GetAddress();
+    return;
   AsyncTask(ENamedThreads::AnyHiPriThreadNormalTask,
             [Out, coreclient, user_message, address, this]() {
               FWalletSignTXEip155Result output;
@@ -455,11 +455,16 @@ void APlayCppSdkActor::SignPersonal(FString user_message, TArray<uint8> address,
 }
 
 void APlayCppSdkActor::SignEip155Transaction(
-    FWalletConnectTxEip155 info, TArray<uint8> address,
+    FWalletConnectTxEip155 info,
     FWalletconnectSignEip155TransactionDelegate Out) {
   ::com::crypto::game_sdk::WalletconnectClient *coreclient = GetClient();
+  // if no walletconnect session, return
+  if (coreclient == nullptr)
+    return;
+  TArray<uint8> address = GetAddress();
+  // if no address, return
   if (address.Num() == 0)
-    address = GetAddress();
+    return;
   AsyncTask(ENamedThreads::AnyHiPriThreadNormalTask, [Out, coreclient, address,
                                                       info, this]() {
     FWalletSignTXEip155Result output;
@@ -576,9 +581,13 @@ void APlayCppSdkActor::destroyCoreClient() {
 void StopWalletConnect() { APlayCppSdkActor::destroyCoreClient(); }
 
 void APlayCppSdkActor::Erc721TransferFrom(
-    FString contractAddress, FString fromAddress, FString toAddress,
-    FString tokenId, FString gasLimit, FString gasPrice,
-    FCronosSignedTransactionDelegate Out) {
+    FString contractAddress, FString toAddress, FString tokenId,
+    FString gasLimit, FString gasPrice, FCronosSignedTransactionDelegate Out) {
+
+  FString fromAddress = UUtlis::ToHex(GetAddress());
+  // if no fromAddress, return
+  if (fromAddress.IsEmpty())
+    return;
 
   AsyncTask(ENamedThreads::AnyHiPriThreadNormalTask,
             [this, Out, contractAddress, fromAddress, toAddress, tokenId,
@@ -615,10 +624,14 @@ void APlayCppSdkActor::Erc721TransferFrom(
 }
 
 void APlayCppSdkActor::Erc721Approve(FString contractAddress,
-                                     FString fromAddress,
                                      FString approvedAddress, FString tokenId,
                                      FString gasLimit, FString gasPrice,
                                      FCronosSignedTransactionDelegate Out) {
+
+  FString fromAddress = UUtlis::ToHex(GetAddress());
+  // if no fromAddress, return
+  if (fromAddress.IsEmpty())
+    return;
   AsyncTask(ENamedThreads::AnyHiPriThreadNormalTask,
             [this, Out, contractAddress, fromAddress, approvedAddress, tokenId,
              gasLimit, gasPrice]() {
@@ -654,9 +667,13 @@ void APlayCppSdkActor::Erc721Approve(FString contractAddress,
 }
 
 void APlayCppSdkActor::Erc1155SafeTransferFrom(
-    FString contractAddress, FString fromAddress, FString toAddress,
-    FString tokenId, FString amount, TArray<uint8> additionalData,
-    FString gasLimit, FString gasPrice, FCronosSignedTransactionDelegate Out) {
+    FString contractAddress, FString toAddress, FString tokenId, FString amount,
+    TArray<uint8> additionalData, FString gasLimit, FString gasPrice,
+    FCronosSignedTransactionDelegate Out) {
+  FString fromAddress = UUtlis::ToHex(GetAddress());
+  // if no fromAddress, return
+  if (fromAddress.IsEmpty())
+    return;
   AsyncTask(ENamedThreads::AnyHiPriThreadNormalTask,
             [this, Out, contractAddress, fromAddress, toAddress, tokenId,
              amount, gasLimit, gasPrice]() {
@@ -693,10 +710,13 @@ void APlayCppSdkActor::Erc1155SafeTransferFrom(
 }
 
 void APlayCppSdkActor::Erc1155Approve(FString contractAddress,
-                                      FString fromAddress,
                                       FString approvedAddress, bool approved,
                                       FString gasLimit, FString gasPrice,
                                       FCronosSignedTransactionDelegate Out) {
+  FString fromAddress = UUtlis::ToHex(GetAddress());
+  // if no fromAddress, return
+  if (fromAddress.IsEmpty())
+    return;
   AsyncTask(ENamedThreads::AnyHiPriThreadNormalTask,
             [this, Out, contractAddress, fromAddress, approvedAddress, approved,
              gasLimit, gasPrice]() {
@@ -732,11 +752,14 @@ void APlayCppSdkActor::Erc1155Approve(FString contractAddress,
 }
 
 void APlayCppSdkActor::Erc20TransferFrom(FString contractAddress,
-                                         FString fromAddress, FString toAddress,
-                                         FString amount, FString gasLimit,
-                                         FString gasPrice,
+                                         FString toAddress, FString amount,
+                                         FString gasLimit, FString gasPrice,
                                          FCronosSignedTransactionDelegate Out) {
 
+  FString fromAddress = UUtlis::ToHex(GetAddress());
+  // if no fromAddress, return
+  if (fromAddress.IsEmpty())
+    return;
   AsyncTask(ENamedThreads::AnyHiPriThreadNormalTask,
             [this, Out, contractAddress, fromAddress, toAddress, amount,
              gasLimit, gasPrice]() {
@@ -791,11 +814,14 @@ void APlayCppSdkActor::setCommon(WalletConnectTxCommon &common,
 }
 
 void APlayCppSdkActor::Erc20Approve(FString contractAddress,
-                                    FString fromAddress,
                                     FString approvedAddress, FString amount,
                                     FString gasLimit, FString gasPrice,
                                     FCronosSignedTransactionDelegate Out) {
 
+  FString fromAddress = UUtlis::ToHex(GetAddress());
+  // if no fromAddress, return
+  if (fromAddress.IsEmpty())
+    return;
   AsyncTask(ENamedThreads::AnyHiPriThreadNormalTask,
             [this, Out, contractAddress, fromAddress, approvedAddress, amount,
              gasLimit, gasPrice]() {
