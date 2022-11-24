@@ -201,6 +201,14 @@ public:
   // Sets default values for this actor's properties
   APlayCppSdkActor();
 
+  ::com::crypto::game_sdk::WalletconnectClient *GetClient() const {
+    assert(coreclient != NULL); // TODO
+    return _coreClient;
+  };
+
+  const TArray<uint8> &GetAddress() const { return _address; }
+  const int64 GetChainId() const { return _chain_id; }
+
 protected:
   // Called when the game starts or when spawned
   virtual void BeginPlay() override;
@@ -379,20 +387,6 @@ public:
   void SignPersonal(FString user_message, TArray<uint8> address,
                     FWalletconnectSignPersonalDelegate Out);
 
-  FWalletconnectSignPersonalDelegate OnWalletconnectSignPersonalDelegate;
-
-  UFUNCTION()
-  void OnWalletconnectSignPersonal(FWalletSignTXEip155Result SigningResult);
-
-  /**
-   * A simple version of `SignPersonal`
-   * @param user_message user message to sign
-   */
-  UFUNCTION(BlueprintCallable,
-            meta = (DisplayName = "SignPersonalSim", Keywords = "PlayCppSdk"),
-            Category = "PlayCppSdk")
-  void SignPersonalSim(FString user_message);
-
   /**
    * sign EIP155 tx
    * @param info EIP 155 tx information
@@ -405,22 +399,6 @@ public:
             Category = "PlayCppSdk")
   void SignEip155Transaction(FWalletConnectTxEip155 info, TArray<uint8> address,
                              FWalletconnectSignEip155TransactionDelegate Out);
-
-  FWalletconnectSignEip155TransactionDelegate
-      OnWalletconnectSignEip155TransactionDelegate;
-
-  UFUNCTION()
-  void OnWalletconnectSignEip155Transaction(FWalletSignTXEip155Result SigningResult);
-
-  /**
-   * A simple version of `SignEip155Transaction`
-   * @param info EIP 155 tx information
-   */
-  UFUNCTION(BlueprintCallable,
-            meta = (DisplayName = "SignEip155TransactionSim",
-                    Keywords = "PlayCppSdk"),
-            Category = "PlayCppSdk")
-  void SignEip155TransactionSim(FWalletConnectTxEip155 info);
 
   /**
    * send wallet-connect information to unreal game thread

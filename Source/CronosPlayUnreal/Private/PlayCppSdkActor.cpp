@@ -127,7 +127,6 @@ void APlayCppSdkActor::ConnectWalletConnect(FString description, FString url,
 
     InitializeWalletConnect(description, url, icon_urls, name, chain_id,
                             OnInitializeWalletConnectDelegate);
-
   }
 }
 
@@ -293,7 +292,6 @@ void APlayCppSdkActor::OnRestoreSession(
 
   _address = SessionResult.addresses[0].address;
   _chain_id = SessionResult.chain_id;
-
 }
 
 void APlayCppSdkActor::OnNewSession(
@@ -426,8 +424,9 @@ void copyVecToTArray(const Vec<uint8_t> &src, TArray<uint8> &dst) {
 
 void APlayCppSdkActor::SignPersonal(FString user_message, TArray<uint8> address,
                                     FWalletconnectSignPersonalDelegate Out) {
-  ::com::crypto::game_sdk::WalletconnectClient *coreclient = _coreClient;
-  assert(coreclient != NULL);
+  ::com::crypto::game_sdk::WalletconnectClient *coreclient = GetClient();
+  if (address.Num() == 0)
+    address = GetAddress();
   AsyncTask(ENamedThreads::AnyHiPriThreadNormalTask,
             [Out, coreclient, user_message, address, this]() {
               FWalletSignTXEip155Result output;
@@ -455,27 +454,12 @@ void APlayCppSdkActor::SignPersonal(FString user_message, TArray<uint8> address,
             });
 }
 
-void APlayCppSdkActor::SignPersonalSim(FString user_message) {
-  if (_address.Num() != 0) {
-    OnWalletconnectSignPersonalDelegate.BindDynamic(
-        this, &APlayCppSdkActor::OnWalletconnectSignPersonal);
-    SignPersonal(user_message, _address, OnWalletconnectSignPersonalDelegate);
-  } else {
-    // TODO Ask users connect with wallet connect first
-  }
-}
-
-void APlayCppSdkActor::OnWalletconnectSignPersonal(
-    FWalletSignTXEip155Result SigningResult) {
-//TODO
-}
-
 void APlayCppSdkActor::SignEip155Transaction(
     FWalletConnectTxEip155 info, TArray<uint8> address,
     FWalletconnectSignEip155TransactionDelegate Out) {
-
-  ::com::crypto::game_sdk::WalletconnectClient *coreclient = _coreClient;
-  assert(coreclient != NULL);
+  ::com::crypto::game_sdk::WalletconnectClient *coreclient = GetClient();
+  if (address.Num() == 0)
+    address = GetAddress();
   AsyncTask(ENamedThreads::AnyHiPriThreadNormalTask, [Out, coreclient, address,
                                                       info, this]() {
     FWalletSignTXEip155Result output;
@@ -518,23 +502,6 @@ void APlayCppSdkActor::SignEip155Transaction(
     AsyncTask(ENamedThreads::GameThread,
               [Out, output]() { Out.ExecuteIfBound(output); });
   });
-}
-
-void APlayCppSdkActor::SignEip155TransactionSim(FWalletConnectTxEip155 info) {
-
-  if (_address.Num() != 0) {
-    OnWalletconnectSignEip155TransactionDelegate.BindDynamic(
-        this, &APlayCppSdkActor::OnWalletconnectSignEip155Transaction);
-    SignEip155Transaction(info, _address,
-                          OnWalletconnectSignEip155TransactionDelegate);
-  } else {
-    // TODO Ask users connect with wallet connect first
-  }
-}
-
-void APlayCppSdkActor::OnWalletconnectSignEip155Transaction(
-    FWalletSignTXEip155Result SigningResult) {
-  // TODO
 }
 
 void APlayCppSdkActor::sendEvent(FWalletConnectSessionInfo info) const {
