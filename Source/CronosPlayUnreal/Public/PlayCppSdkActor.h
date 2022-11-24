@@ -111,6 +111,9 @@ struct FWalletConnectAddress {
 USTRUCT(BlueprintType)
 struct FWalletConnectEnsureSessionResult {
   GENERATED_USTRUCT_BODY()
+  FWalletConnectEnsureSessionResult()
+      : addresses(TArray<FWalletConnectAddress>{}),
+        chain_id(0) {}
 
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayCppSdk")
   TArray<FWalletConnectAddress> addresses;
