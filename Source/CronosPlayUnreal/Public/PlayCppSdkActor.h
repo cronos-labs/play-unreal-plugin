@@ -230,7 +230,6 @@ public:
 
   /**
    * destroy wallet-connect client
-   *
    */
   UFUNCTION(BlueprintCallable,
             meta = (DisplayName = "DestroyClient", Keywords = "PlayCppSdk"),
@@ -240,7 +239,6 @@ public:
   /**
    * Connect wallet client with walletconnect (Only Crypto.com Defi Wallet is
    * suppported at this moment)
-   *
    */
   UFUNCTION(BlueprintCallable,
             meta = (DisplayName = "ConnectWalletConnect",
@@ -257,7 +255,6 @@ public:
    * @param icon_urls wallet-connect icon urls
    * @param name wallet-connect name
    * @param Out InitializeWalletConnect callback
-   *
    */
   UFUNCTION(BlueprintCallable,
             meta = (DisplayName = "InitializeWalletConnect",
@@ -306,7 +303,6 @@ public:
    * @param sessioninfodelegate callback to receive session info
    * @param success succeed or fail
    * @output_message  error message
-   *
    */
   UFUNCTION(BlueprintCallable,
             meta = (DisplayName = "SetupCallback", Keywords = "PlayCppSdk"),
@@ -317,7 +313,6 @@ public:
 
   /**
    * WalletConnect Session Information delegate
-   *
    */
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayCppSdk")
   FWalletconnectSessionInfoDelegate OnReceiveWalletconnectSessionInfoDelegate;
@@ -330,7 +325,6 @@ public:
    * @param output qr code string
    * @param success succeed or fail
    * @param output_message  error message
-   *
    */
   UFUNCTION(BlueprintCallable,
             meta = (DisplayName = "GetConnectionString",
@@ -343,7 +337,6 @@ public:
    * get crypto wallet url
    * @param uri WalletConnect uri
    * @return url starts with cryptowallet://
-   *
    */
   UFUNCTION(BlueprintCallable,
             meta = (DisplayName = "GetCryptoWalletUrl",
@@ -355,7 +348,6 @@ public:
    * @param output session information string
    * @param success succeed or fail
    * @param output_message  error message
-   *
    */
   UFUNCTION(BlueprintCallable,
             meta = (DisplayName = "SaveClient", Keywords = "PlayCppSdk"),
@@ -367,7 +359,6 @@ public:
    * @param jsondata session information string(json)
    * @param success   succeed or fail
    * @param output_message  error message
-   *
    */
   UFUNCTION(BlueprintCallable,
             meta = (DisplayName = "RestoreClient", Keywords = "PlayCppSdk"),
@@ -381,7 +372,6 @@ public:
    * @param signature signature byte arrays
    * @param success succeed or fail
    * @param output_message  error message
-   *
    */
   UFUNCTION(BlueprintCallable,
             meta = (DisplayName = "SignPersonal", Keywords = "PlayCppSdk"),
@@ -397,7 +387,6 @@ public:
   /**
    * A simple version of `SignPersonal`
    * @param user_message user message to sign
-   *
    */
   UFUNCTION(BlueprintCallable,
             meta = (DisplayName = "SignPersonalSim", Keywords = "PlayCppSdk"),
@@ -409,7 +398,6 @@ public:
    * @param info EIP 155 tx information
    * @param address address to sign
    * @param Out sign legacy tx result callback
-   *
    */
   UFUNCTION(BlueprintCallable,
             meta = (DisplayName = "SignEip155Transaction",
@@ -427,7 +415,6 @@ public:
   /**
    * A simple version of `SignEip155Transaction`
    * @param info EIP 155 tx information
-   *
    */
   UFUNCTION(BlueprintCallable,
             meta = (DisplayName = "SignEip155TransactionSim",
@@ -437,7 +424,6 @@ public:
 
   /**
    * send wallet-connect information to unreal game thread
-   *
    */
   void sendEvent(FWalletConnectSessionInfo) const;
 
@@ -476,7 +462,6 @@ public:
    * @param gasLimit gas limit
    * @param gasPrice gas price
    * @param Out FCronosSignedTransactionDelegate callback
-   *
    */
   UFUNCTION(BlueprintCallable,
             meta = (DisplayName = "Erc721Approve", Keywords = "PlayCppSdk"),
@@ -518,7 +503,6 @@ public:
    * @param gasLimit gas limit
    * @param gasPrice gas price
    * @param Out FCronosSignedTransactionDelegate callback
-   *
    */
   UFUNCTION(BlueprintCallable,
             meta = (DisplayName = "Erc1155Approve", Keywords = "PlayCppSdk"),
@@ -555,7 +539,6 @@ public:
    * @param gasLimit gas limit
    * @param gasPrice gas price
    * @param Out FCronosSignedTransactionDelegate callback
-   *
    */
   UFUNCTION(BlueprintCallable,
             meta = (DisplayName = "Erc20Approve", Keywords = "PlayCppSdk"),
