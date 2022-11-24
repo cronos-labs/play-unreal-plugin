@@ -520,6 +520,23 @@ void APlayCppSdkActor::SignEip155Transaction(
   });
 }
 
+void APlayCppSdkActor::SignEip155TransactionSim(FWalletConnectTxEip155 info) {
+
+  if (_address.Num() != 0) {
+    OnWalletconnectSignEip155TransactionDelegate.BindDynamic(
+        this, &APlayCppSdkActor::OnWalletconnectSignEip155Transaction);
+    SignEip155Transaction(info, _address,
+                          OnWalletconnectSignEip155TransactionDelegate);
+  } else {
+    // TODO Ask users connect with wallet connect first
+  }
+}
+
+void APlayCppSdkActor::OnWalletconnectSignEip155Transaction(
+    FWalletSignTXEip155Result SigningResult) {
+  // TODO
+}
+
 void APlayCppSdkActor::sendEvent(FWalletConnectSessionInfo info) const {
 
   AsyncTask(ENamedThreads::GameThread, [this, info]() {

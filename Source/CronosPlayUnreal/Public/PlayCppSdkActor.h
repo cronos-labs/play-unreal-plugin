@@ -418,6 +418,23 @@ public:
   void SignEip155Transaction(FWalletConnectTxEip155 info, TArray<uint8> address,
                              FWalletconnectSignEip155TransactionDelegate Out);
 
+  FWalletconnectSignEip155TransactionDelegate
+      OnWalletconnectSignEip155TransactionDelegate;
+
+  UFUNCTION()
+  void OnWalletconnectSignEip155Transaction(FWalletSignTXEip155Result SigningResult);
+
+  /**
+   * A simple version of `SignEip155Transaction`
+   * @param info EIP 155 tx information
+   *
+   */
+  UFUNCTION(BlueprintCallable,
+            meta = (DisplayName = "SignEip155TransactionSim",
+                    Keywords = "PlayCppSdk"),
+            Category = "PlayCppSdk")
+  void SignEip155TransactionSim(FWalletConnectTxEip155 info);
+
   /**
    * send wallet-connect information to unreal game thread
    *
