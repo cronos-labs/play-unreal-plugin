@@ -541,6 +541,13 @@ void UserWalletConnectCallback::onDisconnected( // NOLINT : flase positive,
             sessioninfo, EWalletconnectSessionState::StateDisconnected);
 
     APlayCppSdkActor::getInstance()->sendEvent(output);
+
+    bool success;
+    APlayCppSdkActor::ClearSession(success);
+    // TODO
+    if (success) {
+    } else {
+    }
   }
 }
 void UserWalletConnectCallback::

@@ -313,7 +313,7 @@ public:
   UFUNCTION(BlueprintCallable,
             meta = (DisplayName = "ClearSession", Keywords = "PlayCppSdk"),
             Category = "PlayCppSdk")
-  void ClearSession(bool &success);
+  static void ClearSession(bool &success);
 
   /**
    * setup callback to receive event
