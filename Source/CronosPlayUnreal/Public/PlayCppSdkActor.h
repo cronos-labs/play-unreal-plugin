@@ -50,6 +50,13 @@ enum class EWalletconnectSessionState : uint8 {
   StateUpdated UMETA(DisplayName = "Updated")
 };
 
+UENUM(BlueprintType)
+enum class EConnectionType : uint8 {
+  URI_STRING UMETA(DisplayName = "Generate uri as String"),
+  QR_TEXTURE UMETA(DisplayName = "Generate uri as a QR code 2D Texture"),
+  LAUNCH_URL UMETA(DisplayName = "Launch uri with native wallet directly"),
+};
+
 /// wallet connect session info
 USTRUCT(BlueprintType)
 struct FWalletConnectSessionInfo {
@@ -144,13 +151,17 @@ DECLARE_DYNAMIC_DELEGATE_OneParam(FWalletconnectSignPersonalDelegate,
                                   FWalletSignTXEip155Result, SigningResult);
 
 /// initialize wallet connect delegate
-DECLARE_DYNAMIC_DELEGATE_TwoParams(FInitializeWalletConnectDelegate, bool,
-                                   Succeed, FString, message);
+DECLARE_DYNAMIC_DELEGATE_ThreeParams(FInitializeWalletConnectDelegate,
+                                     EConnectionType, connection_type, bool,
+                                     Succeed, FString, message);
 
 /// wallet connect ensure session delegate
 DECLARE_DYNAMIC_DELEGATE_TwoParams(FEnsureSessionDelegate,
                                    FWalletConnectEnsureSessionResult,
                                    SessionResult, FString, Result);
+
+/// called when QR is ready
+DECLARE_DYNAMIC_DELEGATE_OneParam(FOnQRReady, UTexture2D *, Texture);
 
 /// wallet connect eip155 tx information
 USTRUCT(BlueprintType)
@@ -189,6 +200,17 @@ private:
   // Internal session result, it will be set after successfully calling
   // `EnsureSession`
   FWalletConnectEnsureSessionResult _session_result;
+
+  /**
+   * InitializeWalletConnect delegate, called after calling
+   * `InitializeWalletConnect`
+   */
+  FInitializeWalletConnectDelegate OnInitializeWalletConnectDelegate;
+
+  /**
+   * EnsureSession delegate, called after calling `EnsureSession`
+   */
+  FEnsureSessionDelegate OnEnsureSessionDelegate;
 
 public:
   static const APlayCppSdkActor *getInstance();
@@ -256,6 +278,12 @@ public:
   /**
    * Connect wallet client with walletconnect (Only Crypto.com Defi Wallet is
    * suppported at this moment)
+   * @param description wallet-connect client description
+   * @param url wallet-connect server url
+   * @param icon_urls wallet-connect icon urls
+   * @param name wallet-connect name
+   * @param chain_id the network chain id (if 0, retrived and decided by wallet,
+   * if > 0, decided by the client)
    */
   UFUNCTION(BlueprintCallable,
             meta = (DisplayName = "ConnectWalletConnect",
@@ -263,7 +291,7 @@ public:
             Category = "PlayCppSdk")
   void ConnectWalletConnect(FString description, FString url,
                             TArray<FString> icon_urls, FString name,
-                            int64 chain_id);
+                            int64 chain_id, EConnectionType connection_type);
 
   /**
    * intialize wallet-connect client
@@ -277,15 +305,14 @@ public:
             meta = (DisplayName = "InitializeWalletConnect",
                     Keywords = "PlayCppSdk"),
             Category = "PlayCppSdk")
-  void InitializeWalletConnect(FString description, FString url,
-                               TArray<FString> icon_urls, FString name,
-                               int64 chain_id,
-                               FInitializeWalletConnectDelegate Out);
-
-  FInitializeWalletConnectDelegate OnInitializeWalletConnectDelegate;
+  void InitializeWalletConnect(
+      FString description, FString url, TArray<FString> icon_urls, FString name,
+      int64 chain_id, FInitializeWalletConnectDelegate Out,
+      EConnectionType connection_type = EConnectionType::URI_STRING);
 
   UFUNCTION()
-  void OnInitializeWalletConnect(bool succeed, FString message);
+  void OnInitializeWalletConnect(EConnectionType connection_type, bool succeed,
+                                 FString message);
 
   /**
    * Create session or restore ession, ensure session
@@ -295,8 +322,6 @@ public:
             meta = (DisplayName = "EnsureSession", Keywords = "PlayCppSdk"),
             Category = "PlayCppSdk")
   void EnsureSession(FEnsureSessionDelegate Out);
-
-  FEnsureSessionDelegate OnEnsureSessionDelegate;
 
   UFUNCTION()
   void OnNewSession(FWalletConnectEnsureSessionResult SessionResult,
@@ -308,7 +333,7 @@ public:
 
   /**
    * Clear Session
-   * @param Out EnsureSession callback
+   * @param success whether clearing session succeed or not
    */
   UFUNCTION(BlueprintCallable,
             meta = (DisplayName = "ClearSession", Keywords = "PlayCppSdk"),
@@ -329,11 +354,17 @@ public:
                 bool &success, FString &output_message);
 
   /**
-   * WalletConnect Session Information delegate, called after walletconnect callback
-   * onConnected, onDisconnected, onConnecting, or onUpdated is called.
+   * WalletConnect Session Information delegate, called after walletconnect
+   * callback onConnected, onDisconnected, onConnecting, or onUpdated is called.
    */
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayCppSdk")
   FWalletconnectSessionInfoDelegate OnReceiveWalletconnectSessionInfoDelegate;
+
+  /**
+   * On QR Ready delegate, called after QR is ready
+   */
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayCppSdk")
+  FOnQRReady OnQRReady;
 
   UFUNCTION()
   void OnWalletconnectSessionInfo(FWalletConnectSessionInfo SessionInfo);

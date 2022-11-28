@@ -6,6 +6,7 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "Misc/FileHelper.h"
 #include "Misc/Paths.h"
+#include "PlayCppSdkBPLibrary.h"
 #include "PlayCppSdkLibrary/Include/extra-cpp-bindings/src/lib.rs.h"
 #include "PlayCppSdkLibrary/Include/rust/cxx.h"
 #include "Utlis.h"
@@ -100,7 +101,8 @@ void APlayCppSdkActor::Destroyed() {
 
 void APlayCppSdkActor::ConnectWalletConnect(FString description, FString url,
                                             TArray<FString> icon_urls,
-                                            FString name, int64 chain_id) {
+                                            FString name, int64 chain_id,
+                                            EConnectionType connection_type) {
   FString Jsondata;
   bool IsRetored;
   FString RestoreClientOutputMessage;
@@ -127,89 +129,140 @@ void APlayCppSdkActor::ConnectWalletConnect(FString description, FString url,
         this, &APlayCppSdkActor::OnInitializeWalletConnect);
 
     InitializeWalletConnect(description, url, icon_urls, name, chain_id,
-                            OnInitializeWalletConnectDelegate);
+                            OnInitializeWalletConnectDelegate, connection_type);
   }
 }
 
 void APlayCppSdkActor::InitializeWalletConnect(
     FString description, FString url, TArray<FString> icon_urls, FString name,
-    int64 chain_id, FInitializeWalletConnectDelegate Out) {
+    int64 chain_id, FInitializeWalletConnectDelegate Out,
+    EConnectionType connection_type) {
 
-  AsyncTask(ENamedThreads::AnyHiPriThreadNormalTask,
-            [this, Out, description, url, icon_urls, name, chain_id]() {
-              FWalletConnectEnsureSessionResult output;
-              bool success = false;
-              FString message;
-              try {
+  AsyncTask(ENamedThreads::AnyHiPriThreadNormalTask, [this, Out, description,
+                                                      url, icon_urls, name,
+                                                      chain_id,
+                                                      connection_type]() {
+    FWalletConnectEnsureSessionResult output;
+    bool success = false;
+    FString message;
+    try {
 
-                std::string mydescription = TCHAR_TO_UTF8(*description);
-                std::string myurl = TCHAR_TO_UTF8(*url);
-                Vec<String> myiconurls;
-                for (int i = 0; i < icon_urls.Num(); i++) {
-                  myiconurls.push_back(TCHAR_TO_UTF8(*icon_urls[i]));
-                }
+      std::string mydescription = TCHAR_TO_UTF8(*description);
+      std::string myurl = TCHAR_TO_UTF8(*url);
+      Vec<String> myiconurls;
+      for (int i = 0; i < icon_urls.Num(); i++) {
+        myiconurls.push_back(TCHAR_TO_UTF8(*icon_urls[i]));
+      }
 
-                std::string myname = TCHAR_TO_UTF8(*name);
+      std::string myname = TCHAR_TO_UTF8(*name);
 
-                Box<WalletconnectClient> tmpClient = walletconnect_new_client(
-                    mydescription, myurl, myiconurls, myname, (uint64)chain_id);
-                _coreClient = tmpClient.into_raw();
-                assert(_coreClient != NULL);
+      Box<WalletconnectClient> tmpClient = walletconnect_new_client(
+          mydescription, myurl, myiconurls, myname, (uint64)chain_id);
+      _coreClient = tmpClient.into_raw();
+      assert(_coreClient != NULL);
 
-                success = true;
+      success = true;
 
-              } catch (const rust::cxxbridge1::Error &e) {
+      switch (connection_type) {
+      case EConnectionType::URI_STRING:
+        // do nothing here, URI string is still needed to be
+        // got from `GetConnectionString` by users
+        break;
+      case EConnectionType::QR_TEXTURE: {
+        FString GetConnectionStringOutput;
+        bool IsGetConnectionString;
+        FString GetConnectionStringOutputMessage;
+        GetConnectionString(GetConnectionStringOutput, IsGetConnectionString,
+                            GetConnectionStringOutputMessage);
 
-                success = false;
-                message = FString::Printf(
-                    TEXT("PlayCppSdk InitializeWalletConnect Error: %s"),
-                    UTF8_TO_TCHAR(e.what()));
-              }
+        if (IsGetConnectionString) {
+          UE_LOG(LogTemp, Log, TEXT("Connection String: "),
+                 *GetConnectionStringOutput);
 
-              AsyncTask(ENamedThreads::GameThread, [Out, success, message]() {
-                Out.ExecuteIfBound(success, message);
+          UTexture2D *qr =
+              UPlayCppSdkBPLibrary::GenerateQrCode(GetConnectionStringOutput);
+          if (qr != nullptr) {
+            // Execute OnQRReady delagate, pass the QR texture out
+            OnQRReady.ExecuteIfBound(qr);
+          } else {
+            // return if can not generate qr code
+            return;
+          }
+
+        } else {
+          UE_LOG(LogTemp, Error, TEXT("Get Connection String failed: %s"),
+                 *(GetConnectionStringOutputMessage));
+        }
+
+        break;
+      }
+      default:
+        break;
+      }
+
+    } catch (const rust::cxxbridge1::Error &e) {
+
+      success = false;
+      message =
+          FString::Printf(TEXT("PlayCppSdk InitializeWalletConnect Error: %s"),
+                          UTF8_TO_TCHAR(e.what()));
+    }
+
+    AsyncTask(ENamedThreads::GameThread,
+              [Out, connection_type, success, message]() {
+                Out.ExecuteIfBound(connection_type, success, message);
               });
-            });
+  });
 }
 
-void APlayCppSdkActor::OnInitializeWalletConnect(bool succeed,
-                                                 FString message) {
-  FString succeed_result = succeed ? "true" : "false";
-  UE_LOG(LogTemp, Log, TEXT("Initialize Wallet Connect: %s %s"),
-         *succeed_result, *message);
+void APlayCppSdkActor::OnInitializeWalletConnect(
+    EConnectionType connection_type, bool succeed, FString message) {
+  if (succeed) {
+    UE_LOG(LogTemp, Log, TEXT("Initialize Wallet Connect succeeded"));
 
-  // Setup Callback
-  bool IsSetupCallback;
-  FString SetupCallbackOutputMessage;
-  OnReceiveWalletconnectSessionInfoDelegate.BindDynamic(
-      this, &APlayCppSdkActor::OnWalletconnectSessionInfo);
-  SetupCallback(OnReceiveWalletconnectSessionInfoDelegate, IsSetupCallback,
-                SetupCallbackOutputMessage);
-  if (IsSetupCallback) {
-    FString GetConnectionStringOutput;
-    bool IsGetConnectionString;
-    FString GetConnectionStringOutputMessage;
-    GetConnectionString(GetConnectionStringOutput, IsGetConnectionString,
-                        GetConnectionStringOutputMessage);
-    if (IsGetConnectionString) {
-      UE_LOG(LogTemp, Log, TEXT("Connection String: "),
-             *GetConnectionStringOutput);
-      // Launch Crypto Wallet
-      UKismetSystemLibrary::LaunchURL(
-          GetCryptoWalletUrl(GetConnectionStringOutput));
+    // Setup Callback
+    bool IsSetupCallback;
+    FString SetupCallbackOutputMessage;
+    OnReceiveWalletconnectSessionInfoDelegate.BindDynamic(
+        this, &APlayCppSdkActor::OnWalletconnectSessionInfo);
+    SetupCallback(OnReceiveWalletconnectSessionInfoDelegate, IsSetupCallback,
+                  SetupCallbackOutputMessage);
+    if (IsSetupCallback) {
+      FString GetConnectionStringOutput;
+      bool IsGetConnectionString;
+      FString GetConnectionStringOutputMessage;
+      GetConnectionString(GetConnectionStringOutput, IsGetConnectionString,
+                          GetConnectionStringOutputMessage);
+      if (IsGetConnectionString) {
+        UE_LOG(LogTemp, Log, TEXT("Connection String: "),
+               *GetConnectionStringOutput);
 
-      // Ensure session
-      OnEnsureSessionDelegate.BindDynamic(this,
-                                          &APlayCppSdkActor::OnNewSession);
-      EnsureSession(OnEnsureSessionDelegate);
+        switch (connection_type) {
+        case EConnectionType::LAUNCH_URL:
+          // Launch Crypto Wallet
+          UKismetSystemLibrary::LaunchURL(
+              GetCryptoWalletUrl(GetConnectionStringOutput));
+          break;
+        default:
+          break;
+        }
 
+        // Ensure session
+        OnEnsureSessionDelegate.BindDynamic(this,
+                                            &APlayCppSdkActor::OnNewSession);
+        EnsureSession(OnEnsureSessionDelegate);
+
+      } else {
+        UE_LOG(LogTemp, Error, TEXT("Get Connection String failed: %s"),
+               *(GetConnectionStringOutputMessage));
+      }
     } else {
-      UE_LOG(LogTemp, Error, TEXT("Get Connection String failed: %s"),
-             *(GetConnectionStringOutputMessage));
+      UE_LOG(LogTemp, Error, TEXT("Setup Callbacked failed: %s"),
+             *(SetupCallbackOutputMessage));
     }
   } else {
-    UE_LOG(LogTemp, Error, TEXT("Setup Callbacked failed: %s"),
-           *(SetupCallbackOutputMessage));
+    UE_LOG(LogTemp, Error, TEXT("InitializeWalletConnect failed: %s"),
+           *(message));
   }
 }
 
