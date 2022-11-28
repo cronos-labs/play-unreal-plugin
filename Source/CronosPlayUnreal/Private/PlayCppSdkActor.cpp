@@ -128,20 +128,21 @@ void APlayCppSdkActor::ConnectWalletConnect(FString description, FString url,
     OnInitializeWalletConnectDelegate.BindDynamic(
         this, &APlayCppSdkActor::OnInitializeWalletConnect);
 
+    // set the connection type
+    _connection_type = connection_type;
+
     InitializeWalletConnect(description, url, icon_urls, name, chain_id,
-                            OnInitializeWalletConnectDelegate, connection_type);
+                            OnInitializeWalletConnectDelegate);
   }
 }
 
 void APlayCppSdkActor::InitializeWalletConnect(
     FString description, FString url, TArray<FString> icon_urls, FString name,
-    int64 chain_id, FInitializeWalletConnectDelegate Out,
-    EConnectionType connection_type) {
+    int64 chain_id, FInitializeWalletConnectDelegate Out) {
 
   AsyncTask(ENamedThreads::AnyHiPriThreadNormalTask, [this, Out, description,
                                                       url, icon_urls, name,
-                                                      chain_id,
-                                                      connection_type]() {
+                                                      chain_id]() {
     FWalletConnectEnsureSessionResult output;
     bool success = false;
     FString message;
@@ -163,7 +164,7 @@ void APlayCppSdkActor::InitializeWalletConnect(
 
       success = true;
 
-      switch (connection_type) {
+      switch (_connection_type) {
       case EConnectionType::URI_STRING:
         // do nothing here, URI string is still needed to be
         // got from `GetConnectionString` by users
@@ -208,15 +209,13 @@ void APlayCppSdkActor::InitializeWalletConnect(
                           UTF8_TO_TCHAR(e.what()));
     }
 
-    AsyncTask(ENamedThreads::GameThread,
-              [Out, connection_type, success, message]() {
-                Out.ExecuteIfBound(connection_type, success, message);
-              });
+    AsyncTask(ENamedThreads::GameThread, [Out, success, message]() {
+      Out.ExecuteIfBound(success, message);
+    });
   });
 }
 
-void APlayCppSdkActor::OnInitializeWalletConnect(
-    EConnectionType connection_type, bool succeed, FString message) {
+void APlayCppSdkActor::OnInitializeWalletConnect(bool succeed, FString message) {
   if (succeed) {
     UE_LOG(LogTemp, Log, TEXT("Initialize Wallet Connect succeeded"));
 
@@ -237,7 +236,7 @@ void APlayCppSdkActor::OnInitializeWalletConnect(
         UE_LOG(LogTemp, Log, TEXT("Connection String: "),
                *GetConnectionStringOutput);
 
-        switch (connection_type) {
+        switch (_connection_type) {
         case EConnectionType::LAUNCH_URL:
           // Launch Crypto Wallet
           UKismetSystemLibrary::LaunchURL(

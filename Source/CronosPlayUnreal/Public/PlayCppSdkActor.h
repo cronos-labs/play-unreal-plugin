@@ -151,9 +151,8 @@ DECLARE_DYNAMIC_DELEGATE_OneParam(FWalletconnectSignPersonalDelegate,
                                   FWalletSignTXEip155Result, SigningResult);
 
 /// initialize wallet connect delegate
-DECLARE_DYNAMIC_DELEGATE_ThreeParams(FInitializeWalletConnectDelegate,
-                                     EConnectionType, connection_type, bool,
-                                     Succeed, FString, message);
+DECLARE_DYNAMIC_DELEGATE_TwoParams(FInitializeWalletConnectDelegate, bool,
+                                   Succeed, FString, message);
 
 /// wallet connect ensure session delegate
 DECLARE_DYNAMIC_DELEGATE_TwoParams(FEnsureSessionDelegate,
@@ -211,6 +210,8 @@ private:
    * EnsureSession delegate, called after calling `EnsureSession`
    */
   FEnsureSessionDelegate OnEnsureSessionDelegate;
+
+  EConnectionType _connection_type = EConnectionType::URI_STRING;
 
 public:
   static const APlayCppSdkActor *getInstance();
@@ -305,14 +306,13 @@ public:
             meta = (DisplayName = "InitializeWalletConnect",
                     Keywords = "PlayCppSdk"),
             Category = "PlayCppSdk")
-  void InitializeWalletConnect(
-      FString description, FString url, TArray<FString> icon_urls, FString name,
-      int64 chain_id, FInitializeWalletConnectDelegate Out,
-      EConnectionType connection_type = EConnectionType::URI_STRING);
+  void InitializeWalletConnect(FString description, FString url,
+                               TArray<FString> icon_urls, FString name,
+                               int64 chain_id,
+                               FInitializeWalletConnectDelegate Out);
 
   UFUNCTION()
-  void OnInitializeWalletConnect(EConnectionType connection_type, bool succeed,
-                                 FString message);
+  void OnInitializeWalletConnect(bool succeed, FString message);
 
   /**
    * Create session or restore ession, ensure session
