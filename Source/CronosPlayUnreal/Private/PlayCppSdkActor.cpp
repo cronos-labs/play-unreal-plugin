@@ -342,17 +342,24 @@ void APlayCppSdkActor::SetupCallback(
 void APlayCppSdkActor::OnWalletconnectSessionInfo(
     FWalletConnectSessionInfo SessionInfo) {
   switch (SessionInfo.sessionstate) {
-    case EWalletconnectSessionState::StateDisconnected:
-      bool success;
-      this->ClearSession(success);
-      // TODO
-      if (success) {
-      } else {
-      }
-      break;
-      // TODO
-    default:
-      break;
+  case EWalletconnectSessionState::StateConnecting:
+    break;
+  case EWalletconnectSessionState::StateConnected:
+    break;
+  case EWalletconnectSessionState::StateUpdated:
+    break;
+  case EWalletconnectSessionState::StateDisconnected:
+    bool success;
+    this->ClearSession(success);
+    if (success) {
+      UE_LOG(LogTemp, Log, TEXT("sessioninfo.json was deleted"));
+    } else {
+      UE_LOG(LogTemp, Log,
+             TEXT("can not delete sessioninfo.json, please try again"));
+    }
+    break;
+  default:
+    break;
   }
 }
 
@@ -553,7 +560,6 @@ void UserWalletConnectCallback::onDisconnected( // NOLINT : flase positive,
             sessioninfo, EWalletconnectSessionState::StateDisconnected);
 
     APlayCppSdkActor::getInstance()->sendEvent(output);
-
   }
 }
 void UserWalletConnectCallback::

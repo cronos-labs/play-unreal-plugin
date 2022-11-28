@@ -329,7 +329,8 @@ public:
                 bool &success, FString &output_message);
 
   /**
-   * WalletConnect Session Information delegate
+   * WalletConnect Session Information delegate, called after walletconnect callback
+   * onConnected, onDisconnected, onConnecting, or onUpdated is called.
    */
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayCppSdk")
   FWalletconnectSessionInfoDelegate OnReceiveWalletconnectSessionInfoDelegate;
