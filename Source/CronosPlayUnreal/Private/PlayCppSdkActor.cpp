@@ -119,7 +119,8 @@ void APlayCppSdkActor::ConnectWalletConnect(FString description, FString url,
                                           &APlayCppSdkActor::OnRestoreSession);
       EnsureSession(OnEnsureSessionDelegate);
     } else {
-      // TODO
+      UE_LOG(LogTemp, Error, TEXT("Setup Callbacked failed: %s"),
+             *(SetupCallbackOutputMessage));
     }
   } else {
     OnInitializeWalletConnectDelegate.BindDynamic(
@@ -203,10 +204,12 @@ void APlayCppSdkActor::OnInitializeWalletConnect(bool succeed,
       EnsureSession(OnEnsureSessionDelegate);
 
     } else {
-      // TODO
+      UE_LOG(LogTemp, Error, TEXT("Get Connection String failed: %s"),
+             *(GetConnectionStringOutputMessage));
     }
   } else {
-    // TODO
+    UE_LOG(LogTemp, Error, TEXT("Setup Callbacked failed: %s"),
+           *(SetupCallbackOutputMessage));
   }
 }
 
