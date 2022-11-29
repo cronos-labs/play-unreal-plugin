@@ -213,6 +213,11 @@ private:
 
   EConnectionType _connection_type = EConnectionType::URI_STRING;
 
+  /**
+   * SetupCallback delegate, called after calling `SetupCallback`
+   */
+  FWalletconnectSessionInfoDelegate OnSetupCallbackDelegate;
+
 public:
   static const APlayCppSdkActor *getInstance();
 

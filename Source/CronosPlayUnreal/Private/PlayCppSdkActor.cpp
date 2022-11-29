@@ -111,9 +111,9 @@ void APlayCppSdkActor::ConnectWalletConnect(FString description, FString url,
     // Setup Callback
     bool IsSetupCallback;
     FString SetupCallbackOutputMessage;
-    OnReceiveWalletconnectSessionInfoDelegate.BindDynamic(
+    OnSetupCallbackDelegate.BindDynamic(
         this, &APlayCppSdkActor::OnWalletconnectSessionInfo);
-    SetupCallback(OnReceiveWalletconnectSessionInfoDelegate, IsSetupCallback,
+    SetupCallback(OnSetupCallbackDelegate, IsSetupCallback,
                   SetupCallbackOutputMessage);
     if (IsSetupCallback) {
       // Ensure session
@@ -224,9 +224,9 @@ void APlayCppSdkActor::OnInitializeWalletConnectFinished(bool succeed,
     // Setup Callback
     bool IsSetupCallback;
     FString SetupCallbackOutputMessage;
-    OnReceiveWalletconnectSessionInfoDelegate.BindDynamic(
+    OnSetupCallbackDelegate.BindDynamic(
         this, &APlayCppSdkActor::OnWalletconnectSessionInfo);
-    SetupCallback(OnReceiveWalletconnectSessionInfoDelegate, IsSetupCallback,
+    SetupCallback(OnSetupCallbackDelegate, IsSetupCallback,
                   SetupCallbackOutputMessage);
     if (IsSetupCallback) {
       switch (_connection_type) {
