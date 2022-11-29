@@ -237,7 +237,7 @@ void APlayCppSdkActor::OnInitializeWalletConnectFinished(bool succeed,
         GetConnectionString(GetConnectionStringOutput, IsGetConnectionString,
                             GetConnectionStringOutputMessage);
         if (IsGetConnectionString) {
-          UE_LOG(LogTemp, Log, TEXT("Connection String 2: %s"),
+          UE_LOG(LogTemp, Log, TEXT("Connection String: %s"),
                  *GetConnectionStringOutput);
 
           // Launch Crypto Wallet
