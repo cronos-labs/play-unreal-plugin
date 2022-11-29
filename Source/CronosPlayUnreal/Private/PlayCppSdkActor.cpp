@@ -177,14 +177,15 @@ void APlayCppSdkActor::InitializeWalletConnect(
                             GetConnectionStringOutputMessage);
 
         if (IsGetConnectionString) {
-          UE_LOG(LogTemp, Log, TEXT("Connection String: "),
+          UE_LOG(LogTemp, Log, TEXT("Connection String: %s"),
                  *GetConnectionStringOutput);
 
           UTexture2D *qr =
               UPlayCppSdkBPLibrary::GenerateQrCode(GetConnectionStringOutput);
           if (qr != nullptr) {
             // Execute OnQRReady delagate, pass the QR texture out
-            OnQRReady.ExecuteIfBound(qr);
+            AsyncTask(ENamedThreads::GameThread,
+                      [this, qr]() { this->OnQRReady.ExecuteIfBound(qr); });
           } else {
             // return if can not generate qr code
             return;
@@ -215,7 +216,8 @@ void APlayCppSdkActor::InitializeWalletConnect(
   });
 }
 
-void APlayCppSdkActor::OnInitializeWalletConnect(bool succeed, FString message) {
+void APlayCppSdkActor::OnInitializeWalletConnect(bool succeed,
+                                                 FString message) {
   if (succeed) {
     UE_LOG(LogTemp, Log, TEXT("Initialize Wallet Connect succeeded"));
 
