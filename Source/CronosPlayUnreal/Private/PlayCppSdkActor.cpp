@@ -126,7 +126,7 @@ void APlayCppSdkActor::ConnectWalletConnect(FString description, FString url,
     }
   } else {
     OnInitializeWalletConnectDelegate.BindDynamic(
-        this, &APlayCppSdkActor::OnInitializeWalletConnect);
+        this, &APlayCppSdkActor::OnInitializeWalletConnectFinished);
 
     // set the connection type
     _connection_type = connection_type;
@@ -180,16 +180,16 @@ void APlayCppSdkActor::InitializeWalletConnect(
           UE_LOG(LogTemp, Log, TEXT("Connection String: %s"),
                  *GetConnectionStringOutput);
 
-          UTexture2D *qr =
-              UPlayCppSdkBPLibrary::GenerateQrCode(GetConnectionStringOutput);
-          if (qr != nullptr) {
-            // Execute OnQRReady delagate, pass the QR texture out
-            AsyncTask(ENamedThreads::GameThread,
-                      [this, qr]() { this->OnQRReady.ExecuteIfBound(qr); });
-          } else {
-            // return if can not generate qr code
-            return;
-          }
+          AsyncTask(ENamedThreads::GameThread, [this,
+                                                GetConnectionStringOutput]() {
+            UTexture2D *qr =
+                UPlayCppSdkBPLibrary::GenerateQrCode(GetConnectionStringOutput);
+            if (qr) {
+              // Execute OnQRReady delagate, pass the QR texture out
+              this->OnQRReady.ExecuteIfBound(qr);
+            } else {
+            }
+          });
 
         } else {
           UE_LOG(LogTemp, Error, TEXT("Get Connection String failed: %s"),
@@ -216,8 +216,8 @@ void APlayCppSdkActor::InitializeWalletConnect(
   });
 }
 
-void APlayCppSdkActor::OnInitializeWalletConnect(bool succeed,
-                                                 FString message) {
+void APlayCppSdkActor::OnInitializeWalletConnectFinished(bool succeed,
+                                                         FString message) {
   if (succeed) {
     UE_LOG(LogTemp, Log, TEXT("Initialize Wallet Connect succeeded"));
 
@@ -229,34 +229,38 @@ void APlayCppSdkActor::OnInitializeWalletConnect(bool succeed,
     SetupCallback(OnReceiveWalletconnectSessionInfoDelegate, IsSetupCallback,
                   SetupCallbackOutputMessage);
     if (IsSetupCallback) {
-      FString GetConnectionStringOutput;
-      bool IsGetConnectionString;
-      FString GetConnectionStringOutputMessage;
-      GetConnectionString(GetConnectionStringOutput, IsGetConnectionString,
-                          GetConnectionStringOutputMessage);
-      if (IsGetConnectionString) {
-        UE_LOG(LogTemp, Log, TEXT("Connection String: "),
-               *GetConnectionStringOutput);
+      switch (_connection_type) {
+      case EConnectionType::LAUNCH_URL: {
+        FString GetConnectionStringOutput;
+        bool IsGetConnectionString;
+        FString GetConnectionStringOutputMessage;
+        GetConnectionString(GetConnectionStringOutput, IsGetConnectionString,
+                            GetConnectionStringOutputMessage);
+        if (IsGetConnectionString) {
+          UE_LOG(LogTemp, Log, TEXT("Connection String 2: %s"),
+                 *GetConnectionStringOutput);
 
-        switch (_connection_type) {
-        case EConnectionType::LAUNCH_URL:
           // Launch Crypto Wallet
           UKismetSystemLibrary::LaunchURL(
               GetCryptoWalletUrl(GetConnectionStringOutput));
-          break;
-        default:
-          break;
+
+        } else {
+          UE_LOG(LogTemp, Error, TEXT("Get Connection String failed: %s"),
+                 *(GetConnectionStringOutputMessage));
+          return;
         }
 
-        // Ensure session
-        OnEnsureSessionDelegate.BindDynamic(this,
-                                            &APlayCppSdkActor::OnNewSession);
-        EnsureSession(OnEnsureSessionDelegate);
-
-      } else {
-        UE_LOG(LogTemp, Error, TEXT("Get Connection String failed: %s"),
-               *(GetConnectionStringOutputMessage));
+        break;
       }
+      default:
+        break;
+      }
+
+      // Ensure session
+      OnEnsureSessionDelegate.BindDynamic(this,
+                                          &APlayCppSdkActor::OnNewSession);
+      EnsureSession(OnEnsureSessionDelegate);
+
     } else {
       UE_LOG(LogTemp, Error, TEXT("Setup Callbacked failed: %s"),
              *(SetupCallbackOutputMessage));

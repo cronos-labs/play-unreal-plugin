@@ -312,7 +312,7 @@ public:
                                FInitializeWalletConnectDelegate Out);
 
   UFUNCTION()
-  void OnInitializeWalletConnect(bool succeed, FString message);
+  void OnInitializeWalletConnectFinished(bool succeed, FString message);
 
   /**
    * Create session or restore ession, ensure session
