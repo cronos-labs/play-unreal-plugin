@@ -347,23 +347,29 @@ void APlayCppSdkActor::EnsureSession(FEnsureSessionDelegate Out) {
 
 void APlayCppSdkActor::OnRestoreSession(
     FWalletConnectEnsureSessionResult SessionResult, FString Result) {
-  UE_LOG(LogTemp, Log,
-         TEXT("Restore Session Succeeded: Account[0]: %s, Chain id: %d"),
-         *UUtlis::ToHex(SessionResult.addresses[0].address),
+  UE_LOG(LogTemp, Log, TEXT("OnRestoreSession Result: %s"), *Result)
+  if (SessionResult.addresses.Num() > 0) {
+    UE_LOG(LogTemp, Log, TEXT("OnRestoreSession Account[0]: %s"),
+           *UUtlis::ToHex(SessionResult.addresses[0].address));
+  }
+  UE_LOG(LogTemp, Log, TEXT("OnRestoreSession Chain id: %d"),
          SessionResult.chain_id);
 }
 
 void APlayCppSdkActor::OnNewSession(
     FWalletConnectEnsureSessionResult SessionResult, FString Result) {
-  UE_LOG(LogTemp, Log,
-         TEXT("Create Session Succeeded: Account[0]: %s, Chain id: %d"),
-         *UUtlis::ToHex(SessionResult.addresses[0].address),
+  UE_LOG(LogTemp, Log, TEXT("OnNewSession Result: %s"), *Result)
+  // Only SaveClient if user approves. If users rejects, addresses would be empty.
+  if (SessionResult.addresses.Num() > 0) {
+    UE_LOG(LogTemp, Log, TEXT("OnNewSession Account[0]: %s"), *UUtlis::ToHex(SessionResult.addresses[0].address));
+    FString output;
+    bool success;
+    FString output_message;
+    SaveClient(output, success, output_message);
+  }
+  UE_LOG(LogTemp, Log, TEXT("OnNewSession Chain id: %d"),
          SessionResult.chain_id);
 
-  FString output;
-  bool success;
-  FString output_message;
-  SaveClient(output, success, output_message);
 }
 
 void APlayCppSdkActor::ClearSession(bool &success) {
