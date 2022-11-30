@@ -50,6 +50,13 @@ enum class EWalletconnectSessionState : uint8 {
   StateUpdated UMETA(DisplayName = "Updated")
 };
 
+UENUM(BlueprintType)
+enum class EConnectionType : uint8 {
+  URI_STRING UMETA(DisplayName = "Generate uri as String"),
+  QR_TEXTURE UMETA(DisplayName = "Generate uri as a QR code 2D Texture"),
+  LAUNCH_URL UMETA(DisplayName = "Launch uri with native wallet directly"),
+};
+
 /// wallet connect session info
 USTRUCT(BlueprintType)
 struct FWalletConnectSessionInfo {
@@ -111,6 +118,8 @@ struct FWalletConnectAddress {
 USTRUCT(BlueprintType)
 struct FWalletConnectEnsureSessionResult {
   GENERATED_USTRUCT_BODY()
+  FWalletConnectEnsureSessionResult()
+      : addresses(TArray<FWalletConnectAddress>{}), chain_id(0) {}
 
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayCppSdk")
   TArray<FWalletConnectAddress> addresses;
@@ -133,22 +142,25 @@ struct FWalletSignTXEip155Result {
   FString result;
 };
 
-/// sign eip155 tx callback
+/// sign eip155 tx delegate
 DECLARE_DYNAMIC_DELEGATE_OneParam(FWalletconnectSignEip155TransactionDelegate,
                                   FWalletSignTXEip155Result, SigningResult);
 
-/// sign personal callback
+/// sign personal delegate
 DECLARE_DYNAMIC_DELEGATE_OneParam(FWalletconnectSignPersonalDelegate,
                                   FWalletSignTXEip155Result, SigningResult);
 
-/// initialize wallet connect callback
+/// initialize wallet connect delegate
 DECLARE_DYNAMIC_DELEGATE_TwoParams(FInitializeWalletConnectDelegate, bool,
                                    Succeed, FString, message);
 
-/// wallet connect ensure sssion callback
+/// wallet connect ensure session delegate
 DECLARE_DYNAMIC_DELEGATE_TwoParams(FEnsureSessionDelegate,
                                    FWalletConnectEnsureSessionResult,
                                    SessionResult, FString, Result);
+
+/// called when QR is ready
+DECLARE_DYNAMIC_DELEGATE_OneParam(FOnQRReady, UTexture2D *, Texture);
 
 /// wallet connect eip155 tx information
 USTRUCT(BlueprintType)
@@ -172,9 +184,6 @@ struct FWalletConnectTxEip155 {
   /** nonce in decimal string */
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayCppSdk")
   FString nonce;
-  /** chain_id */
-  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayCppSdk")
-  int64 chain_id;
 };
 
 /// facade for wallet connect
@@ -183,15 +192,59 @@ class CRONOSPLAYUNREAL_API APlayCppSdkActor : public AActor {
   GENERATED_BODY()
 
 private:
-  // for ue4 async
   static ::com::crypto::game_sdk::WalletconnectClient *_coreClient;
+
   static const APlayCppSdkActor *_sdk;
+
+  // Internal session result, it will be set after successfully calling
+  // `EnsureSession`
+  FWalletConnectEnsureSessionResult _session_result;
+
+  /**
+   * InitializeWalletConnect delegate, called after calling
+   * `InitializeWalletConnect`
+   */
+  FInitializeWalletConnectDelegate OnInitializeWalletConnectDelegate;
+
+  /**
+   * EnsureSession delegate, called after calling `EnsureSession`
+   */
+  FEnsureSessionDelegate OnEnsureSessionDelegate;
+
+  EConnectionType _connection_type = EConnectionType::URI_STRING;
+
+  /**
+   * SetupCallback delegate, called after calling `SetupCallback`
+   */
+  FWalletconnectSessionInfoDelegate OnSetupCallbackDelegate;
 
 public:
   static const APlayCppSdkActor *getInstance();
 
   // Sets default values for this actor's properties
   APlayCppSdkActor();
+
+  ::com::crypto::game_sdk::WalletconnectClient *GetClient() const {
+    return _coreClient;
+  };
+
+  void SetWalletConnectEnsureSessionResult(
+      FWalletConnectEnsureSessionResult InWalletConnectEnsureSessionResult) {
+    _session_result = InWalletConnectEnsureSessionResult;
+  }
+
+  UFUNCTION(BlueprintCallable,
+            meta = (DisplayName = "GetWalletConnectEnsureSessionResult",
+                    Keywords = "PlayCppSdk"),
+            Category = "PlayCppSdk")
+  FWalletConnectEnsureSessionResult GetWalletConnectEnsureSessionResult() {
+    return _session_result;
+  }
+
+  const TArray<uint8> GetAddress() const {
+    return _session_result.addresses[0].address;
+  }
+  const int64 GetChainId() const { return _session_result.chain_id; }
 
 protected:
   // Called when the game starts or when spawned
@@ -222,12 +275,29 @@ public:
 
   /**
    * destroy wallet-connect client
-   *
    */
   UFUNCTION(BlueprintCallable,
             meta = (DisplayName = "DestroyClient", Keywords = "PlayCppSdk"),
             Category = "PlayCppSdk")
   void DestroyClient();
+
+  /**
+   * Connect wallet client with walletconnect (Only Crypto.com Defi Wallet is
+   * suppported at this moment)
+   * @param description wallet-connect client description
+   * @param url wallet-connect server url
+   * @param icon_urls wallet-connect icon urls
+   * @param name wallet-connect name
+   * @param chain_id the network chain id (if 0, retrived and decided by wallet,
+   * if > 0, decided by the client)
+   */
+  UFUNCTION(BlueprintCallable,
+            meta = (DisplayName = "ConnectWalletConnect",
+                    Keywords = "PlayCppSdk"),
+            Category = "PlayCppSdk")
+  void ConnectWalletConnect(FString description, FString url,
+                            TArray<FString> icon_urls, FString name,
+                            int64 chain_id, EConnectionType connection_type);
 
   /**
    * intialize wallet-connect client
@@ -236,7 +306,6 @@ public:
    * @param icon_urls wallet-connect icon urls
    * @param name wallet-connect name
    * @param Out InitializeWalletConnect callback
-   *
    */
   UFUNCTION(BlueprintCallable,
             meta = (DisplayName = "InitializeWalletConnect",
@@ -247,8 +316,11 @@ public:
                                int64 chain_id,
                                FInitializeWalletConnectDelegate Out);
 
+  UFUNCTION()
+  void OnInitializeWalletConnectFinished(bool succeed, FString message);
+
   /**
-   * create session or restore ession, ensure session
+   * Create session or restore ession, ensure session
    * @param Out EnsureSession callback
    */
   UFUNCTION(BlueprintCallable,
@@ -256,12 +328,28 @@ public:
             Category = "PlayCppSdk")
   void EnsureSession(FEnsureSessionDelegate Out);
 
+  UFUNCTION()
+  void OnNewSession(FWalletConnectEnsureSessionResult SessionResult,
+                    FString Result);
+
+  UFUNCTION()
+  void OnRestoreSession(FWalletConnectEnsureSessionResult SessionResult,
+                        FString Result);
+
+  /**
+   * Clear Session
+   * @param success whether clearing session succeed or not
+   */
+  UFUNCTION(BlueprintCallable,
+            meta = (DisplayName = "ClearSession", Keywords = "PlayCppSdk"),
+            Category = "PlayCppSdk")
+  void ClearSession(bool &success);
+
   /**
    * setup callback to receive event
    * @param sessioninfodelegate callback to receive session info
    * @param success succeed or fail
    * @output_message  error message
-   *
    */
   UFUNCTION(BlueprintCallable,
             meta = (DisplayName = "SetupCallback", Keywords = "PlayCppSdk"),
@@ -271,11 +359,26 @@ public:
                 bool &success, FString &output_message);
 
   /**
+   * WalletConnect Session Information delegate, called after walletconnect
+   * callback onConnected, onDisconnected, onConnecting, or onUpdated is called.
+   */
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayCppSdk")
+  FWalletconnectSessionInfoDelegate OnReceiveWalletconnectSessionInfoDelegate;
+
+  /**
+   * On QR Ready delegate, called after QR is ready
+   */
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayCppSdk")
+  FOnQRReady OnQRReady;
+
+  UFUNCTION()
+  void OnWalletconnectSessionInfo(FWalletConnectSessionInfo SessionInfo);
+
+  /**
    * get qr code string
    * @param output qr code string
    * @param success succeed or fail
    * @param output_message  error message
-   *
    */
   UFUNCTION(BlueprintCallable,
             meta = (DisplayName = "GetConnectionString",
@@ -288,7 +391,6 @@ public:
    * get crypto wallet url
    * @param uri WalletConnect uri
    * @return url starts with cryptowallet://
-   *
    */
   UFUNCTION(BlueprintCallable,
             meta = (DisplayName = "GetCryptoWalletUrl",
@@ -300,7 +402,6 @@ public:
    * @param output session information string
    * @param success succeed or fail
    * @param output_message  error message
-   *
    */
   UFUNCTION(BlueprintCallable,
             meta = (DisplayName = "SaveClient", Keywords = "PlayCppSdk"),
@@ -312,52 +413,39 @@ public:
    * @param jsondata session information string(json)
    * @param success   succeed or fail
    * @param output_message  error message
-   *
    */
   UFUNCTION(BlueprintCallable,
             meta = (DisplayName = "RestoreClient", Keywords = "PlayCppSdk"),
             Category = "PlayCppSdk")
-  void RestoreClient(FString jsondata, bool &success, FString &output_message);
+  void RestoreClient(FString &jsondata, bool &success, FString &output_message);
 
   /**
    * sign general message
    * @param user_message user message to sign
-   * @param address address to sign
    * @param signature signature byte arrays
    * @param success succeed or fail
    * @param output_message  error message
-   *
    */
   UFUNCTION(BlueprintCallable,
             meta = (DisplayName = "SignPersonal", Keywords = "PlayCppSdk"),
             Category = "PlayCppSdk")
-  void SignPersonal(FString user_message, TArray<uint8> address,
+  void SignPersonal(FString user_message,
                     FWalletconnectSignPersonalDelegate Out);
 
   /**
    * sign EIP155 tx
    * @param info EIP 155 tx information
-   * @param address address to sign
    * @param Out sign legacy tx result callback
-   *
    */
   UFUNCTION(BlueprintCallable,
             meta = (DisplayName = "SignEip155Transaction",
                     Keywords = "PlayCppSdk"),
             Category = "PlayCppSdk")
-  void SignEip155Transaction(FWalletConnectTxEip155 info, TArray<uint8> address,
+  void SignEip155Transaction(FWalletConnectTxEip155 info,
                              FWalletconnectSignEip155TransactionDelegate Out);
 
   /**
-   * WalletConnect Session Information callback
-   *
-   */
-  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayCppSdk")
-  FWalletconnectSessionInfoDelegate OnReceiveWalletconnectSessionInfoDelegate;
-
-  /**
    * send wallet-connect information to unreal game thread
-   *
    */
   void sendEvent(FWalletConnectSessionInfo) const;
 
@@ -366,7 +454,6 @@ public:
   /**
    * Transfers `token_id` token from `from_address` to `to_address`.
    * @param contractAddress erc721 contract
-   * @param fromAddress from address to move
    * @param toAddress to address
    * @param tokenId token id
    * @param gasLimit gas limit
@@ -377,9 +464,8 @@ public:
             meta = (DisplayName = "Erc721TransferFrom",
                     Keywords = "PlayCppSdk"),
             Category = "PlayCppSdk")
-  void Erc721TransferFrom(FString contractAddress, FString fromAddress,
-                          FString toAddress, FString tokenId, FString gasLimit,
-                          FString gasPrice,
+  void Erc721TransferFrom(FString contractAddress, FString toAddress,
+                          FString tokenId, FString gasLimit, FString gasPrice,
                           FCronosSignedTransactionDelegate Out);
 
   /**
@@ -390,26 +476,23 @@ public:
    * approved at a time, so approving the zero address clears previous
    approvals.
    * @param contractAddress erc721 contract
-   * @param fromAddress from address
    * @param approvedAddress  address to approve
    * @param tokenId token id
    * @param gasLimit gas limit
    * @param gasPrice gas price
    * @param Out FCronosSignedTransactionDelegate callback
-   *
    */
   UFUNCTION(BlueprintCallable,
             meta = (DisplayName = "Erc721Approve", Keywords = "PlayCppSdk"),
             Category = "PlayCppSdk")
-  void Erc721Approve(FString contractAddress, FString fromAddress,
-                     FString approvedAddress, FString tokenId, FString gasLimit,
-                     FString gasPrice, FCronosSignedTransactionDelegate Out);
+  void Erc721Approve(FString contractAddress, FString approvedAddress,
+                     FString tokenId, FString gasLimit, FString gasPrice,
+                     FCronosSignedTransactionDelegate Out);
 
   /**
    * Transfers `amount` tokens of `token_id` from
    * `from_address` to `to_address` with `additional_data`
    * @param contractAddress erc1155 contract
-   * @param fromAddress from address to move
    * @param toAddress to address
    * @param tokenId token id
    * @param amount amount
@@ -422,35 +505,32 @@ public:
             meta = (DisplayName = "Erc1155SafeTransferFrom",
                     Keywords = "PlayCppSdk"),
             Category = "PlayCppSdk")
-  void Erc1155SafeTransferFrom(FString contractAddress, FString fromAddress,
-                               FString toAddress, FString tokenId,
-                               FString amount, TArray<uint8> additionalData,
-                               FString gasLimit, FString gasPrice,
+  void Erc1155SafeTransferFrom(FString contractAddress, FString toAddress,
+                               FString tokenId, FString amount,
+                               TArray<uint8> additionalData, FString gasLimit,
+                               FString gasPrice,
                                FCronosSignedTransactionDelegate Out);
 
   /**
    * Enable or disable approval for a third party `approved_address` to manage
    * all of sender's assets
    * @param contractAddress erc1155 contract
-   * @param fromAddress from address
    * @param approvedAddress address to approve
    * @param approved approved or not
    * @param gasLimit gas limit
    * @param gasPrice gas price
    * @param Out FCronosSignedTransactionDelegate callback
-   *
    */
   UFUNCTION(BlueprintCallable,
             meta = (DisplayName = "Erc1155Approve", Keywords = "PlayCppSdk"),
             Category = "PlayCppSdk")
-  void Erc1155Approve(FString contractAddress, FString fromAddress,
-                      FString approvedAddress, bool approved, FString gasLimit,
-                      FString gasPrice, FCronosSignedTransactionDelegate Out);
+  void Erc1155Approve(FString contractAddress, FString approvedAddress,
+                      bool approved, FString gasLimit, FString gasPrice,
+                      FCronosSignedTransactionDelegate Out);
 
   /**
    * Moves `amount` tokens from the caller’s account to `to_address`.
    * @param contractAddress erc20 contract
-   * @param fromAddress from address to move
    * @param toAddress to address
    * @param amount amount
    * @param gasLimit gas limit
@@ -460,27 +540,24 @@ public:
   UFUNCTION(BlueprintCallable,
             meta = (DisplayName = "Erc20TransferFrom", Keywords = "PlayCppSdk"),
             Category = "PlayCppSdk")
-  void Erc20TransferFrom(FString contractAddress, FString fromAddress,
-                         FString toAddress, FString amount, FString gasLimit,
-                         FString gasPrice,
+  void Erc20TransferFrom(FString contractAddress, FString toAddress,
+                         FString amount, FString gasLimit, FString gasPrice,
                          FCronosSignedTransactionDelegate Out);
 
   /**
-   * Allows `approved_address` to withdraw from your account multiple times, up
-   * to the `amount` amount.
+   * Allows `approved_address` to withdraw from your account multiple times,
+   * up to the `amount` amount.
    * @param contractAddress erc20 contract
-   * @param fromAddress from address to approve
    * @param approvedAddress address to approve
    * @param amount amount
    * @param gasLimit gas limit
    * @param gasPrice gas price
    * @param Out FCronosSignedTransactionDelegate callback
-   *
    */
   UFUNCTION(BlueprintCallable,
             meta = (DisplayName = "Erc20Approve", Keywords = "PlayCppSdk"),
             Category = "PlayCppSdk")
-  void Erc20Approve(FString contractAddress, FString fromAddress,
-                    FString approvedAddress, FString amount, FString gasLimit,
-                    FString gasPrice, FCronosSignedTransactionDelegate Out);
+  void Erc20Approve(FString contractAddress, FString approvedAddress,
+                    FString amount, FString gasLimit, FString gasPrice,
+                    FCronosSignedTransactionDelegate Out);
 };

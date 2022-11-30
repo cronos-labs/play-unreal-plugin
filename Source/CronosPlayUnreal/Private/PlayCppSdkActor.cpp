@@ -2,8 +2,14 @@
 #include "PlayCppSdkActor.h" // clang-diagnostic-error: false postive, can be ignored
 #include "Async/TaskGraphInterfaces.h"
 #include "GenericPlatform/GenericPlatformHttp.h"
+#include "HAL/FileManager.h"
+#include "Kismet/KismetSystemLibrary.h"
+#include "Misc/FileHelper.h"
+#include "Misc/Paths.h"
+#include "PlayCppSdkBPLibrary.h"
 #include "PlayCppSdkLibrary/Include/extra-cpp-bindings/src/lib.rs.h"
 #include "PlayCppSdkLibrary/Include/rust/cxx.h"
+#include "Utlis.h"
 
 #include <iostream>
 #include <memory>
@@ -93,48 +99,180 @@ void APlayCppSdkActor::Destroyed() {
   assert(NULL == _sdk);
 }
 
+void APlayCppSdkActor::ConnectWalletConnect(FString description, FString url,
+                                            TArray<FString> icon_urls,
+                                            FString name, int64 chain_id,
+                                            EConnectionType connection_type) {
+  FString Jsondata;
+  bool IsRestored;
+  FString RestoreClientOutputMessage;
+  RestoreClient(Jsondata, IsRestored, RestoreClientOutputMessage);
+  if (IsRestored) {
+    // Setup Callback
+    bool IsSetupCallback;
+    FString SetupCallbackOutputMessage;
+    OnSetupCallbackDelegate.BindDynamic(
+        this, &APlayCppSdkActor::OnWalletconnectSessionInfo);
+    SetupCallback(OnSetupCallbackDelegate, IsSetupCallback,
+                  SetupCallbackOutputMessage);
+    if (IsSetupCallback) {
+      // Ensure session
+      OnEnsureSessionDelegate.BindDynamic(this,
+                                          &APlayCppSdkActor::OnRestoreSession);
+      EnsureSession(OnEnsureSessionDelegate);
+    } else {
+      UE_LOG(LogTemp, Error, TEXT("Setup Callbacked failed: %s"),
+             *(SetupCallbackOutputMessage));
+    }
+  } else {
+    OnInitializeWalletConnectDelegate.BindDynamic(
+        this, &APlayCppSdkActor::OnInitializeWalletConnectFinished);
+
+    // set the connection type
+    _connection_type = connection_type;
+
+    InitializeWalletConnect(description, url, icon_urls, name, chain_id,
+                            OnInitializeWalletConnectDelegate);
+  }
+}
+
 void APlayCppSdkActor::InitializeWalletConnect(
     FString description, FString url, TArray<FString> icon_urls, FString name,
     int64 chain_id, FInitializeWalletConnectDelegate Out) {
 
-  AsyncTask(ENamedThreads::AnyHiPriThreadNormalTask,
-            [this, Out, description, url, icon_urls, name, chain_id]() {
-              FWalletConnectEnsureSessionResult output;
-              bool success = false;
-              FString message;
-              try {
+  AsyncTask(ENamedThreads::AnyHiPriThreadNormalTask, [this, Out, description,
+                                                      url, icon_urls, name,
+                                                      chain_id]() {
+    FWalletConnectEnsureSessionResult output;
+    bool success = false;
+    FString message;
+    try {
 
-                std::string mydescription = TCHAR_TO_UTF8(*description);
-                std::string myurl = TCHAR_TO_UTF8(*url);
-                Vec<String> myiconurls;
-                for (int i = 0; i < icon_urls.Num(); i++) {
-                  myiconurls.push_back(TCHAR_TO_UTF8(*icon_urls[i]));
-                }
+      std::string mydescription = TCHAR_TO_UTF8(*description);
+      std::string myurl = TCHAR_TO_UTF8(*url);
+      Vec<String> myiconurls;
+      for (int i = 0; i < icon_urls.Num(); i++) {
+        myiconurls.push_back(TCHAR_TO_UTF8(*icon_urls[i]));
+      }
 
-                std::string myname = TCHAR_TO_UTF8(*name);
+      std::string myname = TCHAR_TO_UTF8(*name);
 
-                Box<WalletconnectClient> tmpClient = walletconnect_new_client(
-                    mydescription, myurl, myiconurls, myname, (uint64)chain_id);
-                _coreClient = tmpClient.into_raw();
-                assert(_coreClient != NULL);
+      Box<WalletconnectClient> tmpClient = walletconnect_new_client(
+          mydescription, myurl, myiconurls, myname, (uint64)chain_id);
+      _coreClient = tmpClient.into_raw();
+      assert(_coreClient != NULL);
 
-                success = true;
+      success = true;
 
-              } catch (const rust::cxxbridge1::Error &e) {
+      switch (_connection_type) {
+      case EConnectionType::URI_STRING:
+        // do nothing here, URI string is still needed to be
+        // got from `GetConnectionString` by users
+        break;
+      case EConnectionType::QR_TEXTURE: {
+        FString GetConnectionStringOutput;
+        bool IsGetConnectionString;
+        FString GetConnectionStringOutputMessage;
+        GetConnectionString(GetConnectionStringOutput, IsGetConnectionString,
+                            GetConnectionStringOutputMessage);
 
-                success = false;
-                message = FString::Printf(
-                    TEXT("PlayCppSdk InitializeWalletConnect Error: %s"),
-                    UTF8_TO_TCHAR(e.what()));
-              }
+        if (IsGetConnectionString) {
+          UE_LOG(LogTemp, Log, TEXT("Connection String: %s"),
+                 *GetConnectionStringOutput);
 
-              AsyncTask(ENamedThreads::GameThread, [Out, success, message]() {
-                Out.ExecuteIfBound(success, message);
-              });
-            });
+          AsyncTask(ENamedThreads::GameThread, [this,
+                                                GetConnectionStringOutput]() {
+            UTexture2D *qr =
+                UPlayCppSdkBPLibrary::GenerateQrCode(GetConnectionStringOutput);
+            if (qr) {
+              // Execute OnQRReady delagate, pass the QR texture out
+              this->OnQRReady.ExecuteIfBound(qr);
+            } else {
+            }
+          });
+
+        } else {
+          UE_LOG(LogTemp, Error, TEXT("Get Connection String failed: %s"),
+                 *(GetConnectionStringOutputMessage));
+        }
+
+        break;
+      }
+      default:
+        break;
+      }
+
+    } catch (const rust::cxxbridge1::Error &e) {
+
+      success = false;
+      message =
+          FString::Printf(TEXT("PlayCppSdk InitializeWalletConnect Error: %s"),
+                          UTF8_TO_TCHAR(e.what()));
+    }
+
+    AsyncTask(ENamedThreads::GameThread, [Out, success, message]() {
+      Out.ExecuteIfBound(success, message);
+    });
+  });
 }
 
-void APlayCppSdkActor::RestoreClient(FString jsondata, bool &success,
+void APlayCppSdkActor::OnInitializeWalletConnectFinished(bool succeed,
+                                                         FString message) {
+  if (succeed) {
+    UE_LOG(LogTemp, Log, TEXT("Initialize Wallet Connect succeeded"));
+
+    // Setup Callback
+    bool IsSetupCallback;
+    FString SetupCallbackOutputMessage;
+    OnSetupCallbackDelegate.BindDynamic(
+        this, &APlayCppSdkActor::OnWalletconnectSessionInfo);
+    SetupCallback(OnSetupCallbackDelegate, IsSetupCallback,
+                  SetupCallbackOutputMessage);
+    if (IsSetupCallback) {
+      switch (_connection_type) {
+      case EConnectionType::LAUNCH_URL: {
+        FString GetConnectionStringOutput;
+        bool IsGetConnectionString;
+        FString GetConnectionStringOutputMessage;
+        GetConnectionString(GetConnectionStringOutput, IsGetConnectionString,
+                            GetConnectionStringOutputMessage);
+        if (IsGetConnectionString) {
+          UE_LOG(LogTemp, Log, TEXT("Connection String: %s"),
+                 *GetConnectionStringOutput);
+
+          // Launch Crypto Wallet
+          UKismetSystemLibrary::LaunchURL(
+              GetCryptoWalletUrl(GetConnectionStringOutput));
+
+        } else {
+          UE_LOG(LogTemp, Error, TEXT("Get Connection String failed: %s"),
+                 *(GetConnectionStringOutputMessage));
+          return;
+        }
+
+        break;
+      }
+      default:
+        break;
+      }
+
+      // Ensure session
+      OnEnsureSessionDelegate.BindDynamic(this,
+                                          &APlayCppSdkActor::OnNewSession);
+      EnsureSession(OnEnsureSessionDelegate);
+
+    } else {
+      UE_LOG(LogTemp, Error, TEXT("Setup Callbacked failed: %s"),
+             *(SetupCallbackOutputMessage));
+    }
+  } else {
+    UE_LOG(LogTemp, Error, TEXT("InitializeWalletConnect failed: %s"),
+           *(message));
+  }
+}
+
+// TODO Turn into AsyncTask
+void APlayCppSdkActor::RestoreClient(FString &Jsondata, bool &success,
                                      FString &output_message) {
   try {
     if (NULL != _coreClient) {
@@ -143,7 +281,16 @@ void APlayCppSdkActor::RestoreClient(FString jsondata, bool &success,
       return;
     }
 
-    std::string sessioninfostring = TCHAR_TO_UTF8(*jsondata);
+    success = FFileHelper::LoadFileToString(
+        Jsondata, *(FPaths::ProjectSavedDir() + "sessioninfo.json"));
+    // if load file failed, return
+    if (!success)
+      return;
+    // if nothing in session file, return
+    if (Jsondata.IsEmpty())
+      return;
+
+    std::string sessioninfostring = TCHAR_TO_UTF8(*Jsondata);
     Box<WalletconnectClient> tmpClient =
         walletconnect_restore_client(sessioninfostring);
     _coreClient = tmpClient.into_raw();
@@ -182,6 +329,7 @@ void APlayCppSdkActor::EnsureSession(FEnsureSessionDelegate Out) {
         }
         assert(output.addresses.Num() == sessionresult.addresses.size());
         output.chain_id = sessionresult.chain_id;
+        SetWalletConnectEnsureSessionResult(output);
       } else {
         result = FString::Printf(
             TEXT("PlayCppSdk EnsureSession Error Invalid Client"));
@@ -195,6 +343,43 @@ void APlayCppSdkActor::EnsureSession(FEnsureSessionDelegate Out) {
     AsyncTask(ENamedThreads::GameThread,
               [Out, output, result]() { Out.ExecuteIfBound(output, result); });
   });
+}
+
+void APlayCppSdkActor::OnRestoreSession(
+    FWalletConnectEnsureSessionResult SessionResult, FString Result) {
+  UE_LOG(LogTemp, Log, TEXT("OnRestoreSession Result: %s"), *Result)
+  if (SessionResult.addresses.Num() > 0) {
+    UE_LOG(LogTemp, Log, TEXT("OnRestoreSession Account[0]: %s"),
+           *UUtlis::ToHex(SessionResult.addresses[0].address));
+  }
+  UE_LOG(LogTemp, Log, TEXT("OnRestoreSession Chain id: %d"),
+         SessionResult.chain_id);
+}
+
+void APlayCppSdkActor::OnNewSession(
+    FWalletConnectEnsureSessionResult SessionResult, FString Result) {
+  UE_LOG(LogTemp, Log, TEXT("OnNewSession Result: %s"), *Result)
+  // Only SaveClient if user approves. If users rejects, addresses would be
+  // empty.
+  if (SessionResult.addresses.Num() > 0) {
+    UE_LOG(LogTemp, Log, TEXT("OnNewSession Account[0]: %s"),
+           *UUtlis::ToHex(SessionResult.addresses[0].address));
+    FString output;
+    bool success;
+    FString output_message;
+    SaveClient(output, success, output_message);
+  }
+  UE_LOG(LogTemp, Log, TEXT("OnNewSession Chain id: %d"),
+         SessionResult.chain_id);
+}
+
+void APlayCppSdkActor::ClearSession(bool &success) {
+  IFileManager &FileManager = IFileManager::Get();
+  success =
+      FileManager.Delete(*(FPaths::ProjectSavedDir() + "sessioninfo.json"));
+  _coreClient = NULL;
+  FWalletConnectEnsureSessionResult session_result;
+  _session_result = session_result;
 }
 
 void APlayCppSdkActor::SetupCallback(
@@ -219,6 +404,30 @@ void APlayCppSdkActor::SetupCallback(
     success = false;
     output_message = FString::Printf(TEXT("PlayCppSdk EnsureSession Error: %s"),
                                      UTF8_TO_TCHAR(e.what()));
+  }
+}
+
+void APlayCppSdkActor::OnWalletconnectSessionInfo(
+    FWalletConnectSessionInfo SessionInfo) {
+  switch (SessionInfo.sessionstate) {
+  case EWalletconnectSessionState::StateConnecting:
+    break;
+  case EWalletconnectSessionState::StateConnected:
+    break;
+  case EWalletconnectSessionState::StateUpdated:
+    break;
+  case EWalletconnectSessionState::StateDisconnected:
+    bool success;
+    this->ClearSession(success);
+    if (success) {
+      UE_LOG(LogTemp, Log, TEXT("sessioninfo.json was deleted"));
+    } else {
+      UE_LOG(LogTemp, Log,
+             TEXT("can not delete sessioninfo.json, please try again"));
+    }
+    break;
+  default:
+    break;
   }
 }
 
@@ -270,7 +479,11 @@ void APlayCppSdkActor::SaveClient(FString &output, bool &success,
 
     String sessioninfo = _coreClient->save_client();
     output = UTF8_TO_TCHAR(sessioninfo.c_str());
-    success = true;
+    success = FFileHelper::SaveStringToFile(
+        output, *(FPaths::ProjectSavedDir() + "sessioninfo.json"),
+        FFileHelper::EEncodingOptions::ForceUTF8);
+    UE_LOG(LogTemp, Log, TEXT("Saved sessioninfo.json to: %s"),
+           *(FPaths::ProjectSavedDir() + "sessioninfo.json"));
   } catch (const rust::cxxbridge1::Error &e) {
     success = false;
     output_message = FString::Printf(TEXT("PlayCppSdk SaveClient Error: %s"),
@@ -293,10 +506,16 @@ void copyVecToTArray(const Vec<uint8_t> &src, TArray<uint8> &dst) {
   assert(dst.Num() == src.size());
 }
 
-void APlayCppSdkActor::SignPersonal(FString user_message, TArray<uint8> address,
+void APlayCppSdkActor::SignPersonal(FString user_message,
                                     FWalletconnectSignPersonalDelegate Out) {
-  ::com::crypto::game_sdk::WalletconnectClient *coreclient = _coreClient;
-  assert(coreclient != NULL);
+  ::com::crypto::game_sdk::WalletconnectClient *coreclient = GetClient();
+  // if no walletconnect session, return
+  if (coreclient == nullptr)
+    return;
+  TArray<uint8> address = GetAddress();
+  // if no address, return
+  if (address.Num() == 0)
+    return;
   AsyncTask(ENamedThreads::AnyHiPriThreadNormalTask,
             [Out, coreclient, user_message, address, this]() {
               FWalletSignTXEip155Result output;
@@ -325,13 +544,19 @@ void APlayCppSdkActor::SignPersonal(FString user_message, TArray<uint8> address,
 }
 
 void APlayCppSdkActor::SignEip155Transaction(
-    FWalletConnectTxEip155 info, TArray<uint8> address,
+    FWalletConnectTxEip155 info,
     FWalletconnectSignEip155TransactionDelegate Out) {
-
-  ::com::crypto::game_sdk::WalletconnectClient *coreclient = _coreClient;
-  assert(coreclient != NULL);
+  ::com::crypto::game_sdk::WalletconnectClient *coreclient = GetClient();
+  // if no walletconnect session, return
+  if (coreclient == nullptr)
+    return;
+  TArray<uint8> address = GetAddress();
+  int64 chain_id = (uint64)GetChainId();
+  // if no address, return
+  if (address.Num() == 0 || chain_id == 0)
+    return;
   AsyncTask(ENamedThreads::AnyHiPriThreadNormalTask, [Out, coreclient, address,
-                                                      info, this]() {
+                                                      chain_id, info, this]() {
     FWalletSignTXEip155Result output;
 
     try {
@@ -350,7 +575,7 @@ void APlayCppSdkActor::SignEip155Transaction(
       myinfo.value = TCHAR_TO_UTF8(*info.value);
       copyTArrayToVec(info.data, myinfo.data);
       myinfo.common.nonce = TCHAR_TO_UTF8(*info.nonce);
-      myinfo.common.chainid = (uint64)info.chain_id;
+      myinfo.common.chainid = chain_id;
       if (_coreClient != NULL) {
 
         Vec<uint8_t> sig1 =
@@ -446,9 +671,13 @@ void APlayCppSdkActor::destroyCoreClient() {
 void StopWalletConnect() { APlayCppSdkActor::destroyCoreClient(); }
 
 void APlayCppSdkActor::Erc721TransferFrom(
-    FString contractAddress, FString fromAddress, FString toAddress,
-    FString tokenId, FString gasLimit, FString gasPrice,
-    FCronosSignedTransactionDelegate Out) {
+    FString contractAddress, FString toAddress, FString tokenId,
+    FString gasLimit, FString gasPrice, FCronosSignedTransactionDelegate Out) {
+
+  FString fromAddress = UUtlis::ToHex(GetAddress());
+  // if no fromAddress, return
+  if (fromAddress.IsEmpty())
+    return;
 
   AsyncTask(ENamedThreads::AnyHiPriThreadNormalTask,
             [this, Out, contractAddress, fromAddress, toAddress, tokenId,
@@ -485,10 +714,14 @@ void APlayCppSdkActor::Erc721TransferFrom(
 }
 
 void APlayCppSdkActor::Erc721Approve(FString contractAddress,
-                                     FString fromAddress,
                                      FString approvedAddress, FString tokenId,
                                      FString gasLimit, FString gasPrice,
                                      FCronosSignedTransactionDelegate Out) {
+
+  FString fromAddress = UUtlis::ToHex(GetAddress());
+  // if no fromAddress, return
+  if (fromAddress.IsEmpty())
+    return;
   AsyncTask(ENamedThreads::AnyHiPriThreadNormalTask,
             [this, Out, contractAddress, fromAddress, approvedAddress, tokenId,
              gasLimit, gasPrice]() {
@@ -524,9 +757,13 @@ void APlayCppSdkActor::Erc721Approve(FString contractAddress,
 }
 
 void APlayCppSdkActor::Erc1155SafeTransferFrom(
-    FString contractAddress, FString fromAddress, FString toAddress,
-    FString tokenId, FString amount, TArray<uint8> additionalData,
-    FString gasLimit, FString gasPrice, FCronosSignedTransactionDelegate Out) {
+    FString contractAddress, FString toAddress, FString tokenId, FString amount,
+    TArray<uint8> additionalData, FString gasLimit, FString gasPrice,
+    FCronosSignedTransactionDelegate Out) {
+  FString fromAddress = UUtlis::ToHex(GetAddress());
+  // if no fromAddress, return
+  if (fromAddress.IsEmpty())
+    return;
   AsyncTask(ENamedThreads::AnyHiPriThreadNormalTask,
             [this, Out, contractAddress, fromAddress, toAddress, tokenId,
              amount, gasLimit, gasPrice]() {
@@ -563,10 +800,13 @@ void APlayCppSdkActor::Erc1155SafeTransferFrom(
 }
 
 void APlayCppSdkActor::Erc1155Approve(FString contractAddress,
-                                      FString fromAddress,
                                       FString approvedAddress, bool approved,
                                       FString gasLimit, FString gasPrice,
                                       FCronosSignedTransactionDelegate Out) {
+  FString fromAddress = UUtlis::ToHex(GetAddress());
+  // if no fromAddress, return
+  if (fromAddress.IsEmpty())
+    return;
   AsyncTask(ENamedThreads::AnyHiPriThreadNormalTask,
             [this, Out, contractAddress, fromAddress, approvedAddress, approved,
              gasLimit, gasPrice]() {
@@ -602,11 +842,14 @@ void APlayCppSdkActor::Erc1155Approve(FString contractAddress,
 }
 
 void APlayCppSdkActor::Erc20TransferFrom(FString contractAddress,
-                                         FString fromAddress, FString toAddress,
-                                         FString amount, FString gasLimit,
-                                         FString gasPrice,
+                                         FString toAddress, FString amount,
+                                         FString gasLimit, FString gasPrice,
                                          FCronosSignedTransactionDelegate Out) {
 
+  FString fromAddress = UUtlis::ToHex(GetAddress());
+  // if no fromAddress, return
+  if (fromAddress.IsEmpty())
+    return;
   AsyncTask(ENamedThreads::AnyHiPriThreadNormalTask,
             [this, Out, contractAddress, fromAddress, toAddress, amount,
              gasLimit, gasPrice]() {
@@ -661,11 +904,14 @@ void APlayCppSdkActor::setCommon(WalletConnectTxCommon &common,
 }
 
 void APlayCppSdkActor::Erc20Approve(FString contractAddress,
-                                    FString fromAddress,
                                     FString approvedAddress, FString amount,
                                     FString gasLimit, FString gasPrice,
                                     FCronosSignedTransactionDelegate Out) {
 
+  FString fromAddress = UUtlis::ToHex(GetAddress());
+  // if no fromAddress, return
+  if (fromAddress.IsEmpty())
+    return;
   AsyncTask(ENamedThreads::AnyHiPriThreadNormalTask,
             [this, Out, contractAddress, fromAddress, approvedAddress, amount,
              gasLimit, gasPrice]() {
