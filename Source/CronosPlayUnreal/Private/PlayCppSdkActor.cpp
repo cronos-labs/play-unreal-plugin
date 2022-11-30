@@ -359,9 +359,11 @@ void APlayCppSdkActor::OnRestoreSession(
 void APlayCppSdkActor::OnNewSession(
     FWalletConnectEnsureSessionResult SessionResult, FString Result) {
   UE_LOG(LogTemp, Log, TEXT("OnNewSession Result: %s"), *Result)
-  // Only SaveClient if user approves. If users rejects, addresses would be empty.
+  // Only SaveClient if user approves. If users rejects, addresses would be
+  // empty.
   if (SessionResult.addresses.Num() > 0) {
-    UE_LOG(LogTemp, Log, TEXT("OnNewSession Account[0]: %s"), *UUtlis::ToHex(SessionResult.addresses[0].address));
+    UE_LOG(LogTemp, Log, TEXT("OnNewSession Account[0]: %s"),
+           *UUtlis::ToHex(SessionResult.addresses[0].address));
     FString output;
     bool success;
     FString output_message;
@@ -369,7 +371,6 @@ void APlayCppSdkActor::OnNewSession(
   }
   UE_LOG(LogTemp, Log, TEXT("OnNewSession Chain id: %d"),
          SessionResult.chain_id);
-
 }
 
 void APlayCppSdkActor::ClearSession(bool &success) {
