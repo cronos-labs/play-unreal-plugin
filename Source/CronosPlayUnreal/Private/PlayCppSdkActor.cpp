@@ -104,10 +104,10 @@ void APlayCppSdkActor::ConnectWalletConnect(FString description, FString url,
                                             FString name, int64 chain_id,
                                             EConnectionType connection_type) {
   FString Jsondata;
-  bool IsRetored;
+  bool IsRestored;
   FString RestoreClientOutputMessage;
-  RestoreClient(Jsondata, IsRetored, RestoreClientOutputMessage);
-  if (IsRetored) {
+  RestoreClient(Jsondata, IsRestored, RestoreClientOutputMessage);
+  if (IsRestored) {
     // Setup Callback
     bool IsSetupCallback;
     FString SetupCallbackOutputMessage;
