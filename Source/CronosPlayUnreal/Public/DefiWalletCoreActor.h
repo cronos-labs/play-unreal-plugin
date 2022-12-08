@@ -12,6 +12,8 @@
 #include "PlayCppSdkLibrary/Include/defi-wallet-core-cpp/src/contract.rs.h"
 #include "PlayCppSdkLibrary/Include/defi-wallet-core-cpp/src/lib.rs.h"
 #include "PlayCppSdkLibrary/Include/defi-wallet-core-cpp/src/nft.rs.h"
+#include "PlayCppSdkLibrary/Include/defi-wallet-core-cpp/src/ethereum.rs.h"
+#include "DynamicContractObject.h"
 #include "DefiWalletCoreActor.generated.h"
 
 /*
@@ -26,50 +28,6 @@ destroyErc20();
 destroyErc721();
 destroyErc1155();
 */
-
-/**
- Cronos Transaction Receipt Raw
- */
-USTRUCT(BlueprintType)
-struct FCronosTransactionReceiptRaw {
-    GENERATED_BODY()
-
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CronosPlayUnreal")
-    TArray<uint8> TransationHash;
-
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CronosPlayUnreal")
-    TArray<uint8> BlockHash;
-
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CronosPlayUnreal")
-    FString BlockNumber;
-
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CronosPlayUnreal")
-    FString CumulativeGasUsed;
-
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CronosPlayUnreal")
-    FString GasUsed;
-
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CronosPlayUnreal")
-    FString ContractAddress;
-
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CronosPlayUnreal")
-    TArray<FString> Logs;
-
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CronosPlayUnreal")
-    FString Status;
-
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CronosPlayUnreal")
-    TArray<uint8> Root;
-
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CronosPlayUnreal")
-    TArray<uint8> LogsBloom;
-
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CronosPlayUnreal")
-    FString TransactionType;
-
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CronosPlayUnreal")
-    FString EffectiveGasPrice;
-};
 
 // callback
 // eth
@@ -206,7 +164,16 @@ struct FCosmosNFTOwner {
 UCLASS()
 class CRONOSPLAYUNREAL_API ADefiWalletCoreActor : public AActor {
     GENERATED_BODY()
+
+  private:
+    /**
+     Opaque pointer to store wallet
+     */
+    org::defi_wallet_core::Wallet *_coreWallet;
+
   public:
+    org::defi_wallet_core::Wallet *getCoreWallet();
+
     /**
      * Restore wallet with mnemonics and password (Only for testing &
      * development purpose).
@@ -987,6 +954,42 @@ class CRONOSPLAYUNREAL_API ADefiWalletCoreActor : public AActor {
                         FErc1155ApproveDelegate Out);
 
     /**
+     * create dynamic contract object for call
+     * @param contractaddress function name to encode
+     * @param abijson abi json string (not file path, actual json)
+     * @param success  success or not
+     * @param output_message result message
+     *
+     */
+
+    UFUNCTION(BlueprintCallable,
+              meta = (DisplayName = "CreateDynamicContract",
+                      Keywords = "Wallet"),
+              Category = "CronosPlayUnreal")
+    UDynamicContractObject *CreateDynamicContract(FString contractaddress,
+                                                  FString abijson,
+                                                  bool &success,
+                                                  FString &output_message);
+
+    /**
+     * initialize dynamic contract for send
+     * @param contractaddress function name to encode
+     * @param abijson abi json string (not file path, actual json)
+     * @param walletindex which wallet to use (starts from 0)
+     * @param success  success or not
+     * @param output_message result message
+     *
+     */
+    UFUNCTION(BlueprintCallable,
+              meta = (DisplayName = "CreateDynamicSigningContract",
+                      Keywords = "Wallet"),
+              Category = "CronosPlayUnreal")
+    UDynamicContractObject *
+    CreateDynamicSigningContract(FString contractaddress, FString abijson,
+                                 int32 walletindex, bool &success,
+                                 FString &output_message);
+
+    /**
      * Grpc address
      * for example: http://127.0.0.1:1316
      */
@@ -1032,12 +1035,15 @@ class CRONOSPLAYUNREAL_API ADefiWalletCoreActor : public AActor {
 
     ADefiWalletCoreActor();
 
-    /**
-     Opaque pointer to store wallet
-     */
-    org::defi_wallet_core::Wallet *_coreWallet;
-
     void CreateWallet(FString mneomnics, FString password);
+
+    /**
+     * destroy wallet pointer
+     */
+
+    UFUNCTION(BlueprintCallable,
+              meta = (DisplayName = "DestroyWallet", Keywords = "Wallet"),
+              Category = "CronosPlayUnreal")
     void DestroyWallet();
 
   protected:

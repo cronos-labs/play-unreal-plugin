@@ -9,11 +9,13 @@
 #include "PlayCppSdkDownloader.h"
 #include "PlayCppSdkLibrary/Include/defi-wallet-core-cpp/src/lib.rs.h"
 #include "PlayCppSdkLibrary/Include/extra-cpp-bindings/src/lib.rs.h"
+#include "PlayCppSdkLibrary/Include/defi-wallet-core-cpp/src/ethereum.rs.h"
 #include "PlayCppSdkLibrary/Include/rust/cxx.h"
 #include "Runtime/Launch/Resources/Version.h"
 using namespace std;
 using namespace com::crypto::game_sdk;
 using namespace rust;
+using namespace org::defi_wallet_core;
 
 void convertRawTx(Vec<RawTxDetail> &history, TArray<FRawTxDetail> &output) {
     output.Empty();
@@ -209,8 +211,7 @@ UPlayCppSdkBPLibrary::UPlayCppSdkBPLibrary(
 void UPlayCppSdkBPLibrary::SetupUserAgent(FString UserAgent) {
     UPlayCppSdkDownloader::UserAgent = UserAgent;
     try {
-        org::defi_wallet_core::set_cronos_httpagent(
-            TCHAR_TO_UTF8(*UserAgent));
+        org::defi_wallet_core::set_cronos_httpagent(TCHAR_TO_UTF8(*UserAgent));
     } catch (const rust::cxxbridge1::Error &e) {
         // This captured exception only means the user agent is already set,
         // instead of an error
