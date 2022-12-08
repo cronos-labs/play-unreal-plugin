@@ -670,17 +670,21 @@ struct U256 final {
     ::std::array<::std::uint64_t, 4> data;
 
     /// Convert to Decimal String
+    ///
     ::rust::String to_string() const noexcept;
 
     /// Addition which saturates at the maximum value.
+    ///
     ::org::defi_wallet_core::U256
     saturating_add(::org::defi_wallet_core::U256 other) const noexcept;
 
     /// Subtraction which saturates at zero.
+    ///
     ::org::defi_wallet_core::U256
     saturating_sub(::org::defi_wallet_core::U256 other) const noexcept;
 
     /// Multiplication which saturates at maximum value.
+    ///
     ::org::defi_wallet_core::U256
     saturating_mul(::org::defi_wallet_core::U256 other) const noexcept;
 
@@ -716,18 +720,22 @@ struct U256 final {
     ::org::defi_wallet_core::U256WithOverflow overflowing_neg() const noexcept;
 
     /// add, exception is rasided if overflow
+    ///
     ::org::defi_wallet_core::U256
     add(::org::defi_wallet_core::U256 other) const;
 
     /// sub, exception is rasided if overflow
+    ///
     ::org::defi_wallet_core::U256
     sub(::org::defi_wallet_core::U256 other) const;
 
     /// mul, exception is rasided if overflow
+    ///
     ::org::defi_wallet_core::U256
     mul(::org::defi_wallet_core::U256 other) const;
 
     /// pow, exception is rasided if overflow
+    ///
     ::org::defi_wallet_core::U256
     pow(::org::defi_wallet_core::U256 other) const;
 
@@ -737,17 +745,21 @@ struct U256 final {
     ::org::defi_wallet_core::U256 neg() const noexcept;
 
     /// Returns a pair `(self / other)`
+    ///
     ::org::defi_wallet_core::U256
     div(::org::defi_wallet_core::U256 other) const noexcept;
 
     /// Returns a pair `(self % other)`
+    ///
     ::org::defi_wallet_core::U256
     rem(::org::defi_wallet_core::U256 other) const noexcept;
 
     /// Write to the slice in big-endian format.
+    ///
     void to_big_endian(::rust::Vec<::std::uint8_t> &bytes) const noexcept;
 
     /// Write to the slice in little-endian format.
+    ///
     void to_little_endian(::rust::Vec<::std::uint8_t> &bytes) const noexcept;
 
     /// Format the output for the user which prefer to see values in ether
@@ -758,8 +770,8 @@ struct U256 final {
     /// formatted in _ETH decimals_ (e.g. "1.50000...") wrapped as string
     ::rust::String format_units(::rust::String units) const;
 
-    bool operator==(const U256 &) const noexcept;
-    bool operator!=(const U256 &) const noexcept;
+    bool operator==(U256 const &) const noexcept;
+    bool operator!=(U256 const &) const noexcept;
     using IsRelocatable = ::std::true_type;
 };
 #endif // CXXBRIDGE1_STRUCT_org$defi_wallet_core$U256
@@ -770,13 +782,14 @@ struct U256WithOverflow final {
     ::org::defi_wallet_core::U256 result;
     bool overflow;
 
-    bool operator==(const U256WithOverflow &) const noexcept;
-    bool operator!=(const U256WithOverflow &) const noexcept;
+    bool operator==(U256WithOverflow const &) const noexcept;
+    bool operator!=(U256WithOverflow const &) const noexcept;
     using IsRelocatable = ::std::true_type;
 };
 #endif // CXXBRIDGE1_STRUCT_org$defi_wallet_core$U256WithOverflow
 
 /// Convert from a decimal string.
+///
 ::org::defi_wallet_core::U256 u256(::rust::String value);
 
 /// Converts a string slice in a given base to an integer. Only supports radixes
@@ -784,12 +797,15 @@ struct U256WithOverflow final {
 ::org::defi_wallet_core::U256 u256(::rust::String txt, ::std::uint32_t radix);
 
 /// The maximum value which can be inhabited by this type.
+///
 ::org::defi_wallet_core::U256 u256_max_value() noexcept;
 
 /// Converts the input to a U256 and converts from Ether to Wei.
+///
 ::org::defi_wallet_core::U256 parse_ether(::rust::String eth);
 
 /// Multiplies the provided amount with 10^{units} provided.
+///
 ::org::defi_wallet_core::U256 parse_units(::rust::String amount,
                                           ::rust::String units);
 } // namespace defi_wallet_core

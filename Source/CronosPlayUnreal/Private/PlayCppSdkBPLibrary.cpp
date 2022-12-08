@@ -8,11 +8,13 @@
 #include "Kismet/KismetRenderingLibrary.h"
 #include "PlayCppSdkDownloader.h"
 #include "PlayCppSdkLibrary/Include/extra-cpp-bindings/src/lib.rs.h"
+#include "PlayCppSdkLibrary/Include/defi-wallet-core-cpp/src/ethereum.rs.h"
 #include "PlayCppSdkLibrary/Include/rust/cxx.h"
 #include "Runtime/Launch/Resources/Version.h"
 using namespace std;
 using namespace com::crypto::game_sdk;
 using namespace rust;
+using namespace org::defi_wallet_core;
 
 void convertRawTx(Vec<RawTxDetail> &history, TArray<FRawTxDetail> &output) {
     output.Empty();
@@ -217,4 +219,91 @@ void UPlayCppSdkBPLibrary::SetupUserAgent(FString UserAgent) {
                TEXT("PlayCppSdk SetupUserAgent Already Setup: %s"),
                UTF8_TO_TCHAR(e.what()));
     }
+}
+
+void UPlayCppSdkBPLibrary::EncodeDynamicContract(
+    FString rpcserver, FString contactAddress, FString abiJson,
+    FString functionName, FString functionArgs, TArray<uint8> &output,
+    bool &success, FString &output_message) {
+
+    try {
+        std::string mycronosrpc = TCHAR_TO_UTF8(*rpcserver);
+        std::string mycontract = TCHAR_TO_UTF8(*contactAddress);
+        std::string myjson = TCHAR_TO_UTF8(*abiJson);
+        std::string myfunctionname = TCHAR_TO_UTF8(*functionName);
+        std::string myfunctionargs = TCHAR_TO_UTF8(*functionArgs);
+
+        Box<EthContract> w = new_eth_contract(mycronosrpc, mycontract, myjson);
+        Vec<uint8_t> data = w->encode(myfunctionname, myfunctionargs);
+
+        output.SetNum(data.size());
+        for (int i = 0; i < data.size(); i++) {
+            output[i] = data[i];
+        }
+
+        success = true;
+
+    } catch (const rust::cxxbridge1::Error &e) {
+        success = false;
+        output_message =
+            FString::Printf(TEXT("PlayCppSdk EncodeDynamicContract Error: %s"),
+                            UTF8_TO_TCHAR(e.what()));
+    }
+}
+
+void UPlayCppSdkBPLibrary::CallDynamicContract(
+    FString rpcserver, FString contactAddress, FString abiJson,
+    FString functionName, FString functionArgs,
+    FCallDynamicContractDelegate Out) {
+
+    AsyncTask(ENamedThreads::AnyHiPriThreadNormalTask, [Out, rpcserver,
+                                                        contactAddress, abiJson,
+
+                                                        functionName,
+                                                        functionArgs]() {
+        FString jsonoutput;
+        FString result;
+        try {
+            std::string mycronosrpc = TCHAR_TO_UTF8(*rpcserver);
+            std::string mycontract = TCHAR_TO_UTF8(*contactAddress);
+            std::string myjson = TCHAR_TO_UTF8(*abiJson);
+            std::string myfunctionname = TCHAR_TO_UTF8(*functionName);
+            std::string myfunctionargs = TCHAR_TO_UTF8(*functionArgs);
+            Box<EthContract> w =
+                new_eth_contract(mycronosrpc, mycontract, myjson);
+            std::string response =
+                w->call(myfunctionname, myfunctionargs).c_str();
+            jsonoutput = UTF8_TO_TCHAR(response.c_str());
+        } catch (const rust::cxxbridge1::Error &e) {
+            result = FString::Printf(
+                TEXT("CronosPlayUnreal CallDynamicContract Error: %s"),
+                UTF8_TO_TCHAR(e.what()));
+        }
+
+        AsyncTask(ENamedThreads::GameThread, [Out, jsonoutput, result]() {
+            Out.ExecuteIfBound(jsonoutput, result);
+        });
+    });
+}
+
+FString UPlayCppSdkBPLibrary::DynamicContractReadJson(FString filepath,
+                                                      FString keyname,
+                                                      bool &success,
+                                                      FString &output_message) {
+
+    FString ret = TEXT("");
+    try {
+        std::string myfilepath = TCHAR_TO_UTF8(*filepath);
+        std::string mykeyname = TCHAR_TO_UTF8(*keyname);
+        rust::String abijson = read_json(myfilepath, mykeyname);
+        ret = UTF8_TO_TCHAR(abijson.c_str());
+        success = true;
+    } catch (const rust::cxxbridge1::Error &e) {
+        success = false;
+        output_message = FString::Printf(
+            TEXT("PlayCppSdk DynamicContractReadJson Error: %s"),
+            UTF8_TO_TCHAR(e.what()));
+    }
+
+    return ret;
 }

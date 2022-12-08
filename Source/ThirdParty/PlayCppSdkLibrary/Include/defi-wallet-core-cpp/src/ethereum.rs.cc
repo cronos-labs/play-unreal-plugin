@@ -1,10 +1,10 @@
-#pragma once
-#include "uint.rs.h"
+#include "lib.rs.h"
 #include <algorithm>
 #include <array>
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
+#include <exception>
 #include <initializer_list>
 #include <iterator>
 #include <new>
@@ -774,6 +774,27 @@ template <typename T>
 Vec<T>::Vec(unsafe_bitcopy_t, const Vec &bits) noexcept : repr(bits.repr) {}
 #endif // CXXBRIDGE1_RUST_VEC
 
+#ifndef CXXBRIDGE1_RUST_ERROR
+#define CXXBRIDGE1_RUST_ERROR
+class Error final : public std::exception {
+  public:
+    Error(const Error &);
+    Error(Error &&) noexcept;
+    ~Error() noexcept override;
+
+    Error &operator=(const Error &) &;
+    Error &operator=(Error &&) &noexcept;
+
+    const char *what() const noexcept override;
+
+  private:
+    Error() noexcept = default;
+    friend impl<Error>;
+    const char *msg;
+    std::size_t len;
+};
+#endif // CXXBRIDGE1_RUST_ERROR
+
 #ifndef CXXBRIDGE1_RUST_OPAQUE
 #define CXXBRIDGE1_RUST_OPAQUE
 class Opaque {
@@ -843,185 +864,97 @@ template <typename T> std::size_t size_of() { return layout::size_of<T>(); }
 
 template <typename T> std::size_t align_of() { return layout::align_of<T>(); }
 #endif // CXXBRIDGE1_LAYOUT
+
+#ifndef CXXBRIDGE1_RELOCATABLE
+#define CXXBRIDGE1_RELOCATABLE
+namespace detail {
+template <typename... Ts> struct make_void { using type = void; };
+
+template <typename... Ts> using void_t = typename make_void<Ts...>::type;
+
+template <typename Void, template <typename...> class, typename...>
+struct detect : std::false_type {};
+template <template <typename...> class T, typename... A>
+struct detect<void_t<T<A...>>, T, A...> : std::true_type {};
+
+template <template <typename...> class T, typename... A>
+using is_detected = detect<void, T, A...>;
+
+template <typename T> using detect_IsRelocatable = typename T::IsRelocatable;
+
+template <typename T>
+struct get_IsRelocatable
+    : std::is_same<typename T::IsRelocatable, std::true_type> {};
+} // namespace detail
+
+template <typename T>
+struct IsRelocatable
+    : std::conditional<
+          detail::is_detected<detail::detect_IsRelocatable, T>::value,
+          detail::get_IsRelocatable<T>,
+          std::integral_constant<
+              bool, std::is_trivially_move_constructible<T>::value &&
+                        std::is_trivially_destructible<T>::value>>::type {};
+#endif // CXXBRIDGE1_RELOCATABLE
+
+namespace repr {
+struct PtrLen final {
+    void *ptr;
+    ::std::size_t len;
+};
+} // namespace repr
+
+namespace detail {
+template <typename T, typename = void *> struct operator_new {
+    void *operator()(::std::size_t sz) { return ::operator new(sz); }
+};
+
+template <typename T>
+struct operator_new<T, decltype(T::operator new(sizeof(T)))> {
+    void *operator()(::std::size_t sz) { return T::operator new(sz); }
+};
+} // namespace detail
+
+template <typename T> union MaybeUninit {
+    T value;
+    void *operator new(::std::size_t sz) {
+        return detail::operator_new<T>{}(sz);
+    }
+    MaybeUninit() {}
+    ~MaybeUninit() {}
+};
+
+namespace {
+template <> class impl<Error> final {
+  public:
+    static Error error(repr::PtrLen repr) noexcept {
+        Error error;
+        error.msg = static_cast<char const *>(repr.ptr);
+        error.len = repr.len;
+        return error;
+    }
+};
+} // namespace
 } // namespace cxxbridge1
 } // namespace rust
 
 namespace org {
 namespace defi_wallet_core {
-enum class CoinType : ::std::uint8_t;
-enum class MnemonicWordCount : ::std::uint8_t;
-enum class EthAmount : ::std::uint8_t;
-struct EthTxInfoRaw;
-struct CosmosSDKTxInfoRaw;
-struct CosmosAccountInfoRaw;
-struct CosmosTransactionReceiptRaw;
-struct CronosTransactionReceiptRaw;
-struct PrivateKey;
-struct CosmosSDKMsgRaw;
-struct Wallet;
-struct CppLoginInfo;
-} // namespace defi_wallet_core
+struct EthContract;
+}
 } // namespace org
 
 namespace org {
 namespace defi_wallet_core {
-#ifndef CXXBRIDGE1_ENUM_org$defi_wallet_core$CoinType
-#define CXXBRIDGE1_ENUM_org$defi_wallet_core$CoinType
-enum class CoinType : ::std::uint8_t {
-    /// Crypto.org Chain mainnet
-    ///
-    CryptoOrgMainnet = 0,
-    /// Crypto.org Chain testnet
-    ///
-    CryptoOrgTestnet = 1,
-    /// Cronos mainnet beta
-    ///
-    CronosMainnet = 2,
-    /// Cosmos Hub mainnet
-    ///
-    CosmosHub = 3,
-    /// Ethereum
-    ///
-    Ethereum = 4,
-};
-#endif // CXXBRIDGE1_ENUM_org$defi_wallet_core$CoinType
-
-#ifndef CXXBRIDGE1_ENUM_org$defi_wallet_core$MnemonicWordCount
-#define CXXBRIDGE1_ENUM_org$defi_wallet_core$MnemonicWordCount
-enum class MnemonicWordCount : ::std::uint8_t {
-    /// Word 12
-    ///
-    Twelve = 0,
-    /// Word 18
-    ///
-    Eighteen = 1,
-    /// Word 24
-    ///
-    TwentyFour = 2,
-};
-#endif // CXXBRIDGE1_ENUM_org$defi_wallet_core$MnemonicWordCount
-
-#ifndef CXXBRIDGE1_ENUM_org$defi_wallet_core$EthAmount
-#define CXXBRIDGE1_ENUM_org$defi_wallet_core$EthAmount
-enum class EthAmount : ::std::uint8_t {
-    /// 10^-18 ETH
-    ///
-    WeiDecimal = 0,
-    /// 10^-9 ETH
-    ///
-    GweiDecimal = 1,
-    EthDecimal = 2,
-};
-#endif // CXXBRIDGE1_ENUM_org$defi_wallet_core$EthAmount
-
-#ifndef CXXBRIDGE1_STRUCT_org$defi_wallet_core$EthTxInfoRaw
-#define CXXBRIDGE1_STRUCT_org$defi_wallet_core$EthTxInfoRaw
-struct EthTxInfoRaw final {
-    ::rust::String to_address;
-    ::rust::String amount;
-    ::org::defi_wallet_core::EthAmount amount_unit;
-    ::rust::String nonce;
-    ::rust::String gas_limit;
-    ::rust::String gas_price;
-    ::org::defi_wallet_core::EthAmount gas_price_unit;
-    ::rust::Vec<::std::uint8_t> data;
-
-    using IsRelocatable = ::std::true_type;
-};
-#endif // CXXBRIDGE1_STRUCT_org$defi_wallet_core$EthTxInfoRaw
-
-#ifndef CXXBRIDGE1_STRUCT_org$defi_wallet_core$CosmosSDKTxInfoRaw
-#define CXXBRIDGE1_STRUCT_org$defi_wallet_core$CosmosSDKTxInfoRaw
-struct CosmosSDKTxInfoRaw final {
-    /// global account number of the sender
-    ///
-    ::std::uint64_t account_number;
-    /// equivalent of "account nonce"
-    ///
-    ::std::uint64_t sequence_number;
-    /// the maximum gas limit
-    ///
-    ::std::uint64_t gas_limit;
-    /// the amount fee to be paid (gas_limit * gas_price)
-    ///
-    ::std::uint64_t fee_amount;
-    /// the fee's denomination
-    ///
-    ::rust::String fee_denom;
-    /// transaction timeout
-    ///
-    ::std::uint32_t timeout_height;
-    /// optional memo
-    ///
-    ::rust::String memo_note;
-    /// the network chain id
-    ///
-    ::rust::String chain_id;
-    /// bech32 human readable prefix
-    ///
-    ::rust::String bech32hrp;
-    /// the coin type to use
-    ///
-    ::std::uint32_t coin_type;
-
-    using IsRelocatable = ::std::true_type;
-};
-#endif // CXXBRIDGE1_STRUCT_org$defi_wallet_core$CosmosSDKTxInfoRaw
-
-#ifndef CXXBRIDGE1_STRUCT_org$defi_wallet_core$CosmosAccountInfoRaw
-#define CXXBRIDGE1_STRUCT_org$defi_wallet_core$CosmosAccountInfoRaw
-struct CosmosAccountInfoRaw final {
-    ::std::uint64_t account_number;
-    ::std::uint64_t sequence_number;
-
-    using IsRelocatable = ::std::true_type;
-};
-#endif // CXXBRIDGE1_STRUCT_org$defi_wallet_core$CosmosAccountInfoRaw
-
-#ifndef CXXBRIDGE1_STRUCT_org$defi_wallet_core$CosmosTransactionReceiptRaw
-#define CXXBRIDGE1_STRUCT_org$defi_wallet_core$CosmosTransactionReceiptRaw
-struct CosmosTransactionReceiptRaw final {
-    /// tendermint transaction hash in hexadecimal
-    ///
-    ::rust::String tx_hash_hex;
-    /// error code (0 if success)
-    ///
-    ::std::uint32_t code;
-    /// possible error log
-    ///
-    ::rust::String log;
-
-    using IsRelocatable = ::std::true_type;
-};
-#endif // CXXBRIDGE1_STRUCT_org$defi_wallet_core$CosmosTransactionReceiptRaw
-
-#ifndef CXXBRIDGE1_STRUCT_org$defi_wallet_core$CronosTransactionReceiptRaw
-#define CXXBRIDGE1_STRUCT_org$defi_wallet_core$CronosTransactionReceiptRaw
-struct CronosTransactionReceiptRaw final {
-    ::rust::Vec<::std::uint8_t> transaction_hash;
-    ::rust::String transaction_index;
-    ::rust::Vec<::std::uint8_t> block_hash;
-    ::rust::String block_number;
-    ::rust::String cumulative_gas_used;
-    ::rust::String gas_used;
-    ::rust::String contract_address;
-    ::rust::Vec<::rust::String> logs;
-    /// Status: either 1 (success) or 0 (failure)
-    ///
-    ::rust::String status;
-    ::rust::Vec<::std::uint8_t> root;
-    ::rust::Vec<::std::uint8_t> logs_bloom;
-    ::rust::String transaction_type;
-    ::rust::String effective_gas_price;
-
-    using IsRelocatable = ::std::true_type;
-};
-#endif // CXXBRIDGE1_STRUCT_org$defi_wallet_core$CronosTransactionReceiptRaw
-
-#ifndef CXXBRIDGE1_STRUCT_org$defi_wallet_core$PrivateKey
-#define CXXBRIDGE1_STRUCT_org$defi_wallet_core$PrivateKey
-struct PrivateKey final : public ::rust::Opaque {
-    ~PrivateKey() = delete;
+#ifndef CXXBRIDGE1_STRUCT_org$defi_wallet_core$EthContract
+#define CXXBRIDGE1_STRUCT_org$defi_wallet_core$EthContract
+struct EthContract final : public ::rust::Opaque {
+    ::rust::Vec<::std::uint8_t> encode(::rust::Str function_name,
+                                       ::rust::Str function_args);
+    ::rust::String call(::rust::Str function_name, ::rust::Str function_args);
+    ::org::defi_wallet_core::CronosTransactionReceiptRaw
+    send(::rust::Str function_name, ::rust::Str function_args);
+    ~EthContract() = delete;
 
   private:
     friend ::rust::layout;
@@ -1030,260 +963,164 @@ struct PrivateKey final : public ::rust::Opaque {
         static ::std::size_t align() noexcept;
     };
 };
-#endif // CXXBRIDGE1_STRUCT_org$defi_wallet_core$PrivateKey
-
-#ifndef CXXBRIDGE1_STRUCT_org$defi_wallet_core$CosmosSDKMsgRaw
-#define CXXBRIDGE1_STRUCT_org$defi_wallet_core$CosmosSDKMsgRaw
-struct CosmosSDKMsgRaw final : public ::rust::Opaque {
-    ~CosmosSDKMsgRaw() = delete;
-
-  private:
-    friend ::rust::layout;
-    struct layout {
-        static ::std::size_t size() noexcept;
-        static ::std::size_t align() noexcept;
-    };
-};
-#endif // CXXBRIDGE1_STRUCT_org$defi_wallet_core$CosmosSDKMsgRaw
-
-#ifndef CXXBRIDGE1_STRUCT_org$defi_wallet_core$Wallet
-#define CXXBRIDGE1_STRUCT_org$defi_wallet_core$Wallet
-struct Wallet final : public ::rust::Opaque {
-    /// get backup mnemonic phrase
-    ///
-    ::rust::String get_backup_mnemonic_phrase() const;
-
-    /// returns the default address of the wallet
-    ///
-    ::rust::String
-    get_default_address(::org::defi_wallet_core::CoinType coin) const;
-
-    /// returns the address from index in wallet
-    ///
-    ::rust::String get_address(::org::defi_wallet_core::CoinType coin,
-                               ::std::uint32_t index) const;
-
-    /// returns the ethereum address from index in wallet
-    ///
-    ::rust::String get_eth_address(::std::uint32_t index) const;
-
-    /// return the secret key for a given derivation path
-    ///
-    ::rust::Box<::org::defi_wallet_core::PrivateKey>
-    get_key(::rust::String derivation_path) const;
-
-    ~Wallet() = delete;
-
-  private:
-    friend ::rust::layout;
-    struct layout {
-        static ::std::size_t size() noexcept;
-        static ::std::size_t align() noexcept;
-    };
-};
-#endif // CXXBRIDGE1_STRUCT_org$defi_wallet_core$Wallet
-
-#ifndef CXXBRIDGE1_STRUCT_org$defi_wallet_core$CppLoginInfo
-#define CXXBRIDGE1_STRUCT_org$defi_wallet_core$CppLoginInfo
-struct CppLoginInfo final : public ::rust::Opaque {
-    /// Sign Login Info
-    /// constructs the plaintext message and signs it according to EIP-191
-    /// (as per EIP-4361). The returned vector is a serialized recoverable
-    /// signature (as used in Ethereum).
-    ::rust::Vec<::std::uint8_t> sign_logininfo(
-        ::org::defi_wallet_core::PrivateKey const &private_key) const;
-
-    /// Verify Login Info
-    /// It verified the signature matches + also verifies the content of the
-    /// message:
-    /// - address in the message matches the address recovered from the
-    /// signature
-    /// - the time is valid
-    /// ...
-    /// NOTE: the server may still need to do extra verifications according to
-    /// its needs (e.g. verify chain-id, nonce, uri + possibly fetch additional
-    /// data associated with the given Ethereum address, such as
-    /// ERC-20/ERC-721/ERC-1155 asset ownership)
-    void verify_logininfo(::rust::Slice<::std::uint8_t const> signature) const;
-
-    ~CppLoginInfo() = delete;
-
-  private:
-    friend ::rust::layout;
-    struct layout {
-        static ::std::size_t size() noexcept;
-        static ::std::size_t align() noexcept;
-    };
-};
-#endif // CXXBRIDGE1_STRUCT_org$defi_wallet_core$CppLoginInfo
-
-/// query account details from cosmos address
-///
-::rust::String query_account_details(::rust::String api_url,
-                                     ::rust::String address);
-
-/// query account details info from cosmos address
-///
-::org::defi_wallet_core::CosmosAccountInfoRaw
-query_account_details_info(::rust::String api_url, ::rust::String address);
-
-/// broadcast the cosmos transaction
-///
-::org::defi_wallet_core::CosmosTransactionReceiptRaw
-broadcast_tx(::rust::String tendermint_rpc_url,
-             ::rust::Vec<::std::uint8_t> raw_signed_tx);
-
-/// query account balance from cosmos address and denom name
-///
-::rust::String query_account_balance(::rust::String grpc_url,
-                                     ::rust::String address,
-                                     ::rust::String denom);
-
-/// creates the signed transaction for cosmos
-///
-::rust::Vec<::std::uint8_t>
-get_msg_signed_tx(::org::defi_wallet_core::CosmosSDKTxInfoRaw tx_info,
-                  ::org::defi_wallet_core::PrivateKey const &private_key,
-                  ::org::defi_wallet_core::CosmosSDKMsgRaw const &msg);
-
-/// creates the transaction signing payload (`SignDoc`)
-/// for `MsgSend` from the Cosmos SDK bank module
-::rust::Vec<::std::uint8_t> get_single_bank_send_signdoc(
-    ::org::defi_wallet_core::CosmosSDKTxInfoRaw tx_info,
-    ::rust::Vec<::std::uint8_t> sender_pubkey, ::rust::String recipient_address,
-    ::std::uint64_t amount, ::rust::String denom);
-
-/// creates the signed transaction
-/// for `MsgSend` from the Cosmos SDK bank module
-::rust::Vec<::std::uint8_t> get_single_bank_send_signed_tx(
-    ::org::defi_wallet_core::CosmosSDKTxInfoRaw tx_info,
-    ::org::defi_wallet_core::PrivateKey const &private_key,
-    ::rust::String recipient_address, ::std::uint64_t amount,
-    ::rust::String denom);
-
-/// generates the HD wallet with a BIP39 backup phrase (English words) and
-/// password
-///
-::rust::Box<::org::defi_wallet_core::Wallet>
-new_wallet(::rust::String password,
-           ::org::defi_wallet_core::MnemonicWordCount word_count);
-
-/// generate mnemonics
-///
-::rust::String
-generate_mnemonics(::rust::String password,
-                   ::org::defi_wallet_core::MnemonicWordCount word_count);
-
-/// recovers/imports HD wallet from a BIP39 backup phrase (English words) and
-/// password
-///
-::rust::Box<::org::defi_wallet_core::Wallet>
-restore_wallet(::rust::String mnemonic, ::rust::String password);
-
-/// generates a random private key
-///
-::rust::Box<::org::defi_wallet_core::PrivateKey> new_privatekey() noexcept;
-
-/// constructs private key from bytes
-///
-::rust::Box<::org::defi_wallet_core::PrivateKey>
-new_privatekey_from_bytes(::rust::Vec<::std::uint8_t> bytes);
-
-/// constructs private key from hex string
-///
-::rust::Box<::org::defi_wallet_core::PrivateKey>
-new_privatekey_from_hex(::rust::String hex);
-
-/// creates the signed transaction
-/// for `MsgDelegate` from the Cosmos SDK staking module
-::rust::Vec<::std::uint8_t> get_staking_delegate_signed_tx(
-    ::org::defi_wallet_core::CosmosSDKTxInfoRaw tx_info,
-    ::org::defi_wallet_core::PrivateKey const &private_key,
-    ::rust::String validator_address, ::std::uint64_t amount,
-    ::rust::String denom, bool with_reward_withdrawal);
-
-/// creates the signed transaction
-/// for `MsgBeginRedelegate` from the Cosmos SDK staking module
-::rust::Vec<::std::uint8_t> get_staking_redelegate_signed_tx(
-    ::org::defi_wallet_core::CosmosSDKTxInfoRaw tx_info,
-    ::org::defi_wallet_core::PrivateKey const &private_key,
-    ::rust::String validator_src_address, ::rust::String validator_dst_address,
-    ::std::uint64_t amount, ::rust::String denom, bool with_reward_withdrawal);
-
-/// creates the signed transaction
-/// for `MsgUndelegate` from the Cosmos SDK staking module
-::rust::Vec<::std::uint8_t> get_staking_unbond_signed_tx(
-    ::org::defi_wallet_core::CosmosSDKTxInfoRaw tx_info,
-    ::org::defi_wallet_core::PrivateKey const &private_key,
-    ::rust::String validator_address, ::std::uint64_t amount,
-    ::rust::String denom, bool with_reward_withdrawal);
-
-/// creates the signed transaction
-/// for `MsgSetWithdrawAddress` from the Cosmos SDK distributon module
-::rust::Vec<::std::uint8_t> get_distribution_set_withdraw_address_signed_tx(
-    ::org::defi_wallet_core::CosmosSDKTxInfoRaw tx_info,
-    ::org::defi_wallet_core::PrivateKey const &private_key,
-    ::rust::String withdraw_address);
-
-/// creates the signed transaction
-/// for `MsgWithdrawDelegatorReward` from the Cosmos SDK distributon module
-::rust::Vec<::std::uint8_t> get_distribution_withdraw_reward_signed_tx(
-    ::org::defi_wallet_core::CosmosSDKTxInfoRaw tx_info,
-    ::org::defi_wallet_core::PrivateKey const &private_key,
-    ::rust::String validator_address);
-
-/// creates the signed transaction
-/// for `MsgTransfer` from the Cosmos SDK ibc module
-::rust::Vec<::std::uint8_t> get_ibc_transfer_signed_tx(
-    ::org::defi_wallet_core::CosmosSDKTxInfoRaw tx_info,
-    ::org::defi_wallet_core::PrivateKey const &private_key,
-    ::rust::String receiver, ::rust::String source_port,
-    ::rust::String source_channel, ::rust::String denom, ::std::uint64_t token,
-    ::std::uint64_t revision_height, ::std::uint64_t revision_number,
-    ::std::uint64_t timeout_timestamp);
-
-/// Create Login Info by `msg`
-/// all information from the EIP-4361 plaintext message:
-/// https://eips.ethereum.org/EIPS/eip-4361
-::rust::Box<::org::defi_wallet_core::CppLoginInfo>
-new_logininfo(::rust::String msg);
-
-/// create cronos tx info to sign
-///
-::org::defi_wallet_core::EthTxInfoRaw new_eth_tx_info() noexcept;
-
-/// sign cronos tx with private key
-///
-::rust::Vec<::std::uint8_t>
-build_eth_signed_tx(::org::defi_wallet_core::EthTxInfoRaw tx_info,
-                    ::rust::Str network,
-                    ::org::defi_wallet_core::PrivateKey const &secret_key);
-
-/// sign cronos tx with private key in custom network
-///
-::rust::Vec<::std::uint8_t>
-build_eth_signed_tx(::org::defi_wallet_core::EthTxInfoRaw tx_info,
-                    ::std::uint64_t chain_id, bool legacy,
-                    ::org::defi_wallet_core::PrivateKey const &secret_key);
-
-/// given the account address, it returns the amount of native token it owns
-///
-::org::defi_wallet_core::U256 get_eth_balance(::rust::Str address,
-                                              ::rust::Str api_url);
-
-/// Returns the corresponding account's nonce / number of transactions
-/// sent from it.
-::rust::String get_eth_nonce(::rust::Str address, ::rust::Str api_url);
-
-/// broadcast signed cronos tx
-///
-::org::defi_wallet_core::CronosTransactionReceiptRaw
-broadcast_eth_signed_raw_tx(::rust::Vec<::std::uint8_t> raw_tx,
-                            ::rust::Str web3api_url,
-                            ::std::uint64_t polling_interval_ms);
-
-/// set cronos http-agent name
-///
-void set_cronos_httpagent(::rust::Str agent);
+#endif // CXXBRIDGE1_STRUCT_org$defi_wallet_core$EthContract
 } // namespace defi_wallet_core
 } // namespace org
+
+static_assert(::rust::IsRelocatable<
+                  ::org::defi_wallet_core::CronosTransactionReceiptRaw>::value,
+              "type org::defi_wallet_core::CronosTransactionReceiptRaw should "
+              "be trivially move constructible and trivially destructible in "
+              "C++ to be used as a return value of `send` in Rust");
+
+namespace org {
+namespace defi_wallet_core {
+extern "C" {
+::std::size_t
+org$defi_wallet_core$cxxbridge1$EthContract$operator$sizeof() noexcept;
+::std::size_t
+org$defi_wallet_core$cxxbridge1$EthContract$operator$alignof() noexcept;
+
+::rust::repr::PtrLen org$defi_wallet_core$cxxbridge1$new_eth_contract(
+    ::rust::String *rpcserver, ::rust::String *contact_address,
+    ::rust::String *abi_json,
+    ::rust::Box<::org::defi_wallet_core::EthContract> *return$) noexcept;
+
+::rust::repr::PtrLen org$defi_wallet_core$cxxbridge1$new_signing_eth_contract(
+    ::rust::String *rpcserver, ::rust::String *contact_address,
+    ::rust::String *abi_json,
+    ::org::defi_wallet_core::PrivateKey const &private_key,
+    ::rust::Box<::org::defi_wallet_core::EthContract> *return$) noexcept;
+
+::rust::repr::PtrLen
+org$defi_wallet_core$cxxbridge1$read_json(::rust::String *filepath,
+                                          ::rust::String *keyname,
+                                          ::rust::String *return$) noexcept;
+
+::rust::repr::PtrLen org$defi_wallet_core$cxxbridge1$EthContract$encode(
+    ::org::defi_wallet_core::EthContract &self, ::rust::Str function_name,
+    ::rust::Str function_args, ::rust::Vec<::std::uint8_t> *return$) noexcept;
+
+::rust::repr::PtrLen org$defi_wallet_core$cxxbridge1$EthContract$call(
+    ::org::defi_wallet_core::EthContract &self, ::rust::Str function_name,
+    ::rust::Str function_args, ::rust::String *return$) noexcept;
+
+::rust::repr::PtrLen org$defi_wallet_core$cxxbridge1$EthContract$send(
+    ::org::defi_wallet_core::EthContract &self, ::rust::Str function_name,
+    ::rust::Str function_args,
+    ::org::defi_wallet_core::CronosTransactionReceiptRaw *return$) noexcept;
+} // extern "C"
+
+::std::size_t EthContract::layout::size() noexcept {
+    return org$defi_wallet_core$cxxbridge1$EthContract$operator$sizeof();
+}
+
+::std::size_t EthContract::layout::align() noexcept {
+    return org$defi_wallet_core$cxxbridge1$EthContract$operator$alignof();
+}
+
+::rust::Box<::org::defi_wallet_core::EthContract>
+new_eth_contract(::rust::String rpcserver, ::rust::String contact_address,
+                 ::rust::String abi_json) {
+    ::rust::MaybeUninit<::rust::Box<::org::defi_wallet_core::EthContract>>
+        return$;
+    ::rust::repr::PtrLen error$ =
+        org$defi_wallet_core$cxxbridge1$new_eth_contract(
+            &rpcserver, &contact_address, &abi_json, &return$.value);
+    if (error$.ptr) {
+        throw ::rust::impl<::rust::Error>::error(error$);
+    }
+    return ::std::move(return$.value);
+}
+
+::rust::Box<::org::defi_wallet_core::EthContract> new_signing_eth_contract(
+    ::rust::String rpcserver, ::rust::String contact_address,
+    ::rust::String abi_json,
+    ::org::defi_wallet_core::PrivateKey const &private_key) {
+    ::rust::MaybeUninit<::rust::Box<::org::defi_wallet_core::EthContract>>
+        return$;
+    ::rust::repr::PtrLen error$ =
+        org$defi_wallet_core$cxxbridge1$new_signing_eth_contract(
+            &rpcserver, &contact_address, &abi_json, private_key,
+            &return$.value);
+    if (error$.ptr) {
+        throw ::rust::impl<::rust::Error>::error(error$);
+    }
+    return ::std::move(return$.value);
+}
+
+::rust::String read_json(::rust::String filepath, ::rust::String keyname) {
+    ::rust::MaybeUninit<::rust::String> return$;
+    ::rust::repr::PtrLen error$ = org$defi_wallet_core$cxxbridge1$read_json(
+        &filepath, &keyname, &return$.value);
+    if (error$.ptr) {
+        throw ::rust::impl<::rust::Error>::error(error$);
+    }
+    return ::std::move(return$.value);
+}
+
+::rust::Vec<::std::uint8_t> EthContract::encode(::rust::Str function_name,
+                                                ::rust::Str function_args) {
+    ::rust::MaybeUninit<::rust::Vec<::std::uint8_t>> return$;
+    ::rust::repr::PtrLen error$ =
+        org$defi_wallet_core$cxxbridge1$EthContract$encode(
+            *this, function_name, function_args, &return$.value);
+    if (error$.ptr) {
+        throw ::rust::impl<::rust::Error>::error(error$);
+    }
+    return ::std::move(return$.value);
+}
+
+::rust::String EthContract::call(::rust::Str function_name,
+                                 ::rust::Str function_args) {
+    ::rust::MaybeUninit<::rust::String> return$;
+    ::rust::repr::PtrLen error$ =
+        org$defi_wallet_core$cxxbridge1$EthContract$call(
+            *this, function_name, function_args, &return$.value);
+    if (error$.ptr) {
+        throw ::rust::impl<::rust::Error>::error(error$);
+    }
+    return ::std::move(return$.value);
+}
+
+::org::defi_wallet_core::CronosTransactionReceiptRaw
+EthContract::send(::rust::Str function_name, ::rust::Str function_args) {
+    ::rust::MaybeUninit<::org::defi_wallet_core::CronosTransactionReceiptRaw>
+        return$;
+    ::rust::repr::PtrLen error$ =
+        org$defi_wallet_core$cxxbridge1$EthContract$send(
+            *this, function_name, function_args, &return$.value);
+    if (error$.ptr) {
+        throw ::rust::impl<::rust::Error>::error(error$);
+    }
+    return ::std::move(return$.value);
+}
+} // namespace defi_wallet_core
+} // namespace org
+
+extern "C" {
+::org::defi_wallet_core::EthContract *
+cxxbridge1$box$org$defi_wallet_core$EthContract$alloc() noexcept;
+void cxxbridge1$box$org$defi_wallet_core$EthContract$dealloc(
+    ::org::defi_wallet_core::EthContract *) noexcept;
+void cxxbridge1$box$org$defi_wallet_core$EthContract$drop(
+    ::rust::Box<::org::defi_wallet_core::EthContract> *ptr) noexcept;
+} // extern "C"
+
+namespace rust {
+inline namespace cxxbridge1 {
+template <>
+::org::defi_wallet_core::EthContract *
+Box<::org::defi_wallet_core::EthContract>::allocation::alloc() noexcept {
+    return cxxbridge1$box$org$defi_wallet_core$EthContract$alloc();
+}
+template <>
+void Box<::org::defi_wallet_core::EthContract>::allocation::dealloc(
+    ::org::defi_wallet_core::EthContract *ptr) noexcept {
+    cxxbridge1$box$org$defi_wallet_core$EthContract$dealloc(ptr);
+}
+template <> void Box<::org::defi_wallet_core::EthContract>::drop() noexcept {
+    cxxbridge1$box$org$defi_wallet_core$EthContract$drop(this);
+}
+} // namespace cxxbridge1
+} // namespace rust

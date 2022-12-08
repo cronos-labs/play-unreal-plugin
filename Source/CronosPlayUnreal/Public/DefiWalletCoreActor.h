@@ -12,7 +12,12 @@
 #include "PlayCppSdkLibrary/Include/defi-wallet-core-cpp/src/contract.rs.h"
 #include "PlayCppSdkLibrary/Include/defi-wallet-core-cpp/src/lib.rs.h"
 #include "PlayCppSdkLibrary/Include/defi-wallet-core-cpp/src/nft.rs.h"
+#include "PlayCppSdkLibrary/Include/defi-wallet-core-cpp/src/ethereum.rs.h"
 #include "DefiWalletCoreActor.generated.h"
+
+using namespace std;
+using namespace rust;
+using namespace org::defi_wallet_core;
 
 /*
 TODO:
@@ -107,6 +112,10 @@ DECLARE_DYNAMIC_DELEGATE_TwoParams(FErc20ApproveDelegate,
                                    FCronosTransactionReceiptRaw, TxResult,
                                    FString, Result);
 
+// dynamic contract send
+DECLARE_DYNAMIC_DELEGATE_TwoParams(FDynamicContractSendDelegate,
+                                   FCronosTransactionReceiptRaw, TxResult,
+                                   FString, Result);
 /**
  Cosmos NFT Denom
  */
@@ -996,6 +1005,24 @@ class CRONOSPLAYUNREAL_API ADefiWalletCoreActor : public AActor {
     void Erc1155Approve(FString contractAddress, int32 walletindex,
                         FString approvedAddress, bool approved,
                         FErc1155ApproveDelegate Out);
+
+    /**
+     * send modifying contract call
+     * @param contractAddress contract address
+     * @param walletindex wallet index which starts from 0
+     * @param abiJson abi json
+     * @param functionName function name
+     * @param functionArgs function args injson
+     * @return  tx-receipt
+     */
+    UFUNCTION(BlueprintCallable,
+              meta = (DisplayName = "SendDynamicContract",
+                      Keywords = "Json,Rpc,DynamicContract,Http"),
+              Category = "CronosPlayUnreal")
+    void SendDynamicContract(FString contractAddress, int32 walletindex,
+                             FString abiJson, FString functionName,
+                             FString functionArgs,
+                             FDynamicContractSendDelegate Out);
 
     /**
      * Cosmos rpc address

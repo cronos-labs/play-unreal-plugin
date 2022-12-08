@@ -579,7 +579,7 @@ void ADefiWalletCoreActor::GetBalance(FString address, FString denom,
         std::string myservercosmos =
             TCHAR_TO_UTF8(*myCosmosRpc); /* 1317 port */
         rust::cxxbridge1::String balance = query_account_balance(
-            myservercosmos, TCHAR_TO_UTF8(*address), TCHAR_TO_UTF8(*denom), 1);
+            myservercosmos, TCHAR_TO_UTF8(*address), TCHAR_TO_UTF8(*denom));
 
         output = UTF8_TO_TCHAR(balance.c_str());
         success = true;
@@ -652,7 +652,7 @@ void ADefiWalletCoreActor::BroadcastEthTxAsync(FWalletBroadcastDelegate Out,
             }
             assert(signedtx.size() == usersignedtx.size());
 
-            string mycronosrpc = TCHAR_TO_UTF8(*rpc);
+            std::string mycronosrpc = TCHAR_TO_UTF8(*rpc);
 
             FString txhashtext;
             FString result;
@@ -1925,6 +1925,55 @@ void ADefiWalletCoreActor::Erc1155Approve(FString contractAddress,
             Out.ExecuteIfBound(txresult, result);
         });
     });
+}
+
+void ADefiWalletCoreActor::SendDynamicContract(
+    FString contractAddress, int32 walletindex, FString abiJson,
+    FString functionName, FString functionArgs,
+    FDynamicContractSendDelegate Out) {
+
+    AsyncTask(
+        ENamedThreads::AnyHiPriThreadNormalTask,
+        [this, Out, contractAddress, walletindex, abiJson, functionName,
+         functionArgs]() {
+            FString result;
+            FCronosTransactionReceiptRaw txresult;
+
+            try {
+                if (NULL == _coreWallet) {
+                    result = TEXT("Invalid Wallet");
+                } else {
+                    char hdpath[100];
+                    snprintf(hdpath, sizeof(hdpath), "m/44'/%d'/0'/0/%d",
+                             EthCoinType, walletindex);
+                    rust::cxxbridge1::Box<PrivateKey> privatekey =
+                        _coreWallet->get_key(hdpath);
+
+                    std::string mycontractaddress =
+                        TCHAR_TO_UTF8(*contractAddress);
+                    std::string mycronosrpc = TCHAR_TO_UTF8(*myCronosRpc);
+
+                    std::string myabijson = TCHAR_TO_UTF8(*abiJson);
+                    std::string myfunctionname = TCHAR_TO_UTF8(*functionName);
+                    std::string myfunctionargs = TCHAR_TO_UTF8(*functionArgs);
+
+                    Box<EthContract> w = new_signing_eth_contract(
+                        mycronosrpc, mycontractaddress, myabijson, *privatekey);
+                    CronosTransactionReceiptRaw receipt =
+                        w->send(myfunctionname, myfunctionargs);
+
+                    convertCronosTXReceipt(receipt, txresult);
+                }
+            } catch (const rust::cxxbridge1::Error &e) {
+                result = FString::Printf(
+                    TEXT("CronosPlayUnreal Erc1155Approve Error: %s"),
+                    UTF8_TO_TCHAR(e.what()));
+            }
+
+            AsyncTask(ENamedThreads::GameThread, [Out, txresult, result]() {
+                Out.ExecuteIfBound(txresult, result);
+            });
+        });
 }
 
 void zeroize_buffer(char *dst, char value, int length) {

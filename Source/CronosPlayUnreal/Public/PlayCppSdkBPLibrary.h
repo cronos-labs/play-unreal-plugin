@@ -44,6 +44,9 @@ struct FRawTokenResult {
     FString TokenType;
 };
 
+DECLARE_DYNAMIC_DELEGATE_TwoParams(FCallDynamicContractDelegate, FString,
+                                   JsonResult, FString, Result);
+
 /// Tx Detailed Information
 USTRUCT(BlueprintType)
 struct FRawTxDetail {
@@ -216,4 +219,59 @@ class UPlayCppSdkBPLibrary : public UBlueprintFunctionLibrary {
                       Keywords = "Json,Rpc,UserAgent,Http"),
               Category = "PlayCppSdk")
     static void SetupUserAgent(FString UserAgent);
+
+    /**
+     * EncodeDynamicContract for http access
+     * @param rpcserver    cronos rpc server endpoint
+     * @param contactAddress    contract address
+     * @param abiJson    contract abi json
+     * @param functionName    function name
+     * @param functionArgs    function args in json
+     * @return encoded bytes
+     */
+
+    UFUNCTION(BlueprintCallable,
+              meta = (DisplayName = "EncodeDynamicContract",
+                      Keywords = "Json,Rpc,DynamicContract,Http"),
+              Category = "PlayCppSdk")
+    static void EncodeDynamicContract(FString rpcserver, FString contactAddress,
+                                      FString abiJson, FString functionName,
+                                      FString functionArgs,
+                                      TArray<uint8> &output, bool &success,
+                                      FString &output_message);
+
+    /**
+     * call dynamic contract (non modifying)
+     *
+     * @param rpcserver    cronos rpc server endpoint
+     * @param contactAddress    contract address
+     * @param abiJson    contract abi json
+     * @param functionName    function name
+     * @param functionArgs    function args in json
+     * @return output in json
+     */
+    UFUNCTION(BlueprintCallable,
+              meta = (DisplayName = "CallDynamicContract",
+                      Keywords = "Json,Rpc,DynamicContract,Http"),
+              Category = "PlayCppSdk")
+    static void CallDynamicContract(FString rpcserver, FString contactAddress,
+                                    FString abiJson,
+
+                                    FString functionName, FString functionArgs,
+                                    FCallDynamicContractDelegate Out);
+
+    /**
+     * read json from file , choose by keyname
+     *
+     * @param filepath    json file path
+     * @param keyname    key name
+     * @return output in json
+     */
+    UFUNCTION(BlueprintCallable,
+              meta = (DisplayName = "DynamicContractReadJson",
+                      Keywords = "Json,Rpc,DynamicContract,Http"),
+              Category = "PlayCppSdk")
+    static FString DynamicContractReadJson(FString filepath, FString keyname,
+                                           bool &success,
+                                           FString &output_message);
 };
