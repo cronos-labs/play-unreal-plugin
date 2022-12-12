@@ -7,6 +7,7 @@
 #include "Misc/FileHelper.h"
 #include "Misc/Paths.h"
 #include "PlayCppSdkBPLibrary.h"
+#include "PlayCppSdkLibrary/Include/defi-wallet-core-cpp/src/lib.rs.h"
 #include "PlayCppSdkLibrary/Include/extra-cpp-bindings/src/lib.rs.h"
 #include "PlayCppSdkLibrary/Include/rust/cxx.h"
 #include "Utlis.h"
