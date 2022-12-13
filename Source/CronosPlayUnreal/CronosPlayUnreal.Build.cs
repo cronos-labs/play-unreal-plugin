@@ -6,29 +6,30 @@ using UnrealBuildTool;
 
 public class CronosPlayUnreal : ModuleRules {
 
-  protected string ThirdPartyPath {
-    get {
-      return Path.GetFullPath(
-          Path.Combine(ModuleDirectory, "..", "ThirdParty"));
+    protected string ThirdPartyPath {
+        get {
+            return Path.GetFullPath(
+                Path.Combine(ModuleDirectory, "..", "ThirdParty"));
+        }
     }
-  }
 
-  public CronosPlayUnreal(ReadOnlyTargetRules Target) : base(Target) {
-    bEnableExceptions = true;
+    public CronosPlayUnreal(ReadOnlyTargetRules Target) : base(Target) {
+        bEnableExceptions = true;
 
-    PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
-    CppStandard = CppStandardVersion.Cpp17;
+        PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
+        CppStandard = CppStandardVersion.Cpp17;
 
-    PublicIncludePaths.AddRange(new string[] {});
-    PrivateIncludePaths.AddRange(new string[] { Path.Combine(ThirdPartyPath) });
+        PublicIncludePaths.AddRange(new string[] {});
+        PrivateIncludePaths.AddRange(
+            new string[] { Path.Combine(ThirdPartyPath) });
 
-    PublicDependencyModuleNames.AddRange(
-        new string[] { "Core", "Json", "JsonUtilities", "HTTP" });
+        PublicDependencyModuleNames.AddRange(
+            new string[] { "Core", "Json", "JsonUtilities", "HTTP" });
 
-    PrivateDependencyModuleNames.AddRange(
-        new string[] { "CoreUObject", "Engine", "Slate", "SlateCore", "Projects",
-                       "PlayCppSdkLibrary" });
+        PrivateDependencyModuleNames.AddRange(
+            new string[] { "CoreUObject", "Engine", "Slate", "SlateCore",
+                           "Projects", "PlayCppSdkLibrary" });
 
-    DynamicallyLoadedModuleNames.AddRange(new string[] {});
-  }
+        DynamicallyLoadedModuleNames.AddRange(new string[] {});
+    }
 }

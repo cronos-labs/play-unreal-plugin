@@ -4,5 +4,5 @@
 #include "Containers/UnrealString.h"
 
 FString UUtlis::ToHex(TArray<uint8> address) {
-  return BytesToHex(address.GetData(), address.Num());
+    return BytesToHex(address.GetData(), address.Num());
 }
