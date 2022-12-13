@@ -18,43 +18,43 @@ using System.IO;
 using UnrealBuildTool;
 
 public class PlayCppSdkLibrary : ModuleRules {
-  public PlayCppSdkLibrary(ReadOnlyTargetRules Target) : base(Target) {
-    Type = ModuleType.External;
-    CppStandard = CppStandardVersion.Cpp17;
+    public PlayCppSdkLibrary(ReadOnlyTargetRules Target) : base(Target) {
+        Type = ModuleType.External;
+        CppStandard = CppStandardVersion.Cpp17;
 
-    string IncludePath = Path.Combine(ModuleDirectory, "Include");
-    string LibrariesPath = Path.Combine(ModuleDirectory, "Lib");
+        string IncludePath = Path.Combine(ModuleDirectory, "Include");
+        string LibrariesPath = Path.Combine(ModuleDirectory, "Lib");
 
-    PublicIncludePaths.Add(IncludePath);
+        PublicIncludePaths.Add(IncludePath);
 
-    if (Target.Platform == UnrealTargetPlatform.Win64) {
-      PublicAdditionalLibraries.Add(
-          Path.Combine(LibrariesPath, "Win64", "play_cpp_sdk.lib"));
+        if (Target.Platform == UnrealTargetPlatform.Win64) {
+            PublicAdditionalLibraries.Add(
+                Path.Combine(LibrariesPath, "Win64", "play_cpp_sdk.lib"));
 
-      PublicAdditionalLibraries.Add("Ncrypt.lib");
-      PublicAdditionalLibraries.Add("userenv.lib");
-      PublicAdditionalLibraries.Add("bcrypt.lib");
-      PublicAdditionalLibraries.Add("ntdll.lib");
-      PublicAdditionalLibraries.Add("Secur32.lib");
-      PublicAdditionalLibraries.Add("crypt32.lib");
-      PublicAdditionalLibraries.Add("ws2_32.lib");
+            PublicAdditionalLibraries.Add("Ncrypt.lib");
+            PublicAdditionalLibraries.Add("userenv.lib");
+            PublicAdditionalLibraries.Add("bcrypt.lib");
+            PublicAdditionalLibraries.Add("ntdll.lib");
+            PublicAdditionalLibraries.Add("Secur32.lib");
+            PublicAdditionalLibraries.Add("crypt32.lib");
+            PublicAdditionalLibraries.Add("ws2_32.lib");
 
-    } else if (Target.Platform == UnrealTargetPlatform.Mac) {
-      PublicAdditionalLibraries.Add(
-          Path.Combine(LibrariesPath, "Mac", "libplay_cpp_sdk.a"));
-    } else if (Target.Platform == UnrealTargetPlatform.Linux) {
-      PublicAdditionalLibraries.Add(
-          Path.Combine(LibrariesPath, "Linux", "libplay_cpp_sdk.a"));
-    } else if (Target.Platform == UnrealTargetPlatform.Android) {
-      PublicAdditionalLibraries.Add(
-          Path.Combine(LibrariesPath, "Android", "arm64-v8a", "libplay_cpp_sdk.a"));
-      PublicAdditionalLibraries.Add(
-          Path.Combine(LibrariesPath, "Android", "armeabi-v7a", "libplay_cpp_sdk.a"));
-      PublicAdditionalLibraries.Add(
-          Path.Combine(LibrariesPath, "Android", "x86_64", "libplay_cpp_sdk.a"));
-    } else if (Target.Platform == UnrealTargetPlatform.IOS) {
-        PublicAdditionalLibraries.Add(
-            Path.Combine(LibrariesPath, "iOS", "arm64", "libplay_cpp_sdk.a"));
+        } else if (Target.Platform == UnrealTargetPlatform.Mac) {
+            PublicAdditionalLibraries.Add(
+                Path.Combine(LibrariesPath, "Mac", "libplay_cpp_sdk.a"));
+        } else if (Target.Platform == UnrealTargetPlatform.Linux) {
+            PublicAdditionalLibraries.Add(
+                Path.Combine(LibrariesPath, "Linux", "libplay_cpp_sdk.a"));
+        } else if (Target.Platform == UnrealTargetPlatform.Android) {
+            PublicAdditionalLibraries.Add(Path.Combine(
+                LibrariesPath, "Android", "arm64-v8a", "libplay_cpp_sdk.a"));
+            PublicAdditionalLibraries.Add(Path.Combine(
+                LibrariesPath, "Android", "armeabi-v7a", "libplay_cpp_sdk.a"));
+            PublicAdditionalLibraries.Add(Path.Combine(
+                LibrariesPath, "Android", "x86_64", "libplay_cpp_sdk.a"));
+        } else if (Target.Platform == UnrealTargetPlatform.IOS) {
+            PublicAdditionalLibraries.Add(Path.Combine(
+                LibrariesPath, "iOS", "arm64", "libplay_cpp_sdk.a"));
+        }
     }
-  }
 }

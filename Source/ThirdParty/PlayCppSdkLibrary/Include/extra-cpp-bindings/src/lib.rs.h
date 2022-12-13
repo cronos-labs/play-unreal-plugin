@@ -37,114 +37,114 @@ template <typename T>::std::size_t align_of();
 #ifndef CXXBRIDGE1_RUST_STRING
 #define CXXBRIDGE1_RUST_STRING
 class String final {
-public:
-  String() noexcept;
-  String(const String &) noexcept;
-  String(String &&) noexcept;
-  ~String() noexcept;
+  public:
+    String() noexcept;
+    String(const String &) noexcept;
+    String(String &&) noexcept;
+    ~String() noexcept;
 
-  String(const std::string &);
-  String(const char *);
-  String(const char *, std::size_t);
-  String(const char16_t *);
-  String(const char16_t *, std::size_t);
+    String(const std::string &);
+    String(const char *);
+    String(const char *, std::size_t);
+    String(const char16_t *);
+    String(const char16_t *, std::size_t);
 
-  static String lossy(const std::string &) noexcept;
-  static String lossy(const char *) noexcept;
-  static String lossy(const char *, std::size_t) noexcept;
-  static String lossy(const char16_t *) noexcept;
-  static String lossy(const char16_t *, std::size_t) noexcept;
+    static String lossy(const std::string &) noexcept;
+    static String lossy(const char *) noexcept;
+    static String lossy(const char *, std::size_t) noexcept;
+    static String lossy(const char16_t *) noexcept;
+    static String lossy(const char16_t *, std::size_t) noexcept;
 
-  String &operator=(const String &) &noexcept;
-  String &operator=(String &&) &noexcept;
+    String &operator=(const String &) &noexcept;
+    String &operator=(String &&) &noexcept;
 
-  explicit operator std::string() const;
+    explicit operator std::string() const;
 
-  const char *data() const noexcept;
-  std::size_t size() const noexcept;
-  std::size_t length() const noexcept;
-  bool empty() const noexcept;
+    const char *data() const noexcept;
+    std::size_t size() const noexcept;
+    std::size_t length() const noexcept;
+    bool empty() const noexcept;
 
-  const char *c_str() noexcept;
+    const char *c_str() noexcept;
 
-  std::size_t capacity() const noexcept;
-  void reserve(size_t new_cap) noexcept;
+    std::size_t capacity() const noexcept;
+    void reserve(size_t new_cap) noexcept;
 
-  using iterator = char *;
-  iterator begin() noexcept;
-  iterator end() noexcept;
+    using iterator = char *;
+    iterator begin() noexcept;
+    iterator end() noexcept;
 
-  using const_iterator = const char *;
-  const_iterator begin() const noexcept;
-  const_iterator end() const noexcept;
-  const_iterator cbegin() const noexcept;
-  const_iterator cend() const noexcept;
+    using const_iterator = const char *;
+    const_iterator begin() const noexcept;
+    const_iterator end() const noexcept;
+    const_iterator cbegin() const noexcept;
+    const_iterator cend() const noexcept;
 
-  bool operator==(const String &) const noexcept;
-  bool operator!=(const String &) const noexcept;
-  bool operator<(const String &) const noexcept;
-  bool operator<=(const String &) const noexcept;
-  bool operator>(const String &) const noexcept;
-  bool operator>=(const String &) const noexcept;
+    bool operator==(const String &) const noexcept;
+    bool operator!=(const String &) const noexcept;
+    bool operator<(const String &) const noexcept;
+    bool operator<=(const String &) const noexcept;
+    bool operator>(const String &) const noexcept;
+    bool operator>=(const String &) const noexcept;
 
-  void swap(String &) noexcept;
+    void swap(String &) noexcept;
 
-  String(unsafe_bitcopy_t, const String &) noexcept;
+    String(unsafe_bitcopy_t, const String &) noexcept;
 
-private:
-  struct lossy_t;
-  String(lossy_t, const char *, std::size_t) noexcept;
-  String(lossy_t, const char16_t *, std::size_t) noexcept;
-  friend void swap(String &lhs, String &rhs) noexcept { lhs.swap(rhs); }
+  private:
+    struct lossy_t;
+    String(lossy_t, const char *, std::size_t) noexcept;
+    String(lossy_t, const char16_t *, std::size_t) noexcept;
+    friend void swap(String &lhs, String &rhs) noexcept { lhs.swap(rhs); }
 
-  std::array<std::uintptr_t, 3> repr;
+    std::array<std::uintptr_t, 3> repr;
 };
 #endif // CXXBRIDGE1_RUST_STRING
 
 #ifndef CXXBRIDGE1_RUST_STR
 #define CXXBRIDGE1_RUST_STR
 class Str final {
-public:
-  Str() noexcept;
-  Str(const String &) noexcept;
-  Str(const std::string &);
-  Str(const char *);
-  Str(const char *, std::size_t);
+  public:
+    Str() noexcept;
+    Str(const String &) noexcept;
+    Str(const std::string &);
+    Str(const char *);
+    Str(const char *, std::size_t);
 
-  Str &operator=(const Str &) &noexcept = default;
+    Str &operator=(const Str &) &noexcept = default;
 
-  explicit operator std::string() const;
+    explicit operator std::string() const;
 
-  const char *data() const noexcept;
-  std::size_t size() const noexcept;
-  std::size_t length() const noexcept;
-  bool empty() const noexcept;
+    const char *data() const noexcept;
+    std::size_t size() const noexcept;
+    std::size_t length() const noexcept;
+    bool empty() const noexcept;
 
-  Str(const Str &) noexcept = default;
-  ~Str() noexcept = default;
+    Str(const Str &) noexcept = default;
+    ~Str() noexcept = default;
 
-  using iterator = const char *;
-  using const_iterator = const char *;
-  const_iterator begin() const noexcept;
-  const_iterator end() const noexcept;
-  const_iterator cbegin() const noexcept;
-  const_iterator cend() const noexcept;
+    using iterator = const char *;
+    using const_iterator = const char *;
+    const_iterator begin() const noexcept;
+    const_iterator end() const noexcept;
+    const_iterator cbegin() const noexcept;
+    const_iterator cend() const noexcept;
 
-  bool operator==(const Str &) const noexcept;
-  bool operator!=(const Str &) const noexcept;
-  bool operator<(const Str &) const noexcept;
-  bool operator<=(const Str &) const noexcept;
-  bool operator>(const Str &) const noexcept;
-  bool operator>=(const Str &) const noexcept;
+    bool operator==(const Str &) const noexcept;
+    bool operator!=(const Str &) const noexcept;
+    bool operator<(const Str &) const noexcept;
+    bool operator<=(const Str &) const noexcept;
+    bool operator>(const Str &) const noexcept;
+    bool operator>=(const Str &) const noexcept;
 
-  void swap(Str &) noexcept;
+    void swap(Str &) noexcept;
 
-private:
-  class uninit;
-  Str(uninit) noexcept;
-  friend impl<Str>;
+  private:
+    class uninit;
+    Str(uninit) noexcept;
+    friend impl<Str>;
 
-  std::array<std::uintptr_t, 2> repr;
+    std::array<std::uintptr_t, 2> repr;
 };
 #endif // CXXBRIDGE1_RUST_STR
 
@@ -154,375 +154,376 @@ namespace detail {
 template <bool> struct copy_assignable_if {};
 
 template <> struct copy_assignable_if<false> {
-  copy_assignable_if() noexcept = default;
-  copy_assignable_if(const copy_assignable_if &) noexcept = default;
-  copy_assignable_if &operator=(const copy_assignable_if &) &noexcept = delete;
-  copy_assignable_if &operator=(copy_assignable_if &&) &noexcept = default;
+    copy_assignable_if() noexcept = default;
+    copy_assignable_if(const copy_assignable_if &) noexcept = default;
+    copy_assignable_if &
+    operator=(const copy_assignable_if &) &noexcept = delete;
+    copy_assignable_if &operator=(copy_assignable_if &&) &noexcept = default;
 };
 } // namespace detail
 
 template <typename T>
 class Slice final
     : private detail::copy_assignable_if<std::is_const<T>::value> {
-public:
-  using value_type = T;
+  public:
+    using value_type = T;
 
-  Slice() noexcept;
-  Slice(T *, std::size_t count) noexcept;
+    Slice() noexcept;
+    Slice(T *, std::size_t count) noexcept;
 
-  Slice &operator=(const Slice<T> &) &noexcept = default;
-  Slice &operator=(Slice<T> &&) &noexcept = default;
+    Slice &operator=(const Slice<T> &) &noexcept = default;
+    Slice &operator=(Slice<T> &&) &noexcept = default;
 
-  T *data() const noexcept;
-  std::size_t size() const noexcept;
-  std::size_t length() const noexcept;
-  bool empty() const noexcept;
+    T *data() const noexcept;
+    std::size_t size() const noexcept;
+    std::size_t length() const noexcept;
+    bool empty() const noexcept;
 
-  T &operator[](std::size_t n) const noexcept;
-  T &at(std::size_t n) const;
-  T &front() const noexcept;
-  T &back() const noexcept;
+    T &operator[](std::size_t n) const noexcept;
+    T &at(std::size_t n) const;
+    T &front() const noexcept;
+    T &back() const noexcept;
 
-  Slice(const Slice<T> &) noexcept = default;
-  ~Slice() noexcept = default;
+    Slice(const Slice<T> &) noexcept = default;
+    ~Slice() noexcept = default;
 
-  class iterator;
-  iterator begin() const noexcept;
-  iterator end() const noexcept;
+    class iterator;
+    iterator begin() const noexcept;
+    iterator end() const noexcept;
 
-  void swap(Slice &) noexcept;
+    void swap(Slice &) noexcept;
 
-private:
-  class uninit;
-  Slice(uninit) noexcept;
-  friend impl<Slice>;
-  friend void sliceInit(void *, const void *, std::size_t) noexcept;
-  friend void *slicePtr(const void *) noexcept;
-  friend std::size_t sliceLen(const void *) noexcept;
+  private:
+    class uninit;
+    Slice(uninit) noexcept;
+    friend impl<Slice>;
+    friend void sliceInit(void *, const void *, std::size_t) noexcept;
+    friend void *slicePtr(const void *) noexcept;
+    friend std::size_t sliceLen(const void *) noexcept;
 
-  std::array<std::uintptr_t, 2> repr;
+    std::array<std::uintptr_t, 2> repr;
 };
 
 template <typename T> class Slice<T>::iterator final {
-public:
-  using iterator_category = std::random_access_iterator_tag;
-  using value_type = T;
-  using difference_type = std::ptrdiff_t;
-  using pointer = typename std::add_pointer<T>::type;
-  using reference = typename std::add_lvalue_reference<T>::type;
+  public:
+    using iterator_category = std::random_access_iterator_tag;
+    using value_type = T;
+    using difference_type = std::ptrdiff_t;
+    using pointer = typename std::add_pointer<T>::type;
+    using reference = typename std::add_lvalue_reference<T>::type;
 
-  reference operator*() const noexcept;
-  pointer operator->() const noexcept;
-  reference operator[](difference_type) const noexcept;
+    reference operator*() const noexcept;
+    pointer operator->() const noexcept;
+    reference operator[](difference_type) const noexcept;
 
-  iterator &operator++() noexcept;
-  iterator operator++(int) noexcept;
-  iterator &operator--() noexcept;
-  iterator operator--(int) noexcept;
+    iterator &operator++() noexcept;
+    iterator operator++(int) noexcept;
+    iterator &operator--() noexcept;
+    iterator operator--(int) noexcept;
 
-  iterator &operator+=(difference_type) noexcept;
-  iterator &operator-=(difference_type) noexcept;
-  iterator operator+(difference_type) const noexcept;
-  iterator operator-(difference_type) const noexcept;
-  difference_type operator-(const iterator &) const noexcept;
+    iterator &operator+=(difference_type) noexcept;
+    iterator &operator-=(difference_type) noexcept;
+    iterator operator+(difference_type) const noexcept;
+    iterator operator-(difference_type) const noexcept;
+    difference_type operator-(const iterator &) const noexcept;
 
-  bool operator==(const iterator &) const noexcept;
-  bool operator!=(const iterator &) const noexcept;
-  bool operator<(const iterator &) const noexcept;
-  bool operator<=(const iterator &) const noexcept;
-  bool operator>(const iterator &) const noexcept;
-  bool operator>=(const iterator &) const noexcept;
+    bool operator==(const iterator &) const noexcept;
+    bool operator!=(const iterator &) const noexcept;
+    bool operator<(const iterator &) const noexcept;
+    bool operator<=(const iterator &) const noexcept;
+    bool operator>(const iterator &) const noexcept;
+    bool operator>=(const iterator &) const noexcept;
 
-private:
-  friend class Slice;
-  void *pos;
-  std::size_t stride;
+  private:
+    friend class Slice;
+    void *pos;
+    std::size_t stride;
 };
 
 template <typename T> Slice<T>::Slice() noexcept {
-  sliceInit(this, reinterpret_cast<void *>(align_of<T>()), 0);
+    sliceInit(this, reinterpret_cast<void *>(align_of<T>()), 0);
 }
 
 template <typename T> Slice<T>::Slice(T *s, std::size_t count) noexcept {
-  assert(s != nullptr || count == 0);
-  sliceInit(this,
-            s == nullptr && count == 0
-                ? reinterpret_cast<void *>(align_of<T>())
-                : const_cast<typename std::remove_const<T>::type *>(s),
-            count);
+    assert(s != nullptr || count == 0);
+    sliceInit(this,
+              s == nullptr && count == 0
+                  ? reinterpret_cast<void *>(align_of<T>())
+                  : const_cast<typename std::remove_const<T>::type *>(s),
+              count);
 }
 
 template <typename T> T *Slice<T>::data() const noexcept {
-  return reinterpret_cast<T *>(slicePtr(this));
+    return reinterpret_cast<T *>(slicePtr(this));
 }
 
 template <typename T> std::size_t Slice<T>::size() const noexcept {
-  return sliceLen(this);
+    return sliceLen(this);
 }
 
 template <typename T> std::size_t Slice<T>::length() const noexcept {
-  return this->size();
+    return this->size();
 }
 
 template <typename T> bool Slice<T>::empty() const noexcept {
-  return this->size() == 0;
+    return this->size() == 0;
 }
 
 template <typename T> T &Slice<T>::operator[](std::size_t n) const noexcept {
-  assert(n < this->size());
-  auto ptr = static_cast<char *>(slicePtr(this)) + size_of<T>() * n;
-  return *reinterpret_cast<T *>(ptr);
+    assert(n < this->size());
+    auto ptr = static_cast<char *>(slicePtr(this)) + size_of<T>() * n;
+    return *reinterpret_cast<T *>(ptr);
 }
 
 template <typename T> T &Slice<T>::at(std::size_t n) const {
-  if (n >= this->size()) {
-    panic<std::out_of_range>("rust::Slice index out of range");
-  }
-  return (*this)[n];
+    if (n >= this->size()) {
+        panic<std::out_of_range>("rust::Slice index out of range");
+    }
+    return (*this)[n];
 }
 
 template <typename T> T &Slice<T>::front() const noexcept {
-  assert(!this->empty());
-  return (*this)[0];
+    assert(!this->empty());
+    return (*this)[0];
 }
 
 template <typename T> T &Slice<T>::back() const noexcept {
-  assert(!this->empty());
-  return (*this)[this->size() - 1];
+    assert(!this->empty());
+    return (*this)[this->size() - 1];
 }
 
 template <typename T>
 typename Slice<T>::iterator::reference
 Slice<T>::iterator::operator*() const noexcept {
-  return *static_cast<T *>(this->pos);
+    return *static_cast<T *>(this->pos);
 }
 
 template <typename T>
 typename Slice<T>::iterator::pointer
 Slice<T>::iterator::operator->() const noexcept {
-  return static_cast<T *>(this->pos);
+    return static_cast<T *>(this->pos);
 }
 
 template <typename T>
 typename Slice<T>::iterator::reference Slice<T>::iterator::operator[](
     typename Slice<T>::iterator::difference_type n) const noexcept {
-  auto ptr = static_cast<char *>(this->pos) + this->stride * n;
-  return *reinterpret_cast<T *>(ptr);
+    auto ptr = static_cast<char *>(this->pos) + this->stride * n;
+    return *reinterpret_cast<T *>(ptr);
 }
 
 template <typename T>
 typename Slice<T>::iterator &Slice<T>::iterator::operator++() noexcept {
-  this->pos = static_cast<char *>(this->pos) + this->stride;
-  return *this;
+    this->pos = static_cast<char *>(this->pos) + this->stride;
+    return *this;
 }
 
 template <typename T>
 typename Slice<T>::iterator Slice<T>::iterator::operator++(int) noexcept {
-  auto ret = iterator(*this);
-  this->pos = static_cast<char *>(this->pos) + this->stride;
-  return ret;
+    auto ret = iterator(*this);
+    this->pos = static_cast<char *>(this->pos) + this->stride;
+    return ret;
 }
 
 template <typename T>
 typename Slice<T>::iterator &Slice<T>::iterator::operator--() noexcept {
-  this->pos = static_cast<char *>(this->pos) - this->stride;
-  return *this;
+    this->pos = static_cast<char *>(this->pos) - this->stride;
+    return *this;
 }
 
 template <typename T>
 typename Slice<T>::iterator Slice<T>::iterator::operator--(int) noexcept {
-  auto ret = iterator(*this);
-  this->pos = static_cast<char *>(this->pos) - this->stride;
-  return ret;
+    auto ret = iterator(*this);
+    this->pos = static_cast<char *>(this->pos) - this->stride;
+    return ret;
 }
 
 template <typename T>
 typename Slice<T>::iterator &Slice<T>::iterator::operator+=(
     typename Slice<T>::iterator::difference_type n) noexcept {
-  this->pos = static_cast<char *>(this->pos) + this->stride * n;
-  return *this;
+    this->pos = static_cast<char *>(this->pos) + this->stride * n;
+    return *this;
 }
 
 template <typename T>
 typename Slice<T>::iterator &Slice<T>::iterator::operator-=(
     typename Slice<T>::iterator::difference_type n) noexcept {
-  this->pos = static_cast<char *>(this->pos) - this->stride * n;
-  return *this;
+    this->pos = static_cast<char *>(this->pos) - this->stride * n;
+    return *this;
 }
 
 template <typename T>
 typename Slice<T>::iterator Slice<T>::iterator::operator+(
     typename Slice<T>::iterator::difference_type n) const noexcept {
-  auto ret = iterator(*this);
-  ret.pos = static_cast<char *>(this->pos) + this->stride * n;
-  return ret;
+    auto ret = iterator(*this);
+    ret.pos = static_cast<char *>(this->pos) + this->stride * n;
+    return ret;
 }
 
 template <typename T>
 typename Slice<T>::iterator Slice<T>::iterator::operator-(
     typename Slice<T>::iterator::difference_type n) const noexcept {
-  auto ret = iterator(*this);
-  ret.pos = static_cast<char *>(this->pos) - this->stride * n;
-  return ret;
+    auto ret = iterator(*this);
+    ret.pos = static_cast<char *>(this->pos) - this->stride * n;
+    return ret;
 }
 
 template <typename T>
 typename Slice<T>::iterator::difference_type
 Slice<T>::iterator::operator-(const iterator &other) const noexcept {
-  auto diff = std::distance(static_cast<char *>(other.pos),
-                            static_cast<char *>(this->pos));
-  return diff / this->stride;
+    auto diff = std::distance(static_cast<char *>(other.pos),
+                              static_cast<char *>(this->pos));
+    return diff / this->stride;
 }
 
 template <typename T>
 bool Slice<T>::iterator::operator==(const iterator &other) const noexcept {
-  return this->pos == other.pos;
+    return this->pos == other.pos;
 }
 
 template <typename T>
 bool Slice<T>::iterator::operator!=(const iterator &other) const noexcept {
-  return this->pos != other.pos;
+    return this->pos != other.pos;
 }
 
 template <typename T>
 bool Slice<T>::iterator::operator<(const iterator &other) const noexcept {
-  return this->pos < other.pos;
+    return this->pos < other.pos;
 }
 
 template <typename T>
 bool Slice<T>::iterator::operator<=(const iterator &other) const noexcept {
-  return this->pos <= other.pos;
+    return this->pos <= other.pos;
 }
 
 template <typename T>
 bool Slice<T>::iterator::operator>(const iterator &other) const noexcept {
-  return this->pos > other.pos;
+    return this->pos > other.pos;
 }
 
 template <typename T>
 bool Slice<T>::iterator::operator>=(const iterator &other) const noexcept {
-  return this->pos >= other.pos;
+    return this->pos >= other.pos;
 }
 
 template <typename T>
 typename Slice<T>::iterator Slice<T>::begin() const noexcept {
-  iterator it;
-  it.pos = slicePtr(this);
-  it.stride = size_of<T>();
-  return it;
+    iterator it;
+    it.pos = slicePtr(this);
+    it.stride = size_of<T>();
+    return it;
 }
 
 template <typename T>
 typename Slice<T>::iterator Slice<T>::end() const noexcept {
-  iterator it = this->begin();
-  it.pos = static_cast<char *>(it.pos) + it.stride * this->size();
-  return it;
+    iterator it = this->begin();
+    it.pos = static_cast<char *>(it.pos) + it.stride * this->size();
+    return it;
 }
 
 template <typename T> void Slice<T>::swap(Slice &rhs) noexcept {
-  std::swap(*this, rhs);
+    std::swap(*this, rhs);
 }
 #endif // CXXBRIDGE1_RUST_SLICE
 
 #ifndef CXXBRIDGE1_RUST_BOX
 #define CXXBRIDGE1_RUST_BOX
 template <typename T> class Box final {
-public:
-  using element_type = T;
-  using const_pointer =
-      typename std::add_pointer<typename std::add_const<T>::type>::type;
-  using pointer = typename std::add_pointer<T>::type;
+  public:
+    using element_type = T;
+    using const_pointer =
+        typename std::add_pointer<typename std::add_const<T>::type>::type;
+    using pointer = typename std::add_pointer<T>::type;
 
-  Box() = delete;
-  Box(Box &&) noexcept;
-  ~Box() noexcept;
+    Box() = delete;
+    Box(Box &&) noexcept;
+    ~Box() noexcept;
 
-  explicit Box(const T &);
-  explicit Box(T &&);
+    explicit Box(const T &);
+    explicit Box(T &&);
 
-  Box &operator=(Box &&) &noexcept;
+    Box &operator=(Box &&) &noexcept;
 
-  const T *operator->() const noexcept;
-  const T &operator*() const noexcept;
-  T *operator->() noexcept;
-  T &operator*() noexcept;
+    const T *operator->() const noexcept;
+    const T &operator*() const noexcept;
+    T *operator->() noexcept;
+    T &operator*() noexcept;
 
-  template <typename... Fields> static Box in_place(Fields &&...);
+    template <typename... Fields> static Box in_place(Fields &&...);
 
-  void swap(Box &) noexcept;
+    void swap(Box &) noexcept;
 
-  static Box from_raw(T *) noexcept;
+    static Box from_raw(T *) noexcept;
 
-  T *into_raw() noexcept;
+    T *into_raw() noexcept;
 
-  /* Deprecated */ using value_type = element_type;
+    /* Deprecated */ using value_type = element_type;
 
-private:
-  class uninit;
-  class allocation;
-  Box(uninit) noexcept;
-  void drop() noexcept;
+  private:
+    class uninit;
+    class allocation;
+    Box(uninit) noexcept;
+    void drop() noexcept;
 
-  friend void swap(Box &lhs, Box &rhs) noexcept { lhs.swap(rhs); }
+    friend void swap(Box &lhs, Box &rhs) noexcept { lhs.swap(rhs); }
 
-  T *ptr;
+    T *ptr;
 };
 
 template <typename T> class Box<T>::uninit {};
 
 template <typename T> class Box<T>::allocation {
-  static T *alloc() noexcept;
-  static void dealloc(T *) noexcept;
+    static T *alloc() noexcept;
+    static void dealloc(T *) noexcept;
 
-public:
-  allocation() noexcept : ptr(alloc()) {}
-  ~allocation() noexcept {
-    if (this->ptr) {
-      dealloc(this->ptr);
+  public:
+    allocation() noexcept : ptr(alloc()) {}
+    ~allocation() noexcept {
+        if (this->ptr) {
+            dealloc(this->ptr);
+        }
     }
-  }
-  T *ptr;
+    T *ptr;
 };
 
 template <typename T> Box<T>::Box(Box &&other) noexcept : ptr(other.ptr) {
-  other.ptr = nullptr;
+    other.ptr = nullptr;
 }
 
 template <typename T> Box<T>::Box(const T &val) {
-  allocation alloc;
-  ::new (alloc.ptr) T(val);
-  this->ptr = alloc.ptr;
-  alloc.ptr = nullptr;
+    allocation alloc;
+    ::new (alloc.ptr) T(val);
+    this->ptr = alloc.ptr;
+    alloc.ptr = nullptr;
 }
 
 template <typename T> Box<T>::Box(T &&val) {
-  allocation alloc;
-  ::new (alloc.ptr) T(std::move(val));
-  this->ptr = alloc.ptr;
-  alloc.ptr = nullptr;
+    allocation alloc;
+    ::new (alloc.ptr) T(std::move(val));
+    this->ptr = alloc.ptr;
+    alloc.ptr = nullptr;
 }
 
 template <typename T> Box<T>::~Box() noexcept {
-  if (this->ptr) {
-    this->drop();
-  }
+    if (this->ptr) {
+        this->drop();
+    }
 }
 
 template <typename T> Box<T> &Box<T>::operator=(Box &&other) &noexcept {
-  if (this->ptr) {
-    this->drop();
-  }
-  this->ptr = other.ptr;
-  other.ptr = nullptr;
-  return *this;
+    if (this->ptr) {
+        this->drop();
+    }
+    this->ptr = other.ptr;
+    other.ptr = nullptr;
+    return *this;
 }
 
 template <typename T> const T *Box<T>::operator->() const noexcept {
-  return this->ptr;
+    return this->ptr;
 }
 
 template <typename T> const T &Box<T>::operator*() const noexcept {
-  return *this->ptr;
+    return *this->ptr;
 }
 
 template <typename T> T *Box<T>::operator->() noexcept { return this->ptr; }
@@ -532,28 +533,28 @@ template <typename T> T &Box<T>::operator*() noexcept { return *this->ptr; }
 template <typename T>
 template <typename... Fields>
 Box<T> Box<T>::in_place(Fields &&...fields) {
-  allocation alloc;
-  auto ptr = alloc.ptr;
-  ::new (ptr) T{std::forward<Fields>(fields)...};
-  alloc.ptr = nullptr;
-  return from_raw(ptr);
+    allocation alloc;
+    auto ptr = alloc.ptr;
+    ::new (ptr) T{std::forward<Fields>(fields)...};
+    alloc.ptr = nullptr;
+    return from_raw(ptr);
 }
 
 template <typename T> void Box<T>::swap(Box &rhs) noexcept {
-  using std::swap;
-  swap(this->ptr, rhs.ptr);
+    using std::swap;
+    swap(this->ptr, rhs.ptr);
 }
 
 template <typename T> Box<T> Box<T>::from_raw(T *raw) noexcept {
-  Box box = uninit{};
-  box.ptr = raw;
-  return box;
+    Box box = uninit{};
+    box.ptr = raw;
+    return box;
 }
 
 template <typename T> T *Box<T>::into_raw() noexcept {
-  T *raw = this->ptr;
-  this->ptr = nullptr;
-  return raw;
+    T *raw = this->ptr;
+    this->ptr = nullptr;
+    return raw;
 }
 
 template <typename T> Box<T>::Box(uninit) noexcept {}
@@ -562,214 +563,214 @@ template <typename T> Box<T>::Box(uninit) noexcept {}
 #ifndef CXXBRIDGE1_RUST_BITCOPY_T
 #define CXXBRIDGE1_RUST_BITCOPY_T
 struct unsafe_bitcopy_t final {
-  explicit unsafe_bitcopy_t() = default;
+    explicit unsafe_bitcopy_t() = default;
 };
 #endif // CXXBRIDGE1_RUST_BITCOPY_T
 
 #ifndef CXXBRIDGE1_RUST_VEC
 #define CXXBRIDGE1_RUST_VEC
 template <typename T> class Vec final {
-public:
-  using value_type = T;
+  public:
+    using value_type = T;
 
-  Vec() noexcept;
-  Vec(std::initializer_list<T>);
-  Vec(const Vec &);
-  Vec(Vec &&) noexcept;
-  ~Vec() noexcept;
+    Vec() noexcept;
+    Vec(std::initializer_list<T>);
+    Vec(const Vec &);
+    Vec(Vec &&) noexcept;
+    ~Vec() noexcept;
 
-  Vec &operator=(Vec &&) &noexcept;
-  Vec &operator=(const Vec &) &;
+    Vec &operator=(Vec &&) &noexcept;
+    Vec &operator=(const Vec &) &;
 
-  std::size_t size() const noexcept;
-  bool empty() const noexcept;
-  const T *data() const noexcept;
-  T *data() noexcept;
-  std::size_t capacity() const noexcept;
+    std::size_t size() const noexcept;
+    bool empty() const noexcept;
+    const T *data() const noexcept;
+    T *data() noexcept;
+    std::size_t capacity() const noexcept;
 
-  const T &operator[](std::size_t n) const noexcept;
-  const T &at(std::size_t n) const;
-  const T &front() const noexcept;
-  const T &back() const noexcept;
+    const T &operator[](std::size_t n) const noexcept;
+    const T &at(std::size_t n) const;
+    const T &front() const noexcept;
+    const T &back() const noexcept;
 
-  T &operator[](std::size_t n) noexcept;
-  T &at(std::size_t n);
-  T &front() noexcept;
-  T &back() noexcept;
+    T &operator[](std::size_t n) noexcept;
+    T &at(std::size_t n);
+    T &front() noexcept;
+    T &back() noexcept;
 
-  void reserve(std::size_t new_cap);
-  void push_back(const T &value);
-  void push_back(T &&value);
-  template <typename... Args> void emplace_back(Args &&...args);
-  void truncate(std::size_t len);
-  void clear();
+    void reserve(std::size_t new_cap);
+    void push_back(const T &value);
+    void push_back(T &&value);
+    template <typename... Args> void emplace_back(Args &&...args);
+    void truncate(std::size_t len);
+    void clear();
 
-  using iterator = typename Slice<T>::iterator;
-  iterator begin() noexcept;
-  iterator end() noexcept;
+    using iterator = typename Slice<T>::iterator;
+    iterator begin() noexcept;
+    iterator end() noexcept;
 
-  using const_iterator = typename Slice<const T>::iterator;
-  const_iterator begin() const noexcept;
-  const_iterator end() const noexcept;
-  const_iterator cbegin() const noexcept;
-  const_iterator cend() const noexcept;
+    using const_iterator = typename Slice<const T>::iterator;
+    const_iterator begin() const noexcept;
+    const_iterator end() const noexcept;
+    const_iterator cbegin() const noexcept;
+    const_iterator cend() const noexcept;
 
-  void swap(Vec &) noexcept;
+    void swap(Vec &) noexcept;
 
-  Vec(unsafe_bitcopy_t, const Vec &) noexcept;
+    Vec(unsafe_bitcopy_t, const Vec &) noexcept;
 
-private:
-  void reserve_total(std::size_t new_cap) noexcept;
-  void set_len(std::size_t len) noexcept;
-  void drop() noexcept;
+  private:
+    void reserve_total(std::size_t new_cap) noexcept;
+    void set_len(std::size_t len) noexcept;
+    void drop() noexcept;
 
-  friend void swap(Vec &lhs, Vec &rhs) noexcept { lhs.swap(rhs); }
+    friend void swap(Vec &lhs, Vec &rhs) noexcept { lhs.swap(rhs); }
 
-  std::array<std::uintptr_t, 3> repr;
+    std::array<std::uintptr_t, 3> repr;
 };
 
 template <typename T> Vec<T>::Vec(std::initializer_list<T> init) : Vec{} {
-  this->reserve_total(init.size());
-  std::move(init.begin(), init.end(), std::back_inserter(*this));
+    this->reserve_total(init.size());
+    std::move(init.begin(), init.end(), std::back_inserter(*this));
 }
 
 template <typename T> Vec<T>::Vec(const Vec &other) : Vec() {
-  this->reserve_total(other.size());
-  std::copy(other.begin(), other.end(), std::back_inserter(*this));
+    this->reserve_total(other.size());
+    std::copy(other.begin(), other.end(), std::back_inserter(*this));
 }
 
 template <typename T> Vec<T>::Vec(Vec &&other) noexcept : repr(other.repr) {
-  new (&other) Vec();
+    new (&other) Vec();
 }
 
 template <typename T> Vec<T>::~Vec() noexcept { this->drop(); }
 
 template <typename T> Vec<T> &Vec<T>::operator=(Vec &&other) &noexcept {
-  this->drop();
-  this->repr = other.repr;
-  new (&other) Vec();
-  return *this;
+    this->drop();
+    this->repr = other.repr;
+    new (&other) Vec();
+    return *this;
 }
 
 template <typename T> Vec<T> &Vec<T>::operator=(const Vec &other) & {
-  if (this != &other) {
-    this->drop();
-    new (this) Vec(other);
-  }
-  return *this;
+    if (this != &other) {
+        this->drop();
+        new (this) Vec(other);
+    }
+    return *this;
 }
 
 template <typename T> bool Vec<T>::empty() const noexcept {
-  return this->size() == 0;
+    return this->size() == 0;
 }
 
 template <typename T> T *Vec<T>::data() noexcept {
-  return const_cast<T *>(const_cast<const Vec<T> *>(this)->data());
+    return const_cast<T *>(const_cast<const Vec<T> *>(this)->data());
 }
 
 template <typename T>
 const T &Vec<T>::operator[](std::size_t n) const noexcept {
-  assert(n < this->size());
-  auto data = reinterpret_cast<const char *>(this->data());
-  return *reinterpret_cast<const T *>(data + n * size_of<T>());
+    assert(n < this->size());
+    auto data = reinterpret_cast<const char *>(this->data());
+    return *reinterpret_cast<const T *>(data + n * size_of<T>());
 }
 
 template <typename T> const T &Vec<T>::at(std::size_t n) const {
-  if (n >= this->size()) {
-    panic<std::out_of_range>("rust::Vec index out of range");
-  }
-  return (*this)[n];
+    if (n >= this->size()) {
+        panic<std::out_of_range>("rust::Vec index out of range");
+    }
+    return (*this)[n];
 }
 
 template <typename T> const T &Vec<T>::front() const noexcept {
-  assert(!this->empty());
-  return (*this)[0];
+    assert(!this->empty());
+    return (*this)[0];
 }
 
 template <typename T> const T &Vec<T>::back() const noexcept {
-  assert(!this->empty());
-  return (*this)[this->size() - 1];
+    assert(!this->empty());
+    return (*this)[this->size() - 1];
 }
 
 template <typename T> T &Vec<T>::operator[](std::size_t n) noexcept {
-  assert(n < this->size());
-  auto data = reinterpret_cast<char *>(this->data());
-  return *reinterpret_cast<T *>(data + n * size_of<T>());
+    assert(n < this->size());
+    auto data = reinterpret_cast<char *>(this->data());
+    return *reinterpret_cast<T *>(data + n * size_of<T>());
 }
 
 template <typename T> T &Vec<T>::at(std::size_t n) {
-  if (n >= this->size()) {
-    panic<std::out_of_range>("rust::Vec index out of range");
-  }
-  return (*this)[n];
+    if (n >= this->size()) {
+        panic<std::out_of_range>("rust::Vec index out of range");
+    }
+    return (*this)[n];
 }
 
 template <typename T> T &Vec<T>::front() noexcept {
-  assert(!this->empty());
-  return (*this)[0];
+    assert(!this->empty());
+    return (*this)[0];
 }
 
 template <typename T> T &Vec<T>::back() noexcept {
-  assert(!this->empty());
-  return (*this)[this->size() - 1];
+    assert(!this->empty());
+    return (*this)[this->size() - 1];
 }
 
 template <typename T> void Vec<T>::reserve(std::size_t new_cap) {
-  this->reserve_total(new_cap);
+    this->reserve_total(new_cap);
 }
 
 template <typename T> void Vec<T>::push_back(const T &value) {
-  this->emplace_back(value);
+    this->emplace_back(value);
 }
 
 template <typename T> void Vec<T>::push_back(T &&value) {
-  this->emplace_back(std::move(value));
+    this->emplace_back(std::move(value));
 }
 
 template <typename T>
 template <typename... Args>
 void Vec<T>::emplace_back(Args &&...args) {
-  auto size = this->size();
-  this->reserve_total(size + 1);
-  ::new (reinterpret_cast<T *>(reinterpret_cast<char *>(this->data()) +
-                               size * size_of<T>()))
-      T(std::forward<Args>(args)...);
-  this->set_len(size + 1);
+    auto size = this->size();
+    this->reserve_total(size + 1);
+    ::new (reinterpret_cast<T *>(reinterpret_cast<char *>(this->data()) +
+                                 size * size_of<T>()))
+        T(std::forward<Args>(args)...);
+    this->set_len(size + 1);
 }
 
 template <typename T> void Vec<T>::clear() { this->truncate(0); }
 
 template <typename T> typename Vec<T>::iterator Vec<T>::begin() noexcept {
-  return Slice<T>(this->data(), this->size()).begin();
+    return Slice<T>(this->data(), this->size()).begin();
 }
 
 template <typename T> typename Vec<T>::iterator Vec<T>::end() noexcept {
-  return Slice<T>(this->data(), this->size()).end();
+    return Slice<T>(this->data(), this->size()).end();
 }
 
 template <typename T>
 typename Vec<T>::const_iterator Vec<T>::begin() const noexcept {
-  return this->cbegin();
+    return this->cbegin();
 }
 
 template <typename T>
 typename Vec<T>::const_iterator Vec<T>::end() const noexcept {
-  return this->cend();
+    return this->cend();
 }
 
 template <typename T>
 typename Vec<T>::const_iterator Vec<T>::cbegin() const noexcept {
-  return Slice<const T>(this->data(), this->size()).begin();
+    return Slice<const T>(this->data(), this->size()).begin();
 }
 
 template <typename T>
 typename Vec<T>::const_iterator Vec<T>::cend() const noexcept {
-  return Slice<const T>(this->data(), this->size()).end();
+    return Slice<const T>(this->data(), this->size()).end();
 }
 
 template <typename T> void Vec<T>::swap(Vec &rhs) noexcept {
-  using std::swap;
-  swap(this->repr, rhs.repr);
+    using std::swap;
+    swap(this->repr, rhs.repr);
 }
 
 template <typename T>
@@ -779,10 +780,10 @@ Vec<T>::Vec(unsafe_bitcopy_t, const Vec &bits) noexcept : repr(bits.repr) {}
 #ifndef CXXBRIDGE1_RUST_OPAQUE
 #define CXXBRIDGE1_RUST_OPAQUE
 class Opaque {
-public:
-  Opaque() = delete;
-  Opaque(const Opaque &) = delete;
-  ~Opaque() = delete;
+  public:
+    Opaque() = delete;
+    Opaque(const Opaque &) = delete;
+    ~Opaque() = delete;
 };
 #endif // CXXBRIDGE1_RUST_OPAQUE
 
@@ -801,44 +802,44 @@ struct is_complete<T, decltype(sizeof(T))> : std::true_type {};
 #ifndef CXXBRIDGE1_LAYOUT
 #define CXXBRIDGE1_LAYOUT
 class layout {
-  template <typename T> friend std::size_t size_of();
-  template <typename T> friend std::size_t align_of();
-  template <typename T>
-  static typename std::enable_if<std::is_base_of<Opaque, T>::value,
-                                 std::size_t>::type
-  do_size_of() {
-    return T::layout::size();
-  }
-  template <typename T>
-  static typename std::enable_if<!std::is_base_of<Opaque, T>::value,
-                                 std::size_t>::type
-  do_size_of() {
-    return sizeof(T);
-  }
-  template <typename T>
-  static
-      typename std::enable_if<detail::is_complete<T>::value, std::size_t>::type
-      size_of() {
-    return do_size_of<T>();
-  }
-  template <typename T>
-  static typename std::enable_if<std::is_base_of<Opaque, T>::value,
-                                 std::size_t>::type
-  do_align_of() {
-    return T::layout::align();
-  }
-  template <typename T>
-  static typename std::enable_if<!std::is_base_of<Opaque, T>::value,
-                                 std::size_t>::type
-  do_align_of() {
-    return alignof(T);
-  }
-  template <typename T>
-  static
-      typename std::enable_if<detail::is_complete<T>::value, std::size_t>::type
-      align_of() {
-    return do_align_of<T>();
-  }
+    template <typename T> friend std::size_t size_of();
+    template <typename T> friend std::size_t align_of();
+    template <typename T>
+    static typename std::enable_if<std::is_base_of<Opaque, T>::value,
+                                   std::size_t>::type
+    do_size_of() {
+        return T::layout::size();
+    }
+    template <typename T>
+    static typename std::enable_if<!std::is_base_of<Opaque, T>::value,
+                                   std::size_t>::type
+    do_size_of() {
+        return sizeof(T);
+    }
+    template <typename T>
+    static typename std::enable_if<detail::is_complete<T>::value,
+                                   std::size_t>::type
+    size_of() {
+        return do_size_of<T>();
+    }
+    template <typename T>
+    static typename std::enable_if<std::is_base_of<Opaque, T>::value,
+                                   std::size_t>::type
+    do_align_of() {
+        return T::layout::align();
+    }
+    template <typename T>
+    static typename std::enable_if<!std::is_base_of<Opaque, T>::value,
+                                   std::size_t>::type
+    do_align_of() {
+        return alignof(T);
+    }
+    template <typename T>
+    static typename std::enable_if<detail::is_complete<T>::value,
+                                   std::size_t>::type
+    align_of() {
+        return do_align_of<T>();
+    }
 };
 
 template <typename T> std::size_t size_of() { return layout::size_of<T>(); }
@@ -884,46 +885,46 @@ namespace game_sdk {
 #ifndef CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectTransactionReceiptRaw
 #define CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectTransactionReceiptRaw
 struct WalletConnectTransactionReceiptRaw final {
-  ::rust::Vec<::std::uint8_t> transaction_hash;
-  ::rust::String transaction_index;
-  ::rust::Vec<::std::uint8_t> block_hash;
-  ::rust::String block_number;
-  ::rust::String cumulative_gas_used;
-  ::rust::String gas_used;
-  ::rust::String contract_address;
-  ::rust::Vec<::rust::String> logs;
-  /// Status: either 1 (success) or 0 (failure)
-  ::rust::String status;
-  ::rust::Vec<::std::uint8_t> root;
-  ::rust::Vec<::std::uint8_t> logs_bloom;
-  ::rust::String transaction_type;
-  ::rust::String effective_gas_price;
+    ::rust::Vec<::std::uint8_t> transaction_hash;
+    ::rust::String transaction_index;
+    ::rust::Vec<::std::uint8_t> block_hash;
+    ::rust::String block_number;
+    ::rust::String cumulative_gas_used;
+    ::rust::String gas_used;
+    ::rust::String contract_address;
+    ::rust::Vec<::rust::String> logs;
+    /// Status: either 1 (success) or 0 (failure)
+    ::rust::String status;
+    ::rust::Vec<::std::uint8_t> root;
+    ::rust::Vec<::std::uint8_t> logs_bloom;
+    ::rust::String transaction_type;
+    ::rust::String effective_gas_price;
 
-  using IsRelocatable = ::std::true_type;
+    using IsRelocatable = ::std::true_type;
 };
 #endif // CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectTransactionReceiptRaw
 
 #ifndef CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletQrcode
 #define CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletQrcode
 struct WalletQrcode final {
-  ::rust::String qrcode;
-  ::rust::Vec<::std::uint8_t> image;
-  ::std::uint32_t size;
+    ::rust::String qrcode;
+    ::rust::Vec<::std::uint8_t> image;
+    ::std::uint32_t size;
 
-  using IsRelocatable = ::std::true_type;
+    using IsRelocatable = ::std::true_type;
 };
 #endif // CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletQrcode
 
 #ifndef CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectTxCommon
 #define CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectTxCommon
 struct WalletConnectTxCommon final {
-  ::rust::String gas_limit;
-  ::rust::String gas_price;
-  ::rust::String nonce;
-  ::std::uint64_t chainid;
-  ::rust::String web3api_url;
+    ::rust::String gas_limit;
+    ::rust::String gas_price;
+    ::rust::String nonce;
+    ::std::uint64_t chainid;
+    ::rust::String web3api_url;
 
-  using IsRelocatable = ::std::true_type;
+    using IsRelocatable = ::std::true_type;
 };
 #endif // CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectTxCommon
 
@@ -931,12 +932,12 @@ struct WalletConnectTxCommon final {
 #define CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectTxEip155
 /// wallet connect cronos(eth) eip155-tx signing info
 struct WalletConnectTxEip155 final {
-  ::rust::String to;
-  ::rust::String value;
-  ::rust::Vec<::std::uint8_t> data;
-  ::com::crypto::game_sdk::WalletConnectTxCommon common;
+    ::rust::String to;
+    ::rust::String value;
+    ::rust::Vec<::std::uint8_t> data;
+    ::com::crypto::game_sdk::WalletConnectTxCommon common;
 
-  using IsRelocatable = ::std::true_type;
+    using IsRelocatable = ::std::true_type;
 };
 #endif // CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectTxEip155
 
@@ -944,13 +945,13 @@ struct WalletConnectTxEip155 final {
 #define CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectErc20Transfer
 /// wallet connect cronos(eth) erc20-tx signing info
 struct WalletConnectErc20Transfer final {
-  ::rust::String contract_address;
-  ::rust::String from_address;
-  ::rust::String to_address;
-  ::rust::String amount;
-  ::com::crypto::game_sdk::WalletConnectTxCommon common;
+    ::rust::String contract_address;
+    ::rust::String from_address;
+    ::rust::String to_address;
+    ::rust::String amount;
+    ::com::crypto::game_sdk::WalletConnectTxCommon common;
 
-  using IsRelocatable = ::std::true_type;
+    using IsRelocatable = ::std::true_type;
 };
 #endif // CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectErc20Transfer
 
@@ -958,82 +959,82 @@ struct WalletConnectErc20Transfer final {
 #define CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectErc721Transfer
 /// wallet connect cronos(eth) erc721-tx signing info
 struct WalletConnectErc721Transfer final {
-  ::rust::String contract_address;
-  ::rust::String from_address;
-  ::rust::String to_address;
-  ::rust::String token_id;
-  ::com::crypto::game_sdk::WalletConnectTxCommon common;
+    ::rust::String contract_address;
+    ::rust::String from_address;
+    ::rust::String to_address;
+    ::rust::String token_id;
+    ::com::crypto::game_sdk::WalletConnectTxCommon common;
 
-  using IsRelocatable = ::std::true_type;
+    using IsRelocatable = ::std::true_type;
 };
 #endif // CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectErc721Transfer
 
 #ifndef CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectErc1155Transfer
 #define CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectErc1155Transfer
 struct WalletConnectErc1155Transfer final {
-  ::rust::String contract_address;
-  ::rust::String from_address;
-  ::rust::String to_address;
-  ::rust::String token_id;
-  ::rust::String amount;
-  ::rust::Vec<::std::uint8_t> additional_data;
-  ::com::crypto::game_sdk::WalletConnectTxCommon common;
+    ::rust::String contract_address;
+    ::rust::String from_address;
+    ::rust::String to_address;
+    ::rust::String token_id;
+    ::rust::String amount;
+    ::rust::Vec<::std::uint8_t> additional_data;
+    ::com::crypto::game_sdk::WalletConnectTxCommon common;
 
-  using IsRelocatable = ::std::true_type;
+    using IsRelocatable = ::std::true_type;
 };
 #endif // CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectErc1155Transfer
 
 #ifndef CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectErc1155Batch
 #define CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectErc1155Batch
 struct WalletConnectErc1155Batch final {
-  ::rust::String contract_address;
-  ::rust::String from_address;
-  ::rust::String to_address;
-  ::rust::Vec<::rust::String> token_ids;
-  ::rust::Vec<::rust::String> amounts;
-  ::rust::Vec<::std::uint8_t> additional_data;
-  ::com::crypto::game_sdk::WalletConnectTxCommon common;
+    ::rust::String contract_address;
+    ::rust::String from_address;
+    ::rust::String to_address;
+    ::rust::Vec<::rust::String> token_ids;
+    ::rust::Vec<::rust::String> amounts;
+    ::rust::Vec<::std::uint8_t> additional_data;
+    ::com::crypto::game_sdk::WalletConnectTxCommon common;
 
-  using IsRelocatable = ::std::true_type;
+    using IsRelocatable = ::std::true_type;
 };
 #endif // CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectErc1155Batch
 
 #ifndef CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectErc20Approve
 #define CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectErc20Approve
 struct WalletConnectErc20Approve final {
-  ::rust::String contract_address;
-  ::rust::String from_address;
-  ::rust::String approved_address;
-  ::rust::String amount;
-  ::com::crypto::game_sdk::WalletConnectTxCommon common;
+    ::rust::String contract_address;
+    ::rust::String from_address;
+    ::rust::String approved_address;
+    ::rust::String amount;
+    ::com::crypto::game_sdk::WalletConnectTxCommon common;
 
-  using IsRelocatable = ::std::true_type;
+    using IsRelocatable = ::std::true_type;
 };
 #endif // CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectErc20Approve
 
 #ifndef CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectErc721Approve
 #define CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectErc721Approve
 struct WalletConnectErc721Approve final {
-  ::rust::String contract_address;
-  ::rust::String from_address;
-  ::rust::String approved_address;
-  ::rust::String token_id;
-  ::com::crypto::game_sdk::WalletConnectTxCommon common;
+    ::rust::String contract_address;
+    ::rust::String from_address;
+    ::rust::String approved_address;
+    ::rust::String token_id;
+    ::com::crypto::game_sdk::WalletConnectTxCommon common;
 
-  using IsRelocatable = ::std::true_type;
+    using IsRelocatable = ::std::true_type;
 };
 #endif // CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectErc721Approve
 
 #ifndef CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectErc1155Approve
 #define CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectErc1155Approve
 struct WalletConnectErc1155Approve final {
-  ::rust::String contract_address;
-  ::rust::String from_address;
-  ::rust::String approved_address;
-  bool approved;
-  ::com::crypto::game_sdk::WalletConnectTxCommon common;
+    ::rust::String contract_address;
+    ::rust::String from_address;
+    ::rust::String approved_address;
+    bool approved;
+    ::com::crypto::game_sdk::WalletConnectTxCommon common;
 
-  using IsRelocatable = ::std::true_type;
+    using IsRelocatable = ::std::true_type;
 };
 #endif // CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectErc1155Approve
 
@@ -1041,9 +1042,9 @@ struct WalletConnectErc1155Approve final {
 #define CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectAddress
 /// cronos address info
 struct WalletConnectAddress final {
-  ::std::array<::std::uint8_t, 20> address;
+    ::std::array<::std::uint8_t, 20> address;
 
-  using IsRelocatable = ::std::true_type;
+    using IsRelocatable = ::std::true_type;
 };
 #endif // CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectAddress
 
@@ -1051,10 +1052,10 @@ struct WalletConnectAddress final {
 #define CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectEnsureSessionResult
 /// walletconnect ensure-session result
 struct WalletConnectEnsureSessionResult final {
-  ::rust::Vec<::com::crypto::game_sdk::WalletConnectAddress> addresses;
-  ::std::uint64_t chain_id;
+    ::rust::Vec<::com::crypto::game_sdk::WalletConnectAddress> addresses;
+    ::std::uint64_t chain_id;
 
-  using IsRelocatable = ::std::true_type;
+    using IsRelocatable = ::std::true_type;
 };
 #endif // CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectEnsureSessionResult
 
@@ -1062,26 +1063,26 @@ struct WalletConnectEnsureSessionResult final {
 #define CXXBRIDGE1_STRUCT_com$crypto$game_sdk$CryptoComPaymentResponse
 /// the subset of payment object from https://pay-docs.crypto.com
 struct CryptoComPaymentResponse final {
-  /// uuid of the payment object
-  ::rust::String id;
-  /// the base64 payload to be displayed as QR code that
-  /// can be scanned by the main app
-  ::rust::String main_app_qr_code;
-  /// if the on-chain payment is desired, this will
-  /// have the cryptocurrency address that can be displayed
-  /// as a QR code or put in a tx to be signed via WalletConnect
-  ::rust::String onchain_deposit_address;
-  /// the amount in base denomination
-  /// e.g. for USD, it's cents (1 USD == 100 cents)
-  ::rust::String base_amount;
-  /// the 3-letter currency code
-  ::rust::String currency;
-  /// expiration time in unix timestamp (10 minutes)
-  ::std::uint64_t expiration;
-  /// the status of the payment
-  ::rust::String status;
+    /// uuid of the payment object
+    ::rust::String id;
+    /// the base64 payload to be displayed as QR code that
+    /// can be scanned by the main app
+    ::rust::String main_app_qr_code;
+    /// if the on-chain payment is desired, this will
+    /// have the cryptocurrency address that can be displayed
+    /// as a QR code or put in a tx to be signed via WalletConnect
+    ::rust::String onchain_deposit_address;
+    /// the amount in base denomination
+    /// e.g. for USD, it's cents (1 USD == 100 cents)
+    ::rust::String base_amount;
+    /// the 3-letter currency code
+    ::rust::String currency;
+    /// expiration time in unix timestamp (10 minutes)
+    ::std::uint64_t expiration;
+    /// the status of the payment
+    ::rust::String status;
 
-  using IsRelocatable = ::std::true_type;
+    using IsRelocatable = ::std::true_type;
 };
 #endif // CXXBRIDGE1_STRUCT_com$crypto$game_sdk$CryptoComPaymentResponse
 
@@ -1090,24 +1091,24 @@ struct CryptoComPaymentResponse final {
 /// Raw transaction details (extracted from Cronoscan/Etherscan or BlockScout
 /// API)
 struct RawTxDetail final {
-  /// Transaction hash
-  ::rust::String hash;
-  /// the hexadecimal address of the receiver
-  ::rust::String to_address;
-  /// the hexadecimal address of the sender
-  ::rust::String from_address;
-  /// the value sent in decimal (in base tokens)
-  ::rust::String value;
-  /// block number when it happened
-  ::std::uint64_t block_no;
-  /// the time it happened
-  ::rust::String timestamp;
-  /// the address of the contract (if no contract, it's an empty string)
-  ::rust::String contract_address;
+    /// Transaction hash
+    ::rust::String hash;
+    /// the hexadecimal address of the receiver
+    ::rust::String to_address;
+    /// the hexadecimal address of the sender
+    ::rust::String from_address;
+    /// the value sent in decimal (in base tokens)
+    ::rust::String value;
+    /// block number when it happened
+    ::std::uint64_t block_no;
+    /// the time it happened
+    ::rust::String timestamp;
+    /// the address of the contract (if no contract, it's an empty string)
+    ::rust::String contract_address;
 
-  bool operator==(const RawTxDetail &) const noexcept;
-  bool operator!=(const RawTxDetail &) const noexcept;
-  using IsRelocatable = ::std::true_type;
+    bool operator==(const RawTxDetail &) const noexcept;
+    bool operator!=(const RawTxDetail &) const noexcept;
+    using IsRelocatable = ::std::true_type;
 };
 #endif // CXXBRIDGE1_STRUCT_com$crypto$game_sdk$RawTxDetail
 
@@ -1115,24 +1116,24 @@ struct RawTxDetail final {
 #define CXXBRIDGE1_STRUCT_com$crypto$game_sdk$RawTokenResult
 /// Token ownership result detail from BlockScout API
 struct RawTokenResult final {
-  /// how many tokens are owned by the address
-  ::rust::String balance;
-  /// the deployed contract address
-  ::rust::String contract_address;
-  /// the number of decimal places
-  ::rust::String decimals;
-  /// the token id
-  ::rust::String id;
-  /// the human-readable name of the token
-  ::rust::String name;
-  /// the ticker for the token
-  ::rust::String symbol;
-  /// the token type (ERC-20, ERC-721, ERC-1155)
-  ::rust::String token_type;
+    /// how many tokens are owned by the address
+    ::rust::String balance;
+    /// the deployed contract address
+    ::rust::String contract_address;
+    /// the number of decimal places
+    ::rust::String decimals;
+    /// the token id
+    ::rust::String id;
+    /// the human-readable name of the token
+    ::rust::String name;
+    /// the ticker for the token
+    ::rust::String symbol;
+    /// the token type (ERC-20, ERC-721, ERC-1155)
+    ::rust::String token_type;
 
-  bool operator==(const RawTokenResult &) const noexcept;
-  bool operator!=(const RawTokenResult &) const noexcept;
-  using IsRelocatable = ::std::true_type;
+    bool operator==(const RawTokenResult &) const noexcept;
+    bool operator!=(const RawTokenResult &) const noexcept;
+    using IsRelocatable = ::std::true_type;
 };
 #endif // CXXBRIDGE1_STRUCT_com$crypto$game_sdk$RawTokenResult
 
@@ -1142,23 +1143,23 @@ struct RawTokenResult final {
 ///
 /// tokenid is not supported yet.
 struct TokenHolderDetail final {
-  /// the holder address
-  ::rust::String address;
-  /// balance of the target token
-  ::rust::String value;
+    /// the holder address
+    ::rust::String address;
+    /// balance of the target token
+    ::rust::String value;
 
-  bool operator==(const TokenHolderDetail &) const noexcept;
-  bool operator!=(const TokenHolderDetail &) const noexcept;
-  using IsRelocatable = ::std::true_type;
+    bool operator==(const TokenHolderDetail &) const noexcept;
+    bool operator!=(const TokenHolderDetail &) const noexcept;
+    using IsRelocatable = ::std::true_type;
 };
 #endif // CXXBRIDGE1_STRUCT_com$crypto$game_sdk$TokenHolderDetail
 
 #ifndef CXXBRIDGE1_ENUM_com$crypto$game_sdk$QueryOption
 #define CXXBRIDGE1_ENUM_com$crypto$game_sdk$QueryOption
 enum class QueryOption : ::std::uint8_t {
-  ByContract = 0,
-  ByAddressAndContract = 1,
-  ByAddress = 2,
+    ByContract = 0,
+    ByAddressAndContract = 1,
+    ByAddress = 2,
 };
 #endif // CXXBRIDGE1_ENUM_com$crypto$game_sdk$QueryOption
 
@@ -1166,58 +1167,58 @@ enum class QueryOption : ::std::uint8_t {
 #define CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletconnectClient
 /// WallnetConnect API
 struct WalletconnectClient final : public ::rust::Opaque {
-  /// setup callback
-  void setup_callback_blocking(
-      ::std::unique_ptr<::com::crypto::game_sdk::WalletConnectCallback>
-          usercallback);
+    /// setup callback
+    void setup_callback_blocking(
+        ::std::unique_ptr<::com::crypto::game_sdk::WalletConnectCallback>
+            usercallback);
 
-  /// create or restore a session
-  /// once session is created, it will be reused
-  ::com::crypto::game_sdk::WalletConnectEnsureSessionResult
-  ensure_session_blocking();
+    /// create or restore a session
+    /// once session is created, it will be reused
+    ::com::crypto::game_sdk::WalletConnectEnsureSessionResult
+    ensure_session_blocking();
 
-  /// get connection string for qrcode
-  ::rust::String get_connection_string();
+    /// get connection string for qrcode
+    ::rust::String get_connection_string();
 
-  /// write session-info to string, which can be written to file
-  ::rust::String save_client();
+    /// write session-info to string, which can be written to file
+    ::rust::String save_client();
 
-  /// print qrcode in termal, for debugging
-  ::rust::String print_uri();
+    /// print qrcode in termal, for debugging
+    ::rust::String print_uri();
 
-  /// sign message
-  ::rust::Vec<::std::uint8_t>
-  sign_personal_blocking(::rust::String message,
-                         ::std::array<::std::uint8_t, 20> address);
+    /// sign message
+    ::rust::Vec<::std::uint8_t>
+    sign_personal_blocking(::rust::String message,
+                           ::std::array<::std::uint8_t, 20> address);
 
-  ::rust::Vec<::std::uint8_t> erc20_transfer(
-      const ::com::crypto::game_sdk::WalletConnectErc20Transfer &info);
-  ::rust::Vec<::std::uint8_t> erc721_transfer(
-      const ::com::crypto::game_sdk::WalletConnectErc721Transfer &info);
-  ::rust::Vec<::std::uint8_t> erc1155_transfer(
-      const ::com::crypto::game_sdk::WalletConnectErc1155Transfer &info);
-  ::rust::Vec<::std::uint8_t> erc1155_transfer_batch(
-      const ::com::crypto::game_sdk::WalletConnectErc1155Batch &info);
-  ::rust::Vec<::std::uint8_t>
-  erc20_approve(const ::com::crypto::game_sdk::WalletConnectErc20Approve &info);
-  ::rust::Vec<::std::uint8_t> erc721_approve(
-      const ::com::crypto::game_sdk::WalletConnectErc721Approve &info);
-  ::rust::Vec<::std::uint8_t> erc1155_approve(
-      const ::com::crypto::game_sdk::WalletConnectErc1155Approve &info);
+    ::rust::Vec<::std::uint8_t> erc20_transfer(
+        const ::com::crypto::game_sdk::WalletConnectErc20Transfer &info);
+    ::rust::Vec<::std::uint8_t> erc721_transfer(
+        const ::com::crypto::game_sdk::WalletConnectErc721Transfer &info);
+    ::rust::Vec<::std::uint8_t> erc1155_transfer(
+        const ::com::crypto::game_sdk::WalletConnectErc1155Transfer &info);
+    ::rust::Vec<::std::uint8_t> erc1155_transfer_batch(
+        const ::com::crypto::game_sdk::WalletConnectErc1155Batch &info);
+    ::rust::Vec<::std::uint8_t> erc20_approve(
+        const ::com::crypto::game_sdk::WalletConnectErc20Approve &info);
+    ::rust::Vec<::std::uint8_t> erc721_approve(
+        const ::com::crypto::game_sdk::WalletConnectErc721Approve &info);
+    ::rust::Vec<::std::uint8_t> erc1155_approve(
+        const ::com::crypto::game_sdk::WalletConnectErc1155Approve &info);
 
-  /// build cronos(eth) eip155 transaction
-  ::rust::Vec<::std::uint8_t> sign_eip155_transaction_blocking(
-      const ::com::crypto::game_sdk::WalletConnectTxEip155 &info,
-      ::std::array<::std::uint8_t, 20> address);
+    /// build cronos(eth) eip155 transaction
+    ::rust::Vec<::std::uint8_t> sign_eip155_transaction_blocking(
+        const ::com::crypto::game_sdk::WalletConnectTxEip155 &info,
+        ::std::array<::std::uint8_t, 20> address);
 
-  ~WalletconnectClient() = delete;
+    ~WalletconnectClient() = delete;
 
-private:
-  friend ::rust::layout;
-  struct layout {
-    static ::std::size_t size() noexcept;
-    static ::std::size_t align() noexcept;
-  };
+  private:
+    friend ::rust::layout;
+    struct layout {
+        static ::std::size_t size() noexcept;
+        static ::std::size_t align() noexcept;
+    };
 };
 #endif // CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletconnectClient
 

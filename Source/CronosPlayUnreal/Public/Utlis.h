@@ -11,17 +11,17 @@
  */
 UCLASS()
 class CRONOSPLAYUNREAL_API UUtlis : public UBlueprintFunctionLibrary {
-  GENERATED_BODY()
+    GENERATED_BODY()
 
-public:
-  /**
-   * Convert bytes to hex
-   * @param address bytes address
-   * @return address in hex string
-   *
-   */
-  UFUNCTION(BlueprintCallable,
-            meta = (DisplayName = "ToHex", Keywords = "PlayCppSdk"),
-            Category = "Utils")
-  static FString ToHex(TArray<uint8> address);
+  public:
+    /**
+     * Convert bytes to hex
+     * @param address bytes address
+     * @return address in hex string
+     *
+     */
+    UFUNCTION(BlueprintCallable,
+              meta = (DisplayName = "ToHex", Keywords = "PlayCppSdk"),
+              Category = "Utils")
+    static FString ToHex(TArray<uint8> address);
 };
