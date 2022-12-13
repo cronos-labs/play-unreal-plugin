@@ -2,7 +2,7 @@ UNAME := $(shell uname)
 PWD = $(shell pwd)
 
 # Set the play cpp sdk version
-PLAYCPPSDK=v0.0.11-alpha
+PLAYCPPSDK=v0.0.13-alpha
 # Set NDK versions (to see what NDK_VERSION is available, please check play-cpp-sdk release page)
 NDK_VERSION=21.4.7075529
 # Set names of play cpp sdk library files

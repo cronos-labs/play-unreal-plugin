@@ -45,9 +45,9 @@ FCosmosNFTToken convertToken(::org::defi_wallet_core::BaseNft src) {
 
 // Sets default values
 ADefiWalletCoreActor::ADefiWalletCoreActor()
-    : myCosmosRpc("http://mynode:1317"), myTendermintRpc("http://mynode:26657"),
-      myChainID("testnet-baseball-1"), myCronosRpc("http://mynode:8545"),
-      myCronosChainID(777)
+    : myGrpc("http://mynode:1316"), myCosmosRpc("http://mynode:1317"),
+      myTendermintRpc("http://mynode:26657"), myChainID("testnet-baseball-1"),
+      myCronosRpc("http://mynode:8545"), myCronosChainID(777)
 
 {
     // Set this actor to call Tick() every frame.  You can turn this off to
@@ -84,13 +84,13 @@ void ADefiWalletCoreActor::Destroyed() {
     assert(NULL == _coreWallet);
 }
 
-void ADefiWalletCoreActor::GetNFTSupply(FString mygrpc, FString denomid,
-                                        FString nftowner, int64 &output,
-                                        bool &success, FString &output_message)
+void ADefiWalletCoreActor::GetNFTSupply(FString denomid, FString nftowner,
+                                        int64 &output, bool &success,
+                                        FString &output_message)
 
 {
     try {
-        std::string mygrpcstring = TCHAR_TO_UTF8(*mygrpc);
+        std::string mygrpcstring = TCHAR_TO_UTF8(*myGrpc);
         rust::cxxbridge1::Box<GrpcClient> grpc_client =
             new_grpc_client(mygrpcstring);
 
@@ -105,12 +105,11 @@ void ADefiWalletCoreActor::GetNFTSupply(FString mygrpc, FString denomid,
                             UTF8_TO_TCHAR(e.what()));
     }
 }
-void ADefiWalletCoreActor::GetNFTOwner(FString mygrpc, FString denomid,
-                                       FString nftowner,
+void ADefiWalletCoreActor::GetNFTOwner(FString denomid, FString nftowner,
                                        FCosmosNFTOwner &output, bool &success,
                                        FString &output_message) {
     try {
-        std::string mygrpcstring = TCHAR_TO_UTF8(*mygrpc);
+        std::string mygrpcstring = TCHAR_TO_UTF8(*myGrpc);
         rust::cxxbridge1::Box<GrpcClient> grpc_client =
             new_grpc_client(mygrpcstring);
         new_grpc_client(mygrpcstring);
@@ -146,12 +145,12 @@ void ADefiWalletCoreActor::GetNFTOwner(FString mygrpc, FString denomid,
     }
 }
 
-void ADefiWalletCoreActor::GetNFTCollection(FString mygrpc, FString denomid,
+void ADefiWalletCoreActor::GetNFTCollection(FString denomid,
                                             FCosmosNFTCollection &output,
                                             bool &success,
                                             FString &output_message) {
     try {
-        std::string mygrpcstring = TCHAR_TO_UTF8(*mygrpc);
+        std::string mygrpcstring = TCHAR_TO_UTF8(*myGrpc);
         rust::cxxbridge1::Box<GrpcClient> grpc_client =
             new_grpc_client(mygrpcstring);
         new_grpc_client(mygrpcstring);
@@ -176,11 +175,10 @@ void ADefiWalletCoreActor::GetNFTCollection(FString mygrpc, FString denomid,
     }
 }
 
-void ADefiWalletCoreActor::GetNFTDenom(FString mygrpc, FString denomid,
-                                       FCosmosNFTDenom &output, bool &success,
-                                       FString &output_message) {
+void ADefiWalletCoreActor::GetNFTDenom(FString denomid, FCosmosNFTDenom &output,
+                                       bool &success, FString &output_message) {
     try {
-        std::string mygrpcstring = TCHAR_TO_UTF8(*mygrpc);
+        std::string mygrpcstring = TCHAR_TO_UTF8(*myGrpc);
         rust::cxxbridge1::Box<GrpcClient> grpc_client =
             new_grpc_client(mygrpcstring);
         new_grpc_client(mygrpcstring);
@@ -198,12 +196,12 @@ void ADefiWalletCoreActor::GetNFTDenom(FString mygrpc, FString denomid,
     }
 }
 
-void ADefiWalletCoreActor::GetNFTDenomByName(FString mygrpc, FString denomname,
+void ADefiWalletCoreActor::GetNFTDenomByName(FString denomname,
                                              FCosmosNFTDenom &output,
                                              bool &success,
                                              FString &output_message) {
     try {
-        std::string mygrpcstring = TCHAR_TO_UTF8(*mygrpc);
+        std::string mygrpcstring = TCHAR_TO_UTF8(*myGrpc);
         rust::cxxbridge1::Box<GrpcClient> grpc_client =
             new_grpc_client(mygrpcstring);
         new_grpc_client(mygrpcstring);
@@ -220,12 +218,11 @@ void ADefiWalletCoreActor::GetNFTDenomByName(FString mygrpc, FString denomname,
     }
 }
 
-void ADefiWalletCoreActor::GetNFTAllDenoms(FString mygrpc,
-                                           TArray<FCosmosNFTDenom> &output,
+void ADefiWalletCoreActor::GetNFTAllDenoms(TArray<FCosmosNFTDenom> &output,
                                            bool &success,
                                            FString &output_message) {
     try {
-        std::string mygrpcstring = TCHAR_TO_UTF8(*mygrpc);
+        std::string mygrpcstring = TCHAR_TO_UTF8(*myGrpc);
 
         rust::cxxbridge1::Box<GrpcClient> grpc_client =
             new_grpc_client(mygrpcstring);
@@ -248,11 +245,11 @@ void ADefiWalletCoreActor::GetNFTAllDenoms(FString mygrpc,
     }
 }
 
-void ADefiWalletCoreActor::GetNFTToken(FString mygrpc, FString denomid,
-                                       FString tokenid, FCosmosNFTToken &output,
-                                       bool &success, FString &output_message) {
+void ADefiWalletCoreActor::GetNFTToken(FString denomid, FString tokenid,
+                                       FCosmosNFTToken &output, bool &success,
+                                       FString &output_message) {
     try {
-        std::string mygrpcstring = TCHAR_TO_UTF8(*mygrpc);
+        std::string mygrpcstring = TCHAR_TO_UTF8(*myGrpc);
         rust::cxxbridge1::Box<GrpcClient> grpc_client =
             new_grpc_client(mygrpcstring);
 
@@ -576,10 +573,9 @@ void ADefiWalletCoreActor::GetBalance(FString address, FString denom,
         }
         assert(_coreWallet != NULL);
 
-        std::string myservercosmos =
-            TCHAR_TO_UTF8(*myCosmosRpc); /* 1317 port */
+        std::string myservergrpc = TCHAR_TO_UTF8(*myGrpc); /* 1316 port */
         rust::cxxbridge1::String balance = query_account_balance(
-            myservercosmos, TCHAR_TO_UTF8(*address), TCHAR_TO_UTF8(*denom), 1);
+            myservergrpc, TCHAR_TO_UTF8(*address), TCHAR_TO_UTF8(*denom));
 
         output = UTF8_TO_TCHAR(balance.c_str());
         success = true;
