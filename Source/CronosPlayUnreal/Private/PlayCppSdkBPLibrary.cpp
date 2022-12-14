@@ -7,6 +7,7 @@
 #include "Interfaces/IHttpResponse.h"
 #include "Kismet/KismetRenderingLibrary.h"
 #include "PlayCppSdkDownloader.h"
+#include "PlayCppSdkLibrary/Include/defi-wallet-core-cpp/src/lib.rs.h"
 #include "PlayCppSdkLibrary/Include/extra-cpp-bindings/src/lib.rs.h"
 #include "PlayCppSdkLibrary/Include/rust/cxx.h"
 #include "Runtime/Launch/Resources/Version.h"
@@ -208,7 +209,7 @@ UPlayCppSdkBPLibrary::UPlayCppSdkBPLibrary(
 void UPlayCppSdkBPLibrary::SetupUserAgent(FString UserAgent) {
     UPlayCppSdkDownloader::UserAgent = UserAgent;
     try {
-        ::org::defi_wallet_core::set_cronos_httpagent(
+        org::defi_wallet_core::set_cronos_httpagent(
             TCHAR_TO_UTF8(*UserAgent));
     } catch (const rust::cxxbridge1::Error &e) {
         // This captured exception only means the user agent is already set,
