@@ -674,6 +674,13 @@ template <typename T> std::size_t size_of() { return layout::size_of<T>(); }
 template <typename T> std::size_t align_of() { return layout::align_of<T>(); }
 #endif // CXXBRIDGE1_LAYOUT
 
+namespace repr {
+struct PtrLen final {
+    void *ptr;
+    ::std::size_t len;
+};
+} // namespace repr
+
 namespace detail {
 template <typename T, typename = void *> struct operator_new {
     void *operator()(::std::size_t sz) { return ::operator new(sz); }
@@ -695,18 +702,11 @@ template <typename T> union MaybeUninit {
 };
 
 namespace {
-namespace repr {
-struct PtrLen final {
-    void *ptr;
-    ::std::size_t len;
-};
-} // namespace repr
-
 template <> class impl<Error> final {
   public:
     static Error error(repr::PtrLen repr) noexcept {
         Error error;
-        error.msg = static_cast<const char *>(repr.ptr);
+        error.msg = static_cast<char const *>(repr.ptr);
         error.len = repr.len;
         return error;
     }
@@ -730,17 +730,21 @@ struct U256 final {
     ::std::array<::std::uint64_t, 4> data;
 
     /// Convert to Decimal String
+    ///
     ::rust::String to_string() const noexcept;
 
     /// Addition which saturates at the maximum value.
+    ///
     ::org::defi_wallet_core::U256
     saturating_add(::org::defi_wallet_core::U256 other) const noexcept;
 
     /// Subtraction which saturates at zero.
+    ///
     ::org::defi_wallet_core::U256
     saturating_sub(::org::defi_wallet_core::U256 other) const noexcept;
 
     /// Multiplication which saturates at maximum value.
+    ///
     ::org::defi_wallet_core::U256
     saturating_mul(::org::defi_wallet_core::U256 other) const noexcept;
 
@@ -776,18 +780,22 @@ struct U256 final {
     ::org::defi_wallet_core::U256WithOverflow overflowing_neg() const noexcept;
 
     /// add, exception is rasided if overflow
+    ///
     ::org::defi_wallet_core::U256
     add(::org::defi_wallet_core::U256 other) const;
 
     /// sub, exception is rasided if overflow
+    ///
     ::org::defi_wallet_core::U256
     sub(::org::defi_wallet_core::U256 other) const;
 
     /// mul, exception is rasided if overflow
+    ///
     ::org::defi_wallet_core::U256
     mul(::org::defi_wallet_core::U256 other) const;
 
     /// pow, exception is rasided if overflow
+    ///
     ::org::defi_wallet_core::U256
     pow(::org::defi_wallet_core::U256 other) const;
 
@@ -797,17 +805,21 @@ struct U256 final {
     ::org::defi_wallet_core::U256 neg() const noexcept;
 
     /// Returns a pair `(self / other)`
+    ///
     ::org::defi_wallet_core::U256
     div(::org::defi_wallet_core::U256 other) const noexcept;
 
     /// Returns a pair `(self % other)`
+    ///
     ::org::defi_wallet_core::U256
     rem(::org::defi_wallet_core::U256 other) const noexcept;
 
     /// Write to the slice in big-endian format.
+    ///
     void to_big_endian(::rust::Vec<::std::uint8_t> &bytes) const noexcept;
 
     /// Write to the slice in little-endian format.
+    ///
     void to_little_endian(::rust::Vec<::std::uint8_t> &bytes) const noexcept;
 
     /// Format the output for the user which prefer to see values in ether
@@ -818,8 +830,8 @@ struct U256 final {
     /// formatted in _ETH decimals_ (e.g. "1.50000...") wrapped as string
     ::rust::String format_units(::rust::String units) const;
 
-    bool operator==(const U256 &) const noexcept;
-    bool operator!=(const U256 &) const noexcept;
+    bool operator==(U256 const &) const noexcept;
+    bool operator!=(U256 const &) const noexcept;
     using IsRelocatable = ::std::true_type;
 };
 #endif // CXXBRIDGE1_STRUCT_org$defi_wallet_core$U256
@@ -830,17 +842,17 @@ struct U256WithOverflow final {
     ::org::defi_wallet_core::U256 result;
     bool overflow;
 
-    bool operator==(const U256WithOverflow &) const noexcept;
-    bool operator!=(const U256WithOverflow &) const noexcept;
+    bool operator==(U256WithOverflow const &) const noexcept;
+    bool operator!=(U256WithOverflow const &) const noexcept;
     using IsRelocatable = ::std::true_type;
 };
 #endif // CXXBRIDGE1_STRUCT_org$defi_wallet_core$U256WithOverflow
 
 extern "C" {
-bool org$defi_wallet_core$cxxbridge1$U256$operator$eq(const U256 &,
-                                                      const U256 &) noexcept;
+bool org$defi_wallet_core$cxxbridge1$U256$operator$eq(U256 const &,
+                                                      U256 const &) noexcept;
 bool org$defi_wallet_core$cxxbridge1$U256WithOverflow$operator$eq(
-    const U256WithOverflow &, const U256WithOverflow &) noexcept;
+    U256WithOverflow const &, U256WithOverflow const &) noexcept;
 
 ::rust::repr::PtrLen org$defi_wallet_core$cxxbridge1$u256_from_dec_str(
     ::rust::String *value, ::org::defi_wallet_core::U256 *return$) noexcept;
@@ -853,85 +865,85 @@ bool org$defi_wallet_core$cxxbridge1$U256WithOverflow$operator$eq(
 org$defi_wallet_core$cxxbridge1$u256_max_value() noexcept;
 
 void org$defi_wallet_core$cxxbridge1$U256$to_string(
-    const ::org::defi_wallet_core::U256 &self,
+    ::org::defi_wallet_core::U256 const &self,
     ::rust::String *return$) noexcept;
 
 ::org::defi_wallet_core::U256
 org$defi_wallet_core$cxxbridge1$U256$saturating_add(
-    const ::org::defi_wallet_core::U256 &self,
+    ::org::defi_wallet_core::U256 const &self,
     ::org::defi_wallet_core::U256 other) noexcept;
 
 ::org::defi_wallet_core::U256
 org$defi_wallet_core$cxxbridge1$U256$saturating_sub(
-    const ::org::defi_wallet_core::U256 &self,
+    ::org::defi_wallet_core::U256 const &self,
     ::org::defi_wallet_core::U256 other) noexcept;
 
 ::org::defi_wallet_core::U256
 org$defi_wallet_core$cxxbridge1$U256$saturating_mul(
-    const ::org::defi_wallet_core::U256 &self,
+    ::org::defi_wallet_core::U256 const &self,
     ::org::defi_wallet_core::U256 other) noexcept;
 
 ::org::defi_wallet_core::U256WithOverflow
 org$defi_wallet_core$cxxbridge1$U256$overflowing_add(
-    const ::org::defi_wallet_core::U256 &self,
+    ::org::defi_wallet_core::U256 const &self,
     ::org::defi_wallet_core::U256 other) noexcept;
 
 ::org::defi_wallet_core::U256WithOverflow
 org$defi_wallet_core$cxxbridge1$U256$overflowing_sub(
-    const ::org::defi_wallet_core::U256 &self,
+    ::org::defi_wallet_core::U256 const &self,
     ::org::defi_wallet_core::U256 other) noexcept;
 
 ::org::defi_wallet_core::U256WithOverflow
 org$defi_wallet_core$cxxbridge1$U256$overflowing_mul(
-    const ::org::defi_wallet_core::U256 &self,
+    ::org::defi_wallet_core::U256 const &self,
     ::org::defi_wallet_core::U256 other) noexcept;
 
 ::org::defi_wallet_core::U256WithOverflow
 org$defi_wallet_core$cxxbridge1$U256$overflowing_pow(
-    const ::org::defi_wallet_core::U256 &self,
+    ::org::defi_wallet_core::U256 const &self,
     ::org::defi_wallet_core::U256 other) noexcept;
 
 ::org::defi_wallet_core::U256WithOverflow
 org$defi_wallet_core$cxxbridge1$U256$overflowing_neg(
-    const ::org::defi_wallet_core::U256 &self) noexcept;
+    ::org::defi_wallet_core::U256 const &self) noexcept;
 
 ::rust::repr::PtrLen org$defi_wallet_core$cxxbridge1$U256$add(
-    const ::org::defi_wallet_core::U256 &self,
+    ::org::defi_wallet_core::U256 const &self,
     ::org::defi_wallet_core::U256 other,
     ::org::defi_wallet_core::U256 *return$) noexcept;
 
 ::rust::repr::PtrLen org$defi_wallet_core$cxxbridge1$U256$sub(
-    const ::org::defi_wallet_core::U256 &self,
+    ::org::defi_wallet_core::U256 const &self,
     ::org::defi_wallet_core::U256 other,
     ::org::defi_wallet_core::U256 *return$) noexcept;
 
 ::rust::repr::PtrLen org$defi_wallet_core$cxxbridge1$U256$mul(
-    const ::org::defi_wallet_core::U256 &self,
+    ::org::defi_wallet_core::U256 const &self,
     ::org::defi_wallet_core::U256 other,
     ::org::defi_wallet_core::U256 *return$) noexcept;
 
 ::rust::repr::PtrLen org$defi_wallet_core$cxxbridge1$U256$pow(
-    const ::org::defi_wallet_core::U256 &self,
+    ::org::defi_wallet_core::U256 const &self,
     ::org::defi_wallet_core::U256 other,
     ::org::defi_wallet_core::U256 *return$) noexcept;
 
 ::org::defi_wallet_core::U256 org$defi_wallet_core$cxxbridge1$U256$neg(
-    const ::org::defi_wallet_core::U256 &self) noexcept;
+    ::org::defi_wallet_core::U256 const &self) noexcept;
 
 ::org::defi_wallet_core::U256 org$defi_wallet_core$cxxbridge1$U256$div(
-    const ::org::defi_wallet_core::U256 &self,
+    ::org::defi_wallet_core::U256 const &self,
     ::org::defi_wallet_core::U256 other) noexcept;
 
 ::org::defi_wallet_core::U256 org$defi_wallet_core$cxxbridge1$U256$rem(
-    const ::org::defi_wallet_core::U256 &self,
+    ::org::defi_wallet_core::U256 const &self,
     ::org::defi_wallet_core::U256 other) noexcept;
 
 void org$defi_wallet_core$cxxbridge1$U256$to_big_endian(
-    const ::org::defi_wallet_core::U256 &self,
+    ::org::defi_wallet_core::U256 const &self,
     ::rust::Vec<::std::uint8_t> &bytes) noexcept;
 
 void org$defi_wallet_core$cxxbridge1$U256$to_little_endian(
-    const ::org::defi_wallet_core::U256 &self,
+    ::org::defi_wallet_core::U256 const &self,
     ::rust::Vec<::std::uint8_t> &bytes) noexcept;
 
 ::rust::repr::PtrLen org$defi_wallet_core$cxxbridge1$parse_ether(
@@ -942,31 +954,32 @@ void org$defi_wallet_core$cxxbridge1$U256$to_little_endian(
     ::org::defi_wallet_core::U256 *return$) noexcept;
 
 ::org::defi_wallet_core::U256 org$defi_wallet_core$cxxbridge1$U256$format_ether(
-    const ::org::defi_wallet_core::U256 &self) noexcept;
+    ::org::defi_wallet_core::U256 const &self) noexcept;
 
 ::rust::repr::PtrLen org$defi_wallet_core$cxxbridge1$U256$format_units(
-    const ::org::defi_wallet_core::U256 &self, ::rust::String *units,
+    ::org::defi_wallet_core::U256 const &self, ::rust::String *units,
     ::rust::String *return$) noexcept;
 } // extern "C"
 
-bool U256::operator==(const U256 &rhs) const noexcept {
+bool U256::operator==(U256 const &rhs) const noexcept {
     return org$defi_wallet_core$cxxbridge1$U256$operator$eq(*this, rhs);
 }
 
-bool U256::operator!=(const U256 &rhs) const noexcept {
+bool U256::operator!=(U256 const &rhs) const noexcept {
     return !(*this == rhs);
 }
 
-bool U256WithOverflow::operator==(const U256WithOverflow &rhs) const noexcept {
+bool U256WithOverflow::operator==(U256WithOverflow const &rhs) const noexcept {
     return org$defi_wallet_core$cxxbridge1$U256WithOverflow$operator$eq(*this,
                                                                         rhs);
 }
 
-bool U256WithOverflow::operator!=(const U256WithOverflow &rhs) const noexcept {
+bool U256WithOverflow::operator!=(U256WithOverflow const &rhs) const noexcept {
     return !(*this == rhs);
 }
 
 /// Convert from a decimal string.
+///
 ::org::defi_wallet_core::U256 u256(::rust::String value) {
     ::rust::MaybeUninit<::org::defi_wallet_core::U256> return$;
     ::rust::repr::PtrLen error$ =
@@ -992,6 +1005,7 @@ bool U256WithOverflow::operator!=(const U256WithOverflow &rhs) const noexcept {
 }
 
 /// The maximum value which can be inhabited by this type.
+///
 ::org::defi_wallet_core::U256 u256_max_value() noexcept {
     return org$defi_wallet_core$cxxbridge1$u256_max_value();
 }
@@ -1109,6 +1123,7 @@ void U256::to_little_endian(::rust::Vec<::std::uint8_t> &bytes) const noexcept {
 }
 
 /// Converts the input to a U256 and converts from Ether to Wei.
+///
 ::org::defi_wallet_core::U256 parse_ether(::rust::String eth) {
     ::rust::MaybeUninit<::org::defi_wallet_core::U256> return$;
     ::rust::repr::PtrLen error$ =
@@ -1120,6 +1135,7 @@ void U256::to_little_endian(::rust::Vec<::std::uint8_t> &bytes) const noexcept {
 }
 
 /// Multiplies the provided amount with 10^{units} provided.
+///
 ::org::defi_wallet_core::U256 parse_units(::rust::String amount,
                                           ::rust::String units) {
     ::rust::MaybeUninit<::org::defi_wallet_core::U256> return$;

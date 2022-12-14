@@ -312,7 +312,6 @@ class CRONOSPLAYUNREAL_API ADefiWalletCoreActor : public AActor {
 
     /**
      * Cosmos get nft supply.
-     * @param mygrpc grpc url http://127.0.0.1:9090
      * @param denomid denom id
      * @param nftowner nft owner
      * @param output nft supply
@@ -322,12 +321,11 @@ class CRONOSPLAYUNREAL_API ADefiWalletCoreActor : public AActor {
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "GetNFTSupply", Keywords = "Wallet"),
               Category = "CronosPlayUnreal")
-    void GetNFTSupply(FString mygrpc, FString denomid, FString nftowner,
-                      int64 &output, bool &success, FString &output_message);
+    void GetNFTSupply(FString denomid, FString nftowner, int64 &output,
+                      bool &success, FString &output_message);
 
     /**
      * Cosmos get nft owner.
-     * @param mygrpc grpc url http://127.0.0.1:9090
      * @param denomid denom id
      * @param nftowner nft owner
      * @param output cosmos nft owner
@@ -337,13 +335,11 @@ class CRONOSPLAYUNREAL_API ADefiWalletCoreActor : public AActor {
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "GetNFTOwner", Keywords = "Wallet"),
               Category = "CronosPlayUnreal")
-    void GetNFTOwner(FString mygrpc, FString denomid, FString nftowner,
-                     FCosmosNFTOwner &output, bool &success,
-                     FString &output_message);
+    void GetNFTOwner(FString denomid, FString nftowner, FCosmosNFTOwner &output,
+                     bool &success, FString &output_message);
 
     /**
      * Cosmos get nft collection.
-     * @param mygrpc grpc url http://127.0.0.1:9090
      * @param denomid denom id
      * @param output cosmos nft collection
      * @param success whether succeed or not
@@ -352,13 +348,11 @@ class CRONOSPLAYUNREAL_API ADefiWalletCoreActor : public AActor {
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "GetNFTCollection", Keywords = "Wallet"),
               Category = "CronosPlayUnreal")
-    void GetNFTCollection(FString mygrpc, FString denomid,
-                          FCosmosNFTCollection &output, bool &success,
-                          FString &output_message);
+    void GetNFTCollection(FString denomid, FCosmosNFTCollection &output,
+                          bool &success, FString &output_message);
 
     /**
      * Cosmos get nft denom.
-     * @param mygrpc grpc url http://127.0.0.1:9090
      * @param denomid denom id
      * @param output cosmos nft denom
      * @param success whether succeed or not
@@ -367,12 +361,11 @@ class CRONOSPLAYUNREAL_API ADefiWalletCoreActor : public AActor {
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "GetNFTDenom", Keywords = "Wallet"),
               Category = "CronosPlayUnreal")
-    void GetNFTDenom(FString mygrpc, FString denomid, FCosmosNFTDenom &output,
-                     bool &success, FString &output_message);
+    void GetNFTDenom(FString denomid, FCosmosNFTDenom &output, bool &success,
+                     FString &output_message);
 
     /**
      * Cosmos get nft denom by name
-     * @param mygrpc grpc url http://127.0.0.1:9090
      * @param denomname denom name
      * @param output cosmos nft denom
      * @param success whether succeed or not
@@ -381,13 +374,11 @@ class CRONOSPLAYUNREAL_API ADefiWalletCoreActor : public AActor {
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "GetNFTDenomByName", Keywords = "Wallet"),
               Category = "CronosPlayUnreal")
-    void GetNFTDenomByName(FString mygrpc, FString denomname,
-                           FCosmosNFTDenom &output, bool &success,
-                           FString &output_message);
+    void GetNFTDenomByName(FString denomname, FCosmosNFTDenom &output,
+                           bool &success, FString &output_message);
 
     /**
      * Get all nft denoms
-     * @param mygrpc grpc url http://127.0.0.1:9090
      * @param output cosmos nft denom
      * @param success whether succeed or not
      * @param message error message, "" if succeed
@@ -395,12 +386,11 @@ class CRONOSPLAYUNREAL_API ADefiWalletCoreActor : public AActor {
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "GetNFTAllDenoms", Keywords = "Wallet"),
               Category = "CronosPlayUnreal")
-    void GetNFTAllDenoms(FString mygrpc, TArray<FCosmosNFTDenom> &output,
-                         bool &success, FString &output_message);
+    void GetNFTAllDenoms(TArray<FCosmosNFTDenom> &output, bool &success,
+                         FString &output_message);
 
     /**
      * Get nft token
-     * @param mygrpc grpc url
      * @param denomid denom id
      * @param tokenid token id
      * @param cosmos nft token
@@ -410,9 +400,8 @@ class CRONOSPLAYUNREAL_API ADefiWalletCoreActor : public AActor {
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "GetNFTToken", Keywords = "Wallet"),
               Category = "CronosPlayUnreal")
-    void GetNFTToken(FString mygrpc, FString denomid, FString tokenid,
-                     FCosmosNFTToken &output, bool &success,
-                     FString &output_message);
+    void GetNFTToken(FString denomid, FString tokenid, FCosmosNFTToken &output,
+                     bool &success, FString &output_message);
 
     /**
      * Get eth address with index
@@ -996,6 +985,13 @@ class CRONOSPLAYUNREAL_API ADefiWalletCoreActor : public AActor {
     void Erc1155Approve(FString contractAddress, int32 walletindex,
                         FString approvedAddress, bool approved,
                         FErc1155ApproveDelegate Out);
+
+    /**
+     * Grpc address
+     * for example: http://127.0.0.1:1316
+     */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CronosPlayUnreal")
+    FString myGrpc;
 
     /**
      * Cosmos rpc address

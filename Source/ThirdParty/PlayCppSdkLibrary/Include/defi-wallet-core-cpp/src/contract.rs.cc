@@ -708,6 +708,13 @@ struct IsRelocatable
                         std::is_trivially_destructible<T>::value>>::type {};
 #endif // CXXBRIDGE1_RELOCATABLE
 
+namespace repr {
+struct PtrLen final {
+    void *ptr;
+    ::std::size_t len;
+};
+} // namespace repr
+
 namespace detail {
 template <typename T, typename = void *> struct operator_new {
     void *operator()(::std::size_t sz) { return ::operator new(sz); }
@@ -735,18 +742,11 @@ template <typename T> union MaybeUninit {
 };
 
 namespace {
-namespace repr {
-struct PtrLen final {
-    void *ptr;
-    ::std::size_t len;
-};
-} // namespace repr
-
 template <> class impl<Error> final {
   public:
     static Error error(repr::PtrLen repr) noexcept {
         Error error;
-        error.msg = static_cast<const char *>(repr.ptr);
+        error.msg = static_cast<char const *>(repr.ptr);
         error.len = repr.len;
         return error;
     }
@@ -858,7 +858,7 @@ struct Erc20 final {
     /// ```
     ::org::defi_wallet_core::CronosTransactionReceiptRaw
     transfer(::rust::String to_address, ::rust::String amount,
-             const ::org::defi_wallet_core::PrivateKey &private_key) const;
+             ::org::defi_wallet_core::PrivateKey const &private_key) const;
 
     /// Moves `amount` tokens from `from_address` to `to_address` using the
     /// allowance mechanism. # Transfer from signer1 to validator1 using the
@@ -889,7 +889,7 @@ struct Erc20 final {
     ::org::defi_wallet_core::CronosTransactionReceiptRaw
     transfer_from(::rust::String from_address, ::rust::String to_address,
                   ::rust::String amount,
-                  const ::org::defi_wallet_core::PrivateKey &private_key) const;
+                  ::org::defi_wallet_core::PrivateKey const &private_key) const;
 
     /// Allows `approved_address` to withdraw from your account multiple times,
     /// up to the `amount` amount.
@@ -919,7 +919,7 @@ struct Erc20 final {
     /// ```
     ::org::defi_wallet_core::CronosTransactionReceiptRaw
     approve(::rust::String approved_address, ::rust::String amount,
-            const ::org::defi_wallet_core::PrivateKey &private_key) const;
+            ::org::defi_wallet_core::PrivateKey const &private_key) const;
 
     /// Returns the amount which `spender` is still allowed to withdraw from
     /// `owner`.
@@ -955,40 +955,49 @@ struct Erc721 final {
     ::std::uint64_t chain_id;
 
     /// Returns the number of tokens in owner's `account_address`.
+    ///
     ::org::defi_wallet_core::U256
     balance_of(::rust::String account_address) const;
 
     /// Returns the owner of the `token_id` token.
+    ///
     ::rust::String owner_of(::rust::String token_id) const;
 
     /// Get the descriptive name for a collection of NFTs in this contract
+    ///
     ::rust::String name() const;
 
     /// Get the abbreviated name for NFTs in this contract
+    ///
     ::rust::String symbol() const;
 
     /// Get the distinct Uniform Resource Identifier (URI) for a given asset
+    ///
     ::rust::String token_uri(::rust::String token_id) const;
 
     /// Makes a legacy transaction instead of an EIP-1559 one
+    ///
     ::org::defi_wallet_core::Erc721 legacy() noexcept;
 
     /// Sets the default polling interval for event filters and pending
     /// transactions
+    ///
     ::org::defi_wallet_core::Erc721
     interval(::std::uint64_t polling_interval_ms) noexcept;
 
     /// Transfers `token_id` token from `from_address` to `to_address`.
+    ///
     ::org::defi_wallet_core::CronosTransactionReceiptRaw
     transfer_from(::rust::String from_address, ::rust::String to_address,
                   ::rust::String token_id,
-                  const ::org::defi_wallet_core::PrivateKey &private_key) const;
+                  ::org::defi_wallet_core::PrivateKey const &private_key) const;
 
     /// Safely transfers `token_id` token from `from_address` to `to_address`.
+    ///
     ::org::defi_wallet_core::CronosTransactionReceiptRaw safe_transfer_from(
         ::rust::String from_address, ::rust::String to_address,
         ::rust::String token_id,
-        const ::org::defi_wallet_core::PrivateKey &private_key) const;
+        ::org::defi_wallet_core::PrivateKey const &private_key) const;
 
     /// Safely transfers `token_id` token from `from_address` to `to_address`
     /// with `additional_data`.
@@ -996,7 +1005,7 @@ struct Erc721 final {
     safe_transfer_from_with_data(
         ::rust::String from_address, ::rust::String to_address,
         ::rust::String token_id, ::rust::Vec<::std::uint8_t> additional_data,
-        const ::org::defi_wallet_core::PrivateKey &private_key) const;
+        ::org::defi_wallet_core::PrivateKey const &private_key) const;
 
     /// Gives permission to `approved_address` to transfer `token_id` token to
     /// another account. The approval is cleared when the token is transferred.
@@ -1004,18 +1013,20 @@ struct Erc721 final {
     /// address clears previous approvals.
     ::org::defi_wallet_core::CronosTransactionReceiptRaw
     approve(::rust::String approved_address, ::rust::String token_id,
-            const ::org::defi_wallet_core::PrivateKey &private_key) const;
+            ::org::defi_wallet_core::PrivateKey const &private_key) const;
 
     /// Enable or disable approval for a third party `approved_address` to
     /// manage all of sender's assets
     ::org::defi_wallet_core::CronosTransactionReceiptRaw set_approval_for_all(
         ::rust::String approved_address, bool approved,
-        const ::org::defi_wallet_core::PrivateKey &private_key) const;
+        ::org::defi_wallet_core::PrivateKey const &private_key) const;
 
     /// Get the approved address for a single NFT by `token_id`
+    ///
     ::rust::String get_approved(::rust::String token_id) const;
 
     /// Query if an address is an authorized `approved_address` for `owner`
+    ///
     bool is_approved_for_all(::rust::String owner,
                              ::rust::String approved_address) const;
 
@@ -1051,6 +1062,7 @@ struct Erc1155 final {
     ::std::uint64_t chain_id;
 
     /// Returns the amount of tokens of `token_id` owned by `account_address`.
+    ///
     ::org::defi_wallet_core::U256 balance_of(::rust::String account_address,
                                              ::rust::String token_id) const;
 
@@ -1061,13 +1073,16 @@ struct Erc1155 final {
                      ::rust::Vec<::rust::String> token_ids) const;
 
     /// Get distinct Uniform Resource Identifier (URI) for a given token
+    ///
     ::rust::String uri(::rust::String token_id) const;
 
     /// Makes a legacy transaction instead of an EIP-1559 one
+    ///
     ::org::defi_wallet_core::Erc1155 legacy() noexcept;
 
     /// Sets the default polling interval for event filters and pending
     /// transactions
+    ///
     ::org::defi_wallet_core::Erc1155
     interval(::std::uint64_t polling_interval_ms) noexcept;
 
@@ -1077,24 +1092,26 @@ struct Erc1155 final {
         ::rust::String from_address, ::rust::String to_address,
         ::rust::String token_id, ::rust::String amount,
         ::rust::Vec<::std::uint8_t> additional_data,
-        const ::org::defi_wallet_core::PrivateKey &private_key) const;
+        ::org::defi_wallet_core::PrivateKey const &private_key) const;
 
     /// Batched version of safeTransferFrom.
+    ///
     ::org::defi_wallet_core::CronosTransactionReceiptRaw
     safe_batch_transfer_from(
         ::rust::String from_address, ::rust::String to_address,
         ::rust::Vec<::rust::String> token_ids,
         ::rust::Vec<::rust::String> amounts,
         ::rust::Vec<::std::uint8_t> additional_data,
-        const ::org::defi_wallet_core::PrivateKey &private_key) const;
+        ::org::defi_wallet_core::PrivateKey const &private_key) const;
 
     /// Enable or disable approval for a third party `approved_address` to
     /// manage all of sender's assets
     ::org::defi_wallet_core::CronosTransactionReceiptRaw set_approval_for_all(
         ::rust::String approved_address, bool approved,
-        const ::org::defi_wallet_core::PrivateKey &private_key) const;
+        ::org::defi_wallet_core::PrivateKey const &private_key) const;
 
     /// Query if an address is an authorized `approved_address` for `owner`
+    ///
     bool is_approved_for_all(::rust::String owner,
                              ::rust::String approved_address) const;
 
@@ -1123,19 +1140,19 @@ void org$defi_wallet_core$cxxbridge1$new_erc20(
     ::std::uint64_t chian_id, ::org::defi_wallet_core::Erc20 *return$) noexcept;
 
 ::rust::repr::PtrLen org$defi_wallet_core$cxxbridge1$Erc20$balance_of(
-    const ::org::defi_wallet_core::Erc20 &self, ::rust::String *account_address,
+    ::org::defi_wallet_core::Erc20 const &self, ::rust::String *account_address,
     ::org::defi_wallet_core::U256 *return$) noexcept;
 
 ::rust::repr::PtrLen org$defi_wallet_core$cxxbridge1$Erc20$name(
-    const ::org::defi_wallet_core::Erc20 &self,
+    ::org::defi_wallet_core::Erc20 const &self,
     ::rust::String *return$) noexcept;
 
 ::rust::repr::PtrLen org$defi_wallet_core$cxxbridge1$Erc20$symbol(
-    const ::org::defi_wallet_core::Erc20 &self,
+    ::org::defi_wallet_core::Erc20 const &self,
     ::rust::String *return$) noexcept;
 
 ::rust::repr::PtrLen org$defi_wallet_core$cxxbridge1$Erc20$decimals(
-    const ::org::defi_wallet_core::Erc20 &self,
+    ::org::defi_wallet_core::Erc20 const &self,
     ::std::uint8_t *return$) noexcept;
 
 void org$defi_wallet_core$cxxbridge1$Erc20$legacy(
@@ -1147,29 +1164,29 @@ void org$defi_wallet_core$cxxbridge1$Erc20$interval(
     ::org::defi_wallet_core::Erc20 *return$) noexcept;
 
 ::rust::repr::PtrLen org$defi_wallet_core$cxxbridge1$Erc20$transfer(
-    const ::org::defi_wallet_core::Erc20 &self, ::rust::String *to_address,
+    ::org::defi_wallet_core::Erc20 const &self, ::rust::String *to_address,
     ::rust::String *amount,
-    const ::org::defi_wallet_core::PrivateKey &private_key,
+    ::org::defi_wallet_core::PrivateKey const &private_key,
     ::org::defi_wallet_core::CronosTransactionReceiptRaw *return$) noexcept;
 
 ::rust::repr::PtrLen org$defi_wallet_core$cxxbridge1$Erc20$transfer_from(
-    const ::org::defi_wallet_core::Erc20 &self, ::rust::String *from_address,
+    ::org::defi_wallet_core::Erc20 const &self, ::rust::String *from_address,
     ::rust::String *to_address, ::rust::String *amount,
-    const ::org::defi_wallet_core::PrivateKey &private_key,
+    ::org::defi_wallet_core::PrivateKey const &private_key,
     ::org::defi_wallet_core::CronosTransactionReceiptRaw *return$) noexcept;
 
 ::rust::repr::PtrLen org$defi_wallet_core$cxxbridge1$Erc20$approve(
-    const ::org::defi_wallet_core::Erc20 &self,
+    ::org::defi_wallet_core::Erc20 const &self,
     ::rust::String *approved_address, ::rust::String *amount,
-    const ::org::defi_wallet_core::PrivateKey &private_key,
+    ::org::defi_wallet_core::PrivateKey const &private_key,
     ::org::defi_wallet_core::CronosTransactionReceiptRaw *return$) noexcept;
 
 ::rust::repr::PtrLen org$defi_wallet_core$cxxbridge1$Erc20$allowance(
-    const ::org::defi_wallet_core::Erc20 &self, ::rust::String *owner,
+    ::org::defi_wallet_core::Erc20 const &self, ::rust::String *owner,
     ::rust::String *spender, ::rust::String *return$) noexcept;
 
 ::rust::repr::PtrLen org$defi_wallet_core$cxxbridge1$Erc20$total_supply(
-    const ::org::defi_wallet_core::Erc20 &self,
+    ::org::defi_wallet_core::Erc20 const &self,
     ::org::defi_wallet_core::U256 *return$) noexcept;
 
 void org$defi_wallet_core$cxxbridge1$new_erc721(
@@ -1178,24 +1195,24 @@ void org$defi_wallet_core$cxxbridge1$new_erc721(
     ::org::defi_wallet_core::Erc721 *return$) noexcept;
 
 ::rust::repr::PtrLen org$defi_wallet_core$cxxbridge1$Erc721$balance_of(
-    const ::org::defi_wallet_core::Erc721 &self,
+    ::org::defi_wallet_core::Erc721 const &self,
     ::rust::String *account_address,
     ::org::defi_wallet_core::U256 *return$) noexcept;
 
 ::rust::repr::PtrLen org$defi_wallet_core$cxxbridge1$Erc721$owner_of(
-    const ::org::defi_wallet_core::Erc721 &self, ::rust::String *token_id,
+    ::org::defi_wallet_core::Erc721 const &self, ::rust::String *token_id,
     ::rust::String *return$) noexcept;
 
 ::rust::repr::PtrLen org$defi_wallet_core$cxxbridge1$Erc721$name(
-    const ::org::defi_wallet_core::Erc721 &self,
+    ::org::defi_wallet_core::Erc721 const &self,
     ::rust::String *return$) noexcept;
 
 ::rust::repr::PtrLen org$defi_wallet_core$cxxbridge1$Erc721$symbol(
-    const ::org::defi_wallet_core::Erc721 &self,
+    ::org::defi_wallet_core::Erc721 const &self,
     ::rust::String *return$) noexcept;
 
 ::rust::repr::PtrLen org$defi_wallet_core$cxxbridge1$Erc721$token_uri(
-    const ::org::defi_wallet_core::Erc721 &self, ::rust::String *token_id,
+    ::org::defi_wallet_core::Erc721 const &self, ::rust::String *token_id,
     ::rust::String *return$) noexcept;
 
 void org$defi_wallet_core$cxxbridge1$Erc721$legacy(
@@ -1207,57 +1224,57 @@ void org$defi_wallet_core$cxxbridge1$Erc721$interval(
     ::org::defi_wallet_core::Erc721 *return$) noexcept;
 
 ::rust::repr::PtrLen org$defi_wallet_core$cxxbridge1$Erc721$transfer_from(
-    const ::org::defi_wallet_core::Erc721 &self, ::rust::String *from_address,
+    ::org::defi_wallet_core::Erc721 const &self, ::rust::String *from_address,
     ::rust::String *to_address, ::rust::String *token_id,
-    const ::org::defi_wallet_core::PrivateKey &private_key,
+    ::org::defi_wallet_core::PrivateKey const &private_key,
     ::org::defi_wallet_core::CronosTransactionReceiptRaw *return$) noexcept;
 
 ::rust::repr::PtrLen org$defi_wallet_core$cxxbridge1$Erc721$safe_transfer_from(
-    const ::org::defi_wallet_core::Erc721 &self, ::rust::String *from_address,
+    ::org::defi_wallet_core::Erc721 const &self, ::rust::String *from_address,
     ::rust::String *to_address, ::rust::String *token_id,
-    const ::org::defi_wallet_core::PrivateKey &private_key,
+    ::org::defi_wallet_core::PrivateKey const &private_key,
     ::org::defi_wallet_core::CronosTransactionReceiptRaw *return$) noexcept;
 
 ::rust::repr::PtrLen
 org$defi_wallet_core$cxxbridge1$Erc721$safe_transfer_from_with_data(
-    const ::org::defi_wallet_core::Erc721 &self, ::rust::String *from_address,
+    ::org::defi_wallet_core::Erc721 const &self, ::rust::String *from_address,
     ::rust::String *to_address, ::rust::String *token_id,
     ::rust::Vec<::std::uint8_t> *additional_data,
-    const ::org::defi_wallet_core::PrivateKey &private_key,
+    ::org::defi_wallet_core::PrivateKey const &private_key,
     ::org::defi_wallet_core::CronosTransactionReceiptRaw *return$) noexcept;
 
 ::rust::repr::PtrLen org$defi_wallet_core$cxxbridge1$Erc721$approve(
-    const ::org::defi_wallet_core::Erc721 &self,
+    ::org::defi_wallet_core::Erc721 const &self,
     ::rust::String *approved_address, ::rust::String *token_id,
-    const ::org::defi_wallet_core::PrivateKey &private_key,
+    ::org::defi_wallet_core::PrivateKey const &private_key,
     ::org::defi_wallet_core::CronosTransactionReceiptRaw *return$) noexcept;
 
 ::rust::repr::PtrLen
 org$defi_wallet_core$cxxbridge1$Erc721$set_approval_for_all(
-    const ::org::defi_wallet_core::Erc721 &self,
+    ::org::defi_wallet_core::Erc721 const &self,
     ::rust::String *approved_address, bool approved,
-    const ::org::defi_wallet_core::PrivateKey &private_key,
+    ::org::defi_wallet_core::PrivateKey const &private_key,
     ::org::defi_wallet_core::CronosTransactionReceiptRaw *return$) noexcept;
 
 ::rust::repr::PtrLen org$defi_wallet_core$cxxbridge1$Erc721$get_approved(
-    const ::org::defi_wallet_core::Erc721 &self, ::rust::String *token_id,
+    ::org::defi_wallet_core::Erc721 const &self, ::rust::String *token_id,
     ::rust::String *return$) noexcept;
 
 ::rust::repr::PtrLen org$defi_wallet_core$cxxbridge1$Erc721$is_approved_for_all(
-    const ::org::defi_wallet_core::Erc721 &self, ::rust::String *owner,
+    ::org::defi_wallet_core::Erc721 const &self, ::rust::String *owner,
     ::rust::String *approved_address, bool *return$) noexcept;
 
 ::rust::repr::PtrLen org$defi_wallet_core$cxxbridge1$Erc721$total_supply(
-    const ::org::defi_wallet_core::Erc721 &self,
+    ::org::defi_wallet_core::Erc721 const &self,
     ::org::defi_wallet_core::U256 *return$) noexcept;
 
 ::rust::repr::PtrLen org$defi_wallet_core$cxxbridge1$Erc721$token_by_index(
-    const ::org::defi_wallet_core::Erc721 &self, ::rust::String *index,
+    ::org::defi_wallet_core::Erc721 const &self, ::rust::String *index,
     ::rust::String *return$) noexcept;
 
 ::rust::repr::PtrLen
 org$defi_wallet_core$cxxbridge1$Erc721$token_of_owner_by_index(
-    const ::org::defi_wallet_core::Erc721 &self, ::rust::String *owner,
+    ::org::defi_wallet_core::Erc721 const &self, ::rust::String *owner,
     ::rust::String *index, ::rust::String *return$) noexcept;
 
 void org$defi_wallet_core$cxxbridge1$new_erc1155(
@@ -1266,18 +1283,18 @@ void org$defi_wallet_core$cxxbridge1$new_erc1155(
     ::org::defi_wallet_core::Erc1155 *return$) noexcept;
 
 ::rust::repr::PtrLen org$defi_wallet_core$cxxbridge1$Erc1155$balance_of(
-    const ::org::defi_wallet_core::Erc1155 &self,
+    ::org::defi_wallet_core::Erc1155 const &self,
     ::rust::String *account_address, ::rust::String *token_id,
     ::org::defi_wallet_core::U256 *return$) noexcept;
 
 ::rust::repr::PtrLen org$defi_wallet_core$cxxbridge1$Erc1155$balance_of_batch(
-    const ::org::defi_wallet_core::Erc1155 &self,
+    ::org::defi_wallet_core::Erc1155 const &self,
     ::rust::Vec<::rust::String> *account_addresses,
     ::rust::Vec<::rust::String> *token_ids,
     ::rust::Vec<::rust::String> *return$) noexcept;
 
 ::rust::repr::PtrLen org$defi_wallet_core$cxxbridge1$Erc1155$uri(
-    const ::org::defi_wallet_core::Erc1155 &self, ::rust::String *token_id,
+    ::org::defi_wallet_core::Erc1155 const &self, ::rust::String *token_id,
     ::rust::String *return$) noexcept;
 
 void org$defi_wallet_core$cxxbridge1$Erc1155$legacy(
@@ -1289,31 +1306,31 @@ void org$defi_wallet_core$cxxbridge1$Erc1155$interval(
     ::org::defi_wallet_core::Erc1155 *return$) noexcept;
 
 ::rust::repr::PtrLen org$defi_wallet_core$cxxbridge1$Erc1155$safe_transfer_from(
-    const ::org::defi_wallet_core::Erc1155 &self, ::rust::String *from_address,
+    ::org::defi_wallet_core::Erc1155 const &self, ::rust::String *from_address,
     ::rust::String *to_address, ::rust::String *token_id,
     ::rust::String *amount, ::rust::Vec<::std::uint8_t> *additional_data,
-    const ::org::defi_wallet_core::PrivateKey &private_key,
+    ::org::defi_wallet_core::PrivateKey const &private_key,
     ::org::defi_wallet_core::CronosTransactionReceiptRaw *return$) noexcept;
 
 ::rust::repr::PtrLen
 org$defi_wallet_core$cxxbridge1$Erc1155$safe_batch_transfer_from(
-    const ::org::defi_wallet_core::Erc1155 &self, ::rust::String *from_address,
+    ::org::defi_wallet_core::Erc1155 const &self, ::rust::String *from_address,
     ::rust::String *to_address, ::rust::Vec<::rust::String> *token_ids,
     ::rust::Vec<::rust::String> *amounts,
     ::rust::Vec<::std::uint8_t> *additional_data,
-    const ::org::defi_wallet_core::PrivateKey &private_key,
+    ::org::defi_wallet_core::PrivateKey const &private_key,
     ::org::defi_wallet_core::CronosTransactionReceiptRaw *return$) noexcept;
 
 ::rust::repr::PtrLen
 org$defi_wallet_core$cxxbridge1$Erc1155$set_approval_for_all(
-    const ::org::defi_wallet_core::Erc1155 &self,
+    ::org::defi_wallet_core::Erc1155 const &self,
     ::rust::String *approved_address, bool approved,
-    const ::org::defi_wallet_core::PrivateKey &private_key,
+    ::org::defi_wallet_core::PrivateKey const &private_key,
     ::org::defi_wallet_core::CronosTransactionReceiptRaw *return$) noexcept;
 
 ::rust::repr::PtrLen
 org$defi_wallet_core$cxxbridge1$Erc1155$is_approved_for_all(
-    const ::org::defi_wallet_core::Erc1155 &self, ::rust::String *owner,
+    ::org::defi_wallet_core::Erc1155 const &self, ::rust::String *owner,
     ::rust::String *approved_address, bool *return$) noexcept;
 } // extern "C"
 
@@ -1389,7 +1406,7 @@ Erc20::interval(::std::uint64_t polling_interval_ms) noexcept {
 
 ::org::defi_wallet_core::CronosTransactionReceiptRaw
 Erc20::transfer(::rust::String to_address, ::rust::String amount,
-                const ::org::defi_wallet_core::PrivateKey &private_key) const {
+                ::org::defi_wallet_core::PrivateKey const &private_key) const {
     ::rust::MaybeUninit<::org::defi_wallet_core::CronosTransactionReceiptRaw>
         return$;
     ::rust::repr::PtrLen error$ =
@@ -1404,7 +1421,7 @@ Erc20::transfer(::rust::String to_address, ::rust::String amount,
 ::org::defi_wallet_core::CronosTransactionReceiptRaw Erc20::transfer_from(
     ::rust::String from_address, ::rust::String to_address,
     ::rust::String amount,
-    const ::org::defi_wallet_core::PrivateKey &private_key) const {
+    ::org::defi_wallet_core::PrivateKey const &private_key) const {
     ::rust::MaybeUninit<::org::defi_wallet_core::CronosTransactionReceiptRaw>
         return$;
     ::rust::repr::PtrLen error$ =
@@ -1419,7 +1436,7 @@ Erc20::transfer(::rust::String to_address, ::rust::String amount,
 
 ::org::defi_wallet_core::CronosTransactionReceiptRaw
 Erc20::approve(::rust::String approved_address, ::rust::String amount,
-               const ::org::defi_wallet_core::PrivateKey &private_key) const {
+               ::org::defi_wallet_core::PrivateKey const &private_key) const {
     ::rust::MaybeUninit<::org::defi_wallet_core::CronosTransactionReceiptRaw>
         return$;
     ::rust::repr::PtrLen error$ = org$defi_wallet_core$cxxbridge1$Erc20$approve(
@@ -1454,6 +1471,7 @@ Erc20::approve(::rust::String approved_address, ::rust::String amount,
 }
 
 /// Construct an Erc721 struct
+///
 ::org::defi_wallet_core::Erc721 new_erc721(::rust::String address,
                                            ::rust::String web3api_url,
                                            ::std::uint64_t chian_id) noexcept {
@@ -1534,7 +1552,7 @@ Erc721::interval(::std::uint64_t polling_interval_ms) noexcept {
 ::org::defi_wallet_core::CronosTransactionReceiptRaw Erc721::transfer_from(
     ::rust::String from_address, ::rust::String to_address,
     ::rust::String token_id,
-    const ::org::defi_wallet_core::PrivateKey &private_key) const {
+    ::org::defi_wallet_core::PrivateKey const &private_key) const {
     ::rust::MaybeUninit<::org::defi_wallet_core::CronosTransactionReceiptRaw>
         return$;
     ::rust::repr::PtrLen error$ =
@@ -1550,7 +1568,7 @@ Erc721::interval(::std::uint64_t polling_interval_ms) noexcept {
 ::org::defi_wallet_core::CronosTransactionReceiptRaw Erc721::safe_transfer_from(
     ::rust::String from_address, ::rust::String to_address,
     ::rust::String token_id,
-    const ::org::defi_wallet_core::PrivateKey &private_key) const {
+    ::org::defi_wallet_core::PrivateKey const &private_key) const {
     ::rust::MaybeUninit<::org::defi_wallet_core::CronosTransactionReceiptRaw>
         return$;
     ::rust::repr::PtrLen error$ =
@@ -1567,7 +1585,7 @@ Erc721::interval(::std::uint64_t polling_interval_ms) noexcept {
 Erc721::safe_transfer_from_with_data(
     ::rust::String from_address, ::rust::String to_address,
     ::rust::String token_id, ::rust::Vec<::std::uint8_t> additional_data,
-    const ::org::defi_wallet_core::PrivateKey &private_key) const {
+    ::org::defi_wallet_core::PrivateKey const &private_key) const {
     ::rust::ManuallyDrop<::rust::Vec<::std::uint8_t>> additional_data$(
         ::std::move(additional_data));
     ::rust::MaybeUninit<::org::defi_wallet_core::CronosTransactionReceiptRaw>
@@ -1584,7 +1602,7 @@ Erc721::safe_transfer_from_with_data(
 
 ::org::defi_wallet_core::CronosTransactionReceiptRaw
 Erc721::approve(::rust::String approved_address, ::rust::String token_id,
-                const ::org::defi_wallet_core::PrivateKey &private_key) const {
+                ::org::defi_wallet_core::PrivateKey const &private_key) const {
     ::rust::MaybeUninit<::org::defi_wallet_core::CronosTransactionReceiptRaw>
         return$;
     ::rust::repr::PtrLen error$ =
@@ -1599,7 +1617,7 @@ Erc721::approve(::rust::String approved_address, ::rust::String token_id,
 ::org::defi_wallet_core::CronosTransactionReceiptRaw
 Erc721::set_approval_for_all(
     ::rust::String approved_address, bool approved,
-    const ::org::defi_wallet_core::PrivateKey &private_key) const {
+    ::org::defi_wallet_core::PrivateKey const &private_key) const {
     ::rust::MaybeUninit<::org::defi_wallet_core::CronosTransactionReceiptRaw>
         return$;
     ::rust::repr::PtrLen error$ =
@@ -1669,6 +1687,7 @@ bool Erc721::is_approved_for_all(::rust::String owner,
 }
 
 /// Construct an Erc1155 struct
+///
 ::org::defi_wallet_core::Erc1155
 new_erc1155(::rust::String address, ::rust::String web3api_url,
             ::std::uint64_t chian_id) noexcept {
@@ -1738,7 +1757,7 @@ Erc1155::safe_transfer_from(
     ::rust::String from_address, ::rust::String to_address,
     ::rust::String token_id, ::rust::String amount,
     ::rust::Vec<::std::uint8_t> additional_data,
-    const ::org::defi_wallet_core::PrivateKey &private_key) const {
+    ::org::defi_wallet_core::PrivateKey const &private_key) const {
     ::rust::ManuallyDrop<::rust::Vec<::std::uint8_t>> additional_data$(
         ::std::move(additional_data));
     ::rust::MaybeUninit<::org::defi_wallet_core::CronosTransactionReceiptRaw>
@@ -1758,7 +1777,7 @@ Erc1155::safe_batch_transfer_from(
     ::rust::String from_address, ::rust::String to_address,
     ::rust::Vec<::rust::String> token_ids, ::rust::Vec<::rust::String> amounts,
     ::rust::Vec<::std::uint8_t> additional_data,
-    const ::org::defi_wallet_core::PrivateKey &private_key) const {
+    ::org::defi_wallet_core::PrivateKey const &private_key) const {
     ::rust::ManuallyDrop<::rust::Vec<::rust::String>> token_ids$(
         ::std::move(token_ids));
     ::rust::ManuallyDrop<::rust::Vec<::rust::String>> amounts$(
@@ -1781,7 +1800,7 @@ Erc1155::safe_batch_transfer_from(
 ::org::defi_wallet_core::CronosTransactionReceiptRaw
 Erc1155::set_approval_for_all(
     ::rust::String approved_address, bool approved,
-    const ::org::defi_wallet_core::PrivateKey &private_key) const {
+    ::org::defi_wallet_core::PrivateKey const &private_key) const {
     ::rust::MaybeUninit<::org::defi_wallet_core::CronosTransactionReceiptRaw>
         return$;
     ::rust::repr::PtrLen error$ =

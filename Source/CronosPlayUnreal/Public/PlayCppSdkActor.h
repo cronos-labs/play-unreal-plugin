@@ -242,7 +242,12 @@ class CRONOSPLAYUNREAL_API APlayCppSdkActor : public AActor {
     }
 
     const TArray<uint8> GetAddress() const {
-        return _session_result.addresses[0].address;
+        if (_session_result.addresses.Num() > 0) {
+            return _session_result.addresses[0].address;
+        } else {
+            TArray<uint8> IntArray;
+            return IntArray;
+        }
     }
     const int64 GetChainId() const { return _session_result.chain_id; }
 
