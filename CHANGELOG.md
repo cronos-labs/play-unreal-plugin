@@ -1,4 +1,23 @@
 # Changelog
+
+## Unreleased
+- Support Unreal Engine 5.1.0
+- play-cpp-sdk v0.0.13-alpha
+- Save session to a sessioninfo.json file under project dir
+- Restore session info sessioninfo.json file
+- Consolidate Engine Version, Platform Name, and Plugin Version Name into user agent
+- Add support of walletconnect and erc-721, erc-1155, erc-20 
+- Add IOS support
+- Add chain_id to function: SignEip155Transaction
+- Rename 
+  - `FInitializeWalletConnectBlockingDelegate` to `FInitializeWalletConnectDelegate`
+  - Rename `EnsureSessionBlocking` to `EnsureSession`
+  - Add GetCryptoWalletUrl
+  - Turn `SignPersonalBlocking` into `async SignPersonal`
+  - Rename `SignEip155TransactionBlocking` to `SignEip155Transaction`
+- Add ToHex function
+
+
 ## [v0.0.9-alpha] - 2022-11-01
 !!! Please notice: This version introduces some breaking changes !!!
 - Add `chain_id` for function `InitializeWalletConnect`
