@@ -27,12 +27,9 @@ Skip this step if you prefer building from source.
 Skip this step if you prefer building from the release zip file.
 
 - Step 2a: Clone this project
-- Step 2b: run `make` (mac) or run `install-play-cpp-sdk.bat` (windows) to setup [play-cpp-sdk](https://github.com/cronos-labs/play-cpp-sdk).
+- Step 2b: run `make` (mac/linux) or run `install-play-cpp-sdk.bat` (windows) to setup [play-cpp-sdk](https://github.com/cronos-labs/play-cpp-sdk).
 
-### Step 3: Run RunUAT.bat[or RunUAT.sh] script to build the plugin
-``` bash
-Engine\Build\BatchFiles\RunUAT.bat[or RunUAT.sh] BuildPlugin -Plugin=[Path to .uplugin file, must be outside engine directory] -Package=[Output directory] -Rocket
-```
+### Step 3: Run `make RunUAT` (mac/linux) or run `windows-build.bat` (windows) to build the Plugin
 
 ### Windows
 Make sure you use Visual Studio 2019 or newer.
