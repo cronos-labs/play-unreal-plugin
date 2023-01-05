@@ -1,6 +1,12 @@
 REM Set the play cpp sdk version
 set PLAYCPPSDK=v0.0.14-alpha
 
+REM Set the play-cpp-sdk cache path
+set PLAYCPPSDK_CACHE_DIR=C:\play-cpp-sdk\%PLAYCPPSDK%
+
+REM Set the play-cpp-sdk target path
+set PLAYCPPSDK_TARGET_DIR=Source\ThirdParty\PlayCppSdkLibrary\Lib
+
 REM Set NDK versions (to see what NDK_VERSION is available, please check play-cpp-sdk release page)
 set NDK_VERSION=21.4.7075529
 
@@ -37,39 +43,47 @@ set ANDROID_X86_64_CHECKSUM_SRC=https://github.com/cronos-labs/play-cpp-sdk/rele
 set IOS_SRC=https://github.com/cronos-labs/play-cpp-sdk/releases/download/%PLAYCPPSDK%/%IOS_FILE%
 set IOS_CHEKSUM_SRC=https://github.com/cronos-labs/play-cpp-sdk/releases/download/%PLAYCPPSDK%/%IOS_CHECKSUM_FILE%
 
-rmdir install\ /s /q
+REM rmdir %PLAYCPPSDK_CACHE_DIR%\ /s /q
 
-mkdir install\mac
-mkdir install\windows
-mkdir install\linux
-mkdir install\android\arm64-v8a
-mkdir install\android\armeabi-v7a
-mkdir install\android\x86_64
-mkdir install\ios
-mkdir Source\ThirdParty\PlayCppSdkLibrary\Lib\Mac
-mkdir Source\ThirdParty\PlayCppSdkLibrary\Lib\Win64
-mkdir Source\ThirdParty\PlayCppSdkLibrary\Lib\Linux
-mkdir Source\ThirdParty\PlayCppSdkLibrary\Lib\Android\arm64-v8a
-mkdir Source\ThirdParty\PlayCppSdkLibrary\Lib\Android\armeabi-v7a
-mkdir Source\ThirdParty\PlayCppSdkLibrary\Lib\Android\x86_64
-mkdir Source\ThirdParty\PlayCppSdkLibrary\Lib\iOS\arm64
+if exist %PLAYCPPSDK_CACHE_DIR% (
+   echo "%PLAYCPPSDK_CACHE_DIR% exists"
+) else (
+    mkdir %PLAYCPPSDK_CACHE_DIR%\Mac
+    mkdir %PLAYCPPSDK_CACHE_DIR%\Win64
+    mkdir %PLAYCPPSDK_CACHE_DIR%\Linux
+    mkdir %PLAYCPPSDK_CACHE_DIR%\Android\arm64-v8a
+    mkdir %PLAYCPPSDK_CACHE_DIR%\Android\armeabi-v7a
+    mkdir %PLAYCPPSDK_CACHE_DIR%\Android\x86_64
+    mkdir %PLAYCPPSDK_CACHE_DIR%\iOS\arm64
 
-powershell -Command "Invoke-WebRequest %MAC_SRC% -OutFile install\mac\%MAC_FILE%"
-powershell -Command "Invoke-WebRequest %WINDOWS_SRC% -OutFile install\windows\%WINDOWS_FILE%"
-powershell -Command "Invoke-WebRequest %LINUX_SRC% -OutFile install\linux\%LINUX_FILE%"
-powershell -Command "Invoke-WebRequest %ANDROID_ARM64_V8A_SRC% -OutFile install\android\arm64-v8a\%ARM64_V8A_FILE%"
-powershell -Command "Invoke-WebRequest %ANDROID_ARMEABI_V7A_SRC% -OutFile install\android\armeabi-v7a\%ARMEABI_V7A_FILE%"
-powershell -Command "Invoke-WebRequest %ANDROID_X86_64_SRC% -OutFile install\android\x86_64\%X86_64_FILE%"
-powershell -Command "Invoke-WebRequest %IOS_SRC% -OutFile install\ios\%IOS_FILE%"
+    powershell -Command "Invoke-WebRequest %MAC_SRC% -OutFile %PLAYCPPSDK_CACHE_DIR%\Mac\%MAC_FILE%"
+    powershell -Command "Invoke-WebRequest %WINDOWS_SRC% -OutFile %PLAYCPPSDK_CACHE_DIR%\Win64\%WINDOWS_FILE%"
+    powershell -Command "Invoke-WebRequest %LINUX_SRC% -OutFile %PLAYCPPSDK_CACHE_DIR%\Linux\%LINUX_FILE%"
+    powershell -Command "Invoke-WebRequest %ANDROID_ARM64_V8A_SRC% -OutFile %PLAYCPPSDK_CACHE_DIR%\Android\arm64-v8a\%ARM64_V8A_FILE%"
+    powershell -Command "Invoke-WebRequest %ANDROID_ARMEABI_V7A_SRC% -OutFile %PLAYCPPSDK_CACHE_DIR%\Android\armeabi-v7a\%ARMEABI_V7A_FILE%"
+    powershell -Command "Invoke-WebRequest %ANDROID_X86_64_SRC% -OutFile %PLAYCPPSDK_CACHE_DIR%\Android\x86_64\%X86_64_FILE%"
+    powershell -Command "Invoke-WebRequest %IOS_SRC% -OutFile %PLAYCPPSDK_CACHE_DIR%\iOS\arm64\%IOS_FILE%"
+)
+
+if not exist %PLAYCPPSDK_TARGET_DIR%\Mac mkdir %PLAYCPPSDK_TARGET_DIR%\Mac
+if not exist %PLAYCPPSDK_TARGET_DIR%\Win64 mkdir %PLAYCPPSDK_TARGET_DIR%\Win64
+if not exist %PLAYCPPSDK_TARGET_DIR%\Linux mkdir %PLAYCPPSDK_TARGET_DIR%\Linux
+if not exist %PLAYCPPSDK_TARGET_DIR%\Android\arm64-v8a mkdir %PLAYCPPSDK_TARGET_DIR%\Android\arm64-v8a
+if not exist %PLAYCPPSDK_TARGET_DIR%\Android\armeabi-v7a mkdir %PLAYCPPSDK_TARGET_DIR%\Android\armeabi-v7a
+if not exist %PLAYCPPSDK_TARGET_DIR%\Android\x86_64 mkdir %PLAYCPPSDK_TARGET_DIR%\Android\x86_64
+if not exist %PLAYCPPSDK_TARGET_DIR%\iOS\arm64 mkdir %PLAYCPPSDK_TARGET_DIR%\iOS\arm64
 
 REM Check checksum
 REM echo %WINDOWSHASH% | sha256sum -c  -
 
-powershell -Command "Expand-Archive -LiteralPath install\windows\%WINDOWS_FILE% -DestinationPath install\windows"
-copy install\windows\sdk\lib\play_cpp_sdk.lib Source\ThirdParty\PlayCppSdkLibrary\Lib\Win64
-tar xvf install\mac\%MAC_FILE% -C Source\ThirdParty\PlayCppSdkLibrary\Lib\Mac --strip-components=2 sdk/lib/libplay_cpp_sdk.a
-tar xvf install\linux\%LINUX_FILE% -C Source\ThirdParty\PlayCppSdkLibrary\Lib\Linux --strip-components=2 sdk/lib/libplay_cpp_sdk.a
-tar xvf install\android\arm64-v8a\%ARM64_V8A_FILE% -C Source\ThirdParty\PlayCppSdkLibrary\Lib\Android\arm64-v8a --strip-components=2 sdk/lib/libplay_cpp_sdk.a
-tar xvf install\android\armeabi-v7a\%ARMEABI_V7A_FILE% -C Source\ThirdParty\PlayCppSdkLibrary\Lib\Android\armeabi-v7a --strip-components=2 sdk/lib/libplay_cpp_sdk.a
-tar xvf install\android\x86_64\%X86_64_FILE% -C Source\ThirdParty\PlayCppSdkLibrary\Lib\Android\x86_64 --strip-components=2 sdk/lib/libplay_cpp_sdk.a
-tar xvf install\ios\%IOS_FILE% -C Source\ThirdParty\PlayCppSdkLibrary\Lib\iOS\arm64 --strip-components=2 sdk/lib/libplay_cpp_sdk.a
+powershell -Command "Expand-Archive -LiteralPath %PLAYCPPSDK_CACHE_DIR%\Win64\%WINDOWS_FILE% -DestinationPath %PLAYCPPSDK_CACHE_DIR%\Win64"
+copy %PLAYCPPSDK_CACHE_DIR%\Win64\sdk\lib\play_cpp_sdk.lib %PLAYCPPSDK_TARGET_DIR%\Win64
+if exist %PLAYCPPSDK_CACHE_DIR%\Win64\sdk (
+   rmdir %PLAYCPPSDK_CACHE_DIR%\Win64\sdk /s /q
+)
+tar xvf %PLAYCPPSDK_CACHE_DIR%\Mac\%MAC_FILE% -C %PLAYCPPSDK_TARGET_DIR%\Mac --strip-components=2 sdk/lib/libplay_cpp_sdk.a
+tar xvf %PLAYCPPSDK_CACHE_DIR%\Linux\%LINUX_FILE% -C %PLAYCPPSDK_TARGET_DIR%\Linux --strip-components=2 sdk/lib/libplay_cpp_sdk.a
+tar xvf %PLAYCPPSDK_CACHE_DIR%\Android\arm64-v8a\%ARM64_V8A_FILE% -C %PLAYCPPSDK_TARGET_DIR%\Android\arm64-v8a --strip-components=2 sdk/lib/libplay_cpp_sdk.a
+tar xvf %PLAYCPPSDK_CACHE_DIR%\Android\armeabi-v7a\%ARMEABI_V7A_FILE% -C %PLAYCPPSDK_TARGET_DIR%\Android\armeabi-v7a --strip-components=2 sdk/lib/libplay_cpp_sdk.a
+tar xvf %PLAYCPPSDK_CACHE_DIR%\Android\x86_64\%X86_64_FILE% -C %PLAYCPPSDK_TARGET_DIR%\Android\x86_64 --strip-components=2 sdk/lib/libplay_cpp_sdk.a
+tar xvf %PLAYCPPSDK_CACHE_DIR%\iOS\arm64\%IOS_FILE% -C %PLAYCPPSDK_TARGET_DIR%\iOS\arm64 --strip-components=2 sdk/lib/libplay_cpp_sdk.a
