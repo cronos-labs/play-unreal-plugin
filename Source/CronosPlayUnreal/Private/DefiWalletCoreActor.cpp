@@ -17,15 +17,15 @@
 using namespace std;
 using namespace org::defi_wallet_core;
 const int EthCoinType = 60;
-std::string to_hex(const unsigned char *data, int len);
+auto to_hex(const unsigned char *data, int len) -> std::string;
 void from_hex(const std::string &s, unsigned char *data, int len);
 void zeroize_buffer(char *dst, char value, int length);
-bool isSameAddress(std::string address1, std::string address2);
+auto isSameAddress(std::string address1, std::string address2) -> bool;
 void convertCronosTXReceipt(
     ::org::defi_wallet_core::CronosTransactionReceiptRaw &src,
     FCronosTransactionReceiptRaw &dst);
-FCosmosNFTDenom convertDenom(::org::defi_wallet_core::Denom src) {
-    FCosmosNFTDenom ret;
+auto convertDenom(::org::defi_wallet_core::Denom src) -> FCosmosNFTDenom {
+    FCosmosNFTDenom ret; // NOLINT
     ret.ID = UTF8_TO_TCHAR(src.id.c_str());
     ret.Name = UTF8_TO_TCHAR(src.name.c_str());
     ret.Schema = UTF8_TO_TCHAR(src.schema.c_str());
@@ -33,8 +33,8 @@ FCosmosNFTDenom convertDenom(::org::defi_wallet_core::Denom src) {
     return ret;
 }
 
-FCosmosNFTToken convertToken(::org::defi_wallet_core::BaseNft src) {
-    FCosmosNFTToken ret;
+auto convertToken(::org::defi_wallet_core::BaseNft src) -> FCosmosNFTToken {
+    FCosmosNFTToken ret; // NOLINT
     ret.ID = UTF8_TO_TCHAR(src.id.c_str());
     ret.Name = UTF8_TO_TCHAR(src.name.c_str());
     ret.URI = UTF8_TO_TCHAR(src.uri.c_str());
@@ -339,7 +339,10 @@ void ADefiWalletCoreActor::SendAmount(int32 walletIndex, FString fromaddress,
 }
 
 void ADefiWalletCoreActor::DestroyWallet() {
+    UE_LOG(LogTemp, Log, TEXT("ADefiWalletCoreActor  DestroyWallet"));
     if (_coreWallet != NULL) {
+        UE_LOG(LogTemp, Log, TEXT("ADefiWalletCoreActor  Removed CoreWallet"));
+
         // restored back
         rust::cxxbridge1::Box<org::defi_wallet_core::Wallet> tmpwallet =
             rust::cxxbridge1::Box<org::defi_wallet_core::Wallet>::from_raw(
@@ -648,7 +651,7 @@ void ADefiWalletCoreActor::BroadcastEthTxAsync(FWalletBroadcastDelegate Out,
             }
             assert(signedtx.size() == usersignedtx.size());
 
-            string mycronosrpc = TCHAR_TO_UTF8(*rpc);
+            std::string mycronosrpc = TCHAR_TO_UTF8(*rpc);
 
             FString txhashtext;
             FString result;
@@ -672,13 +675,13 @@ void ADefiWalletCoreActor::BroadcastEthTxAsync(FWalletBroadcastDelegate Out,
         });
 }
 
-std::string toLower(std::string strToConvert) {
+auto toLower(std::string strToConvert) -> std::string {
     std::transform(strToConvert.begin(), strToConvert.end(),
                    strToConvert.begin(), ::tolower);
     return strToConvert;
 }
 
-bool isSameAddress(std::string address1, std::string address2) {
+auto isSameAddress(std::string address1, std::string address2) -> bool {
     return toLower(address1) == toLower(address2);
 }
 
@@ -799,8 +802,6 @@ TArray<uint8> ADefiWalletCoreActor::SignEthAmount(
 
         eth_tx_info.amount = TCHAR_TO_UTF8(*amount);
         eth_tx_info.amount_unit = org::defi_wallet_core::EthAmount::EthDecimal;
-        rust::Vec<::std::uint8_t> signedtx = build_eth_signed_tx(
-            eth_tx_info, (uint64)myCronosChainID, false, *privatekey);
 
         // data
         eth_tx_info.data.clear();
@@ -808,6 +809,10 @@ TArray<uint8> ADefiWalletCoreActor::SignEthAmount(
             eth_tx_info.data.push_back(txdata[i]);
         }
         assert(eth_tx_info.data.size() == txdata.Num());
+
+        // sign
+        rust::Vec<::std::uint8_t> signedtx = build_eth_signed_tx(
+            eth_tx_info, (uint64)myCronosChainID, false, *privatekey);
 
         int size = signedtx.size();
         output.Init(0, size);
@@ -901,17 +906,19 @@ void ADefiWalletCoreActor::VerifyLogin(FString document,
     }
 }
 
-std::string to_hex(const unsigned char *data, int len) {
-    std::string s;
+auto to_hex(const unsigned char *data, int len) -> std::string {
+    std::string s; // NOLINT
+    std::string hexstring = "0123456789abcdef";
     for (int i = 0; i < len; i++) {
-        s += "0123456789abcdef"[data[i] >> 4];
-        s += "0123456789abcdef"[data[i] & 0xf];
+        s += hexstring[(int)(data[i] >> 4)];
+        s += hexstring[(int)(data[i] & 0xf)];
     }
     return s;
 }
 // convert hex string to array
 void from_hex(const std::string &s, unsigned char *data, int len) {
     for (int i = 0; i < len; i++) {
+        // NOLINTNEXTLINE
         data[i] = (unsigned char)strtol(s.substr(i * 2, 2).c_str(), NULL, 16);
     }
 }
@@ -1923,8 +1930,32 @@ void ADefiWalletCoreActor::Erc1155Approve(FString contractAddress,
     });
 }
 
+UDynamicContractObject *
+ADefiWalletCoreActor::CreateDynamicContract(FString contractaddress,
+                                            FString abijson, bool &success,
+                                            FString &output_message) {
+    UDynamicContractObject *ret = NewObject<UDynamicContractObject>();
+    ret->defiWallet = this;
+    ret->NewEthContract(contractaddress, abijson, success, output_message);
+    return ret;
+}
+
+org::defi_wallet_core::Wallet *ADefiWalletCoreActor::getCoreWallet() {
+    return _coreWallet;
+}
+
+UDynamicContractObject *ADefiWalletCoreActor::CreateDynamicSigningContract(
+    FString contractaddress, FString abijson, int32 walletindex, bool &success,
+    FString &output_message) {
+    UDynamicContractObject *ret = NewObject<UDynamicContractObject>();
+    ret->defiWallet = this;
+    ret->NewSigningEthContract(contractaddress, abijson, walletindex, success,
+                               output_message);
+    return ret;
+}
+
 void zeroize_buffer(char *dst, char value, int length) {
     for (int i = 0; i < length; i++) {
-        dst[i] = value;
+        dst[i] = value; // NOLINT
     }
 }
