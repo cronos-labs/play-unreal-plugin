@@ -1,12 +1,12 @@
 # Changelog
 
-## Unreleased
+## [v0.0.10-alpha] - 2023-1-09
 - Add DynamicContractObject: which is created from DefiWalletActor
 - Add DynamicContractObject::Send : for modifying contract
 - Add DynamicContractObject::Call : for query contract
 - Add DynamicContractObject::Encode : for wallet connect
 - Support Unreal Engine 5.1.0
-- play-cpp-sdk v0.0.13-alpha
+- play-cpp-sdk v0.0.14-alpha
 - Save session to a sessioninfo.json file under project dir
 - Restore session info sessioninfo.json file
 - Consolidate Engine Version, Platform Name, and Plugin Version Name into user agent
