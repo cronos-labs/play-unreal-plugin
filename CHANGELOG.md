@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## [v0.0.10-alpha] - 2023-1-09
 - Add DynamicContractObject: which is created from DefiWalletActor
 - Add DynamicContractObject::Send : for modifying contract
 - Add DynamicContractObject::Call : for query contract
