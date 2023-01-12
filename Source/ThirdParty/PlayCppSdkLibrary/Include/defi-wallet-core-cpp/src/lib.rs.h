@@ -1175,6 +1175,20 @@ generate_mnemonics(::rust::String password,
                    ::org::defi_wallet_core::MnemonicWordCount word_count);
 
 /// recovers/imports HD wallet from a BIP39 backup phrase (English words) and
+/// password and save to secure storage
+::rust::Box<::org::defi_wallet_core::Wallet>
+restore_wallet_save_to_securestorage(::rust::String mnemonic,
+                                     ::rust::String password,
+                                     ::rust::String servicename,
+                                     ::rust::String username);
+
+/// recovers/imports HD wallet from a BIP39 backup phrase (English words) and
+/// password from secure storage
+::rust::Box<::org::defi_wallet_core::Wallet>
+restore_wallet_load_from_securestorage(::rust::String servicename,
+                                       ::rust::String username);
+
+/// recovers/imports HD wallet from a BIP39 backup phrase (English words) and
 /// password
 ///
 ::rust::Box<::org::defi_wallet_core::Wallet>

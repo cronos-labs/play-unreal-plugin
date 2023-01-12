@@ -19,7 +19,6 @@ using namespace std;
 using namespace rust;
 using namespace com::crypto::game_sdk;
 
-
 ::com::crypto::game_sdk::WalletconnectClient *APlayCppSdkActor::_coreClient =
     NULL;
 APlayCppSdkActor *APlayCppSdkActor::_sdk = NULL;
@@ -307,8 +306,8 @@ void APlayCppSdkActor::OnRestoreClientFinished(bool succeed, FString message) {
     } else {
         OnInitializeWalletConnectDelegate.BindDynamic(
             this, &APlayCppSdkActor::OnInitializeWalletConnectFinished);
-        InitializeWalletConnect(_description, _url, _icon_urls, _name, _chain_id,
-                                OnInitializeWalletConnectDelegate);
+        InitializeWalletConnect(_description, _url, _icon_urls, _name,
+                                _chain_id, OnInitializeWalletConnectDelegate);
     }
 }
 
@@ -337,7 +336,8 @@ void APlayCppSdkActor::EnsureSession(FEnsureSessionDelegate Out) {
                     }
                     assert(20 == newaddress.address.Num());
                     output.addresses.Add(newaddress);
-                    _session_info.accounts.Add(UUtlis::ToHex(newaddress.address));
+                    _session_info.accounts.Add(
+                        UUtlis::ToHex(newaddress.address));
                 }
                 assert(output.addresses.Num() ==
                        sessionresult.addresses.size());
@@ -346,7 +346,8 @@ void APlayCppSdkActor::EnsureSession(FEnsureSessionDelegate Out) {
                 _session_info.sessionstate =
                     EWalletconnectSessionState::StateRestored;
                 _session_info.connected = true;
-                _session_info.chain_id = FString::FromInt(sessionresult.chain_id);
+                _session_info.chain_id =
+                    FString::FromInt(sessionresult.chain_id);
 
                 SetWalletConnectEnsureSessionResult(output);
             } else {

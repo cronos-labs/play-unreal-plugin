@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<root xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:tools="http://schemas.android.com/tools">
+
+	
+    <AARImports>
+        <insertValue value="androidx.security,security-crypto,1.1.0-alpha04" />
+        <insertNewline />
+    </AARImports>
+
+
+	<gradleCopies>
+		<copyDir
+			src="$S(PluginDir)/Android/"
+			dst="$S(BuildDir)/gradle/app/src/main/java/com/cronos/play/" />
+	</gradleCopies>
+
+    <gradleProperties>
+		<insert>
+			android.useAndroidX = true
+			android.enableJetifier = true
+		</insert>
+	</gradleProperties>
+
+
+</root>

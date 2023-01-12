@@ -1288,6 +1288,17 @@ org$defi_wallet_core$cxxbridge1$Wallet$get_backup_mnemonic_phrase(
     ::org::defi_wallet_core::MnemonicWordCount word_count,
     ::rust::String *return$) noexcept;
 
+::rust::repr::PtrLen
+org$defi_wallet_core$cxxbridge1$restore_wallet_save_to_securestorage(
+    ::rust::String *mnemonic, ::rust::String *password,
+    ::rust::String *servicename, ::rust::String *username,
+    ::rust::Box<::org::defi_wallet_core::Wallet> *return$) noexcept;
+
+::rust::repr::PtrLen
+org$defi_wallet_core$cxxbridge1$restore_wallet_load_from_securestorage(
+    ::rust::String *servicename, ::rust::String *username,
+    ::rust::Box<::org::defi_wallet_core::Wallet> *return$) noexcept;
+
 ::rust::repr::PtrLen org$defi_wallet_core$cxxbridge1$restore_wallet(
     ::rust::String *mnemonic, ::rust::String *password,
     ::rust::Box<::org::defi_wallet_core::Wallet> *return$) noexcept;
@@ -1596,6 +1607,38 @@ generate_mnemonics(::rust::String password,
     ::rust::repr::PtrLen error$ =
         org$defi_wallet_core$cxxbridge1$generate_mnemonics(
             &password, word_count, &return$.value);
+    if (error$.ptr) {
+        throw ::rust::impl<::rust::Error>::error(error$);
+    }
+    return ::std::move(return$.value);
+}
+
+/// recovers/imports HD wallet from a BIP39 backup phrase (English words) and
+/// password and save to secure storage
+::rust::Box<::org::defi_wallet_core::Wallet>
+restore_wallet_save_to_securestorage(::rust::String mnemonic,
+                                     ::rust::String password,
+                                     ::rust::String servicename,
+                                     ::rust::String username) {
+    ::rust::MaybeUninit<::rust::Box<::org::defi_wallet_core::Wallet>> return$;
+    ::rust::repr::PtrLen error$ =
+        org$defi_wallet_core$cxxbridge1$restore_wallet_save_to_securestorage(
+            &mnemonic, &password, &servicename, &username, &return$.value);
+    if (error$.ptr) {
+        throw ::rust::impl<::rust::Error>::error(error$);
+    }
+    return ::std::move(return$.value);
+}
+
+/// recovers/imports HD wallet from a BIP39 backup phrase (English words) and
+/// password from secure storage
+::rust::Box<::org::defi_wallet_core::Wallet>
+restore_wallet_load_from_securestorage(::rust::String servicename,
+                                       ::rust::String username) {
+    ::rust::MaybeUninit<::rust::Box<::org::defi_wallet_core::Wallet>> return$;
+    ::rust::repr::PtrLen error$ =
+        org$defi_wallet_core$cxxbridge1$restore_wallet_load_from_securestorage(
+            &servicename, &username, &return$.value);
     if (error$.ptr) {
         throw ::rust::impl<::rust::Error>::error(error$);
     }
