@@ -190,6 +190,43 @@ class CRONOSPLAYUNREAL_API ADefiWalletCoreActor : public AActor {
                        bool &success, FString &output_message);
 
     /**
+     * Restore wallet for secure storage with mnemonics and password (Only for
+     * testing & development purpose).
+     * @param mnemonics mnemonics to restore
+     * @param password salt in mnemonics restoration
+     * @param servicename service name for secure storage
+     * @param username username for secure storage
+     * @param output generated address (index=0)
+     * @param success whether succeed or not
+     * @param message error message, "" if succeed
+     */
+    UFUNCTION(BlueprintCallable,
+              meta = (DisplayName = "RestoreWalletSaveToSecureStorage",
+                      Keywords = "Wallet"),
+              Category = "CronosPlayUnreal")
+    void RestoreWalletSaveToSecureStorage(FString mnemonics, FString password,
+                                          FString servicename, FString username,
+                                          FString &output, bool &success,
+                                          FString &output_message);
+
+    /**
+     * Restore wallet from secure storage
+     * @param servicename service name for secure storage
+     * @param username username for secure storage
+     * @param output generated address (index=0)
+     * @param success whether succeed or not
+     * @param message error message, "" if succeed
+     */
+    UFUNCTION(BlueprintCallable,
+              meta = (DisplayName = "RestoreWalletLoadFromSecureStorage",
+                      Keywords = "Wallet"),
+              Category = "CronosPlayUnreal")
+    void RestoreWalletLoadFromSecureStorage(FString servicename,
+                                            FString username, FString &output,
+                                            bool &success,
+                                            FString &output_message);
+
+    /**
      * Create a new wallet with password and wordcount (Only for testing &
      * development purpose).
      * @param password salt in mnemonics restoration

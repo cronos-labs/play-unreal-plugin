@@ -401,6 +401,65 @@ void ADefiWalletCoreActor::RestoreWallet(FString mnemonics, FString password,
     }
 }
 
+void ADefiWalletCoreActor::RestoreWalletSaveToSecureStorage(
+    FString mnemonics, FString password, FString servicename, FString username,
+    FString &output, bool &success, FString &output_message) {
+    try {
+        if (NULL != _coreWallet) {
+            success = false;
+            output_message = TEXT("Wallet Already Exists");
+            return;
+        }
+
+        rust::cxxbridge1::Box<org::defi_wallet_core::Wallet> tmpWallet =
+            restore_wallet_save_to_securestorage(
+                TCHAR_TO_UTF8(*mnemonics), TCHAR_TO_UTF8(*password),
+                TCHAR_TO_UTF8(*servicename), TCHAR_TO_UTF8(*username));
+        _coreWallet = tmpWallet.into_raw();
+
+        assert(_coreWallet != NULL);
+        rust::cxxbridge1::String result =
+            _coreWallet->get_address(CoinType::CryptoOrgMainnet, 0);
+        output = UTF8_TO_TCHAR(result.c_str());
+        success = true;
+    } catch (const rust::cxxbridge1::Error &e) {
+        success = false;
+        output = TEXT("");
+        output_message =
+            FString::Printf(TEXT("CronosPlayUnreal RestoreWalletSaveToSecureStorage Error: %s"),
+                            UTF8_TO_TCHAR(e.what()));
+    }
+}
+
+void ADefiWalletCoreActor::RestoreWalletLoadFromSecureStorage(
+    FString servicename, FString username, FString &output, bool &success,
+    FString &output_message) {
+    try {
+        if (NULL != _coreWallet) {
+            success = false;
+            output_message = TEXT("Wallet Already Exists");
+            return;
+        }
+
+        rust::cxxbridge1::Box<org::defi_wallet_core::Wallet> tmpWallet =
+            restore_wallet_load_from_securestorage(TCHAR_TO_UTF8(*servicename),
+                                                   TCHAR_TO_UTF8(*username));
+        _coreWallet = tmpWallet.into_raw();
+
+        assert(_coreWallet != NULL);
+        rust::cxxbridge1::String result =
+            _coreWallet->get_address(CoinType::CryptoOrgMainnet, 0);
+        output = UTF8_TO_TCHAR(result.c_str());
+        success = true;
+    } catch (const rust::cxxbridge1::Error &e) {
+        success = false;
+        output = TEXT("");
+        output_message =
+            FString::Printf(TEXT("CronosPlayUnreal RestoreWalletLoadFromSecureStorage Error: %s"),
+                            UTF8_TO_TCHAR(e.what()));
+    }
+}
+
 /**
  * CAUTION: use only for testing & development purpose
  * storing mnemonics need caution, please not to expose user mnemonics for
