@@ -3,6 +3,10 @@ PWD = $(shell pwd)
 
 # Set the play cpp sdk version
 PLAYCPPSDK=v0.0.14-alpha
+# Set the play-cpp-sdk cache path
+PLAYCPPSDK_CACHE_DIR=./install/$(PLAYCPPSDK)
+# Set the play-cpp-sdk target path
+PLAYCPPSDK_TARGET_DIR=./Source/ThirdParty/PlayCppSdkLibrary/Lib
 # Set NDK versions (to see what NDK_VERSION is available, please check play-cpp-sdk release page)
 NDK_VERSION=21.4.7075529
 # Set names of play cpp sdk library files
@@ -38,64 +42,65 @@ IOS_SRC=https://github.com/cronos-labs/play-cpp-sdk/releases/download/$(PLAYCPPS
 IOS_CHEKSUM_SRC=https://github.com/cronos-labs/play-cpp-sdk/releases/download/$(PLAYCPPSDK)/$(IOS_CHECKSUM_FILE)
 
 
-all: rm download checkhash uncompress
+all: download checkhash uncompress
 
-rm:
-	rm -rf ./install
+download:
+ifneq (,$(wildcard $(PLAYCPPSDK_CACHE_DIR)))
+	echo "$(PLAYCPPSDK_CACHE_DIR) exists"
+else
+	mkdir -p $(PLAYCPPSDK_CACHE_DIR)/Mac
+	mkdir -p $(PLAYCPPSDK_CACHE_DIR)/Win64
+	mkdir -p $(PLAYCPPSDK_CACHE_DIR)/Linux
+	mkdir -p $(PLAYCPPSDK_CACHE_DIR)/Android/arm64-v8a
+	mkdir -p $(PLAYCPPSDK_CACHE_DIR)/Android/armeabi-v7a
+	mkdir -p $(PLAYCPPSDK_CACHE_DIR)/Android/x86_64
+	mkdir -p $(PLAYCPPSDK_CACHE_DIR)/iOS/arm64
 
-prepare:
-	mkdir -p ./install/mac
-	mkdir -p ./install/windows
-	mkdir -p ./install/linux
-	mkdir -p ./install/android/arm64-v8a
-	mkdir -p ./install/android/armeabi-v7a
-	mkdir -p ./install/android/x86_64
-	mkdir -p ./install/ios
-	mkdir -p ./Source/ThirdParty/PlayCppSdkLibrary/Lib/Mac
-	mkdir -p ./Source/ThirdParty/PlayCppSdkLibrary/Lib/Win64
-	mkdir -p ./Source/ThirdParty/PlayCppSdkLibrary/Lib/Linux
-	mkdir -p ./Source/ThirdParty/PlayCppSdkLibrary/Lib/Android/arm64-v8a
-	mkdir -p ./Source/ThirdParty/PlayCppSdkLibrary/Lib/Android/armeabi-v7a
-	mkdir -p ./Source/ThirdParty/PlayCppSdkLibrary/Lib/Android/x86_64
-	mkdir -p ./Source/ThirdParty/PlayCppSdkLibrary/Lib/iOS/arm64
-
-download: prepare
-	cd install/mac && curl -s -O -L $(MAC_SRC)
-	cd install/windows && curl -s -O -L $(WINDOWS_SRC)
-	cd install/linux && curl -s -O -L $(LINUX_SRC)
-	cd install/android/arm64-v8a && curl -s -O -L $(ANDROID_ARM64_V8A_SRC)
-	cd install/android/armeabi-v7a && curl -s -O -L $(ANDROID_ARMEABI_V7A_SRC)
-	cd install/android/x86_64 && curl -s -O -L $(ANDROID_X86_64_SRC)
-	cd install/ios && curl -s -O -L $(IOS_SRC)
+	cd $(PLAYCPPSDK_CACHE_DIR)/Mac && curl -s -O -L $(MAC_SRC)
+	cd $(PLAYCPPSDK_CACHE_DIR)/Win64 && curl -s -O -L $(WINDOWS_SRC)
+	cd $(PLAYCPPSDK_CACHE_DIR)/Linux && curl -s -O -L $(LINUX_SRC)
+	cd $(PLAYCPPSDK_CACHE_DIR)/Android/arm64-v8a && curl -s -O -L $(ANDROID_ARM64_V8A_SRC)
+	cd $(PLAYCPPSDK_CACHE_DIR)/Android/armeabi-v7a && curl -s -O -L $(ANDROID_ARMEABI_V7A_SRC)
+	cd $(PLAYCPPSDK_CACHE_DIR)/Android/x86_64 && curl -s -O -L $(ANDROID_X86_64_SRC)
+	cd $(PLAYCPPSDK_CACHE_DIR)/iOS/arm64 && curl -s -O -L $(IOS_SRC)
+endif
 
 checkhash:
 ifeq ($(UNAME), Darwin)
-	cd install/mac && curl -s -L $(MAC_CHEKSUM_SRC) | shasum -a 256 -c -
-	cd install/windows &&  curl -s -L $(WINDOWS_CHECKSUM_SRC) | shasum -a 256 -c -
-	cd install/linux && curl -s -L $(LINUX_CHECKSUM_SRC) | shasum -a 256 -c -
-	cd install/android/arm64-v8a && curl -s -L $(ANDROID_ARM64_V8A_CHECKSUM_SRC) | shasum -a 256 -c -
-	cd install/android/armeabi-v7a && curl -s -L $(ANDROID_ARMEABI_V7A_CHECKSUM_SRC) | shasum -a 256 -c -
-	cd install/android/x86_64 && curl -s -L $(ANDROID_X86_64_CHECKSUM_SRC) | shasum -a 256 -c -
-	cd install/ios && curl -s -L $(IOS_CHEKSUM_SRC) | shasum -a 256 -c -
+	cd $(PLAYCPPSDK_CACHE_DIR)/Mac && curl -s -L $(MAC_CHEKSUM_SRC) | shasum -a 256 -c -
+	cd $(PLAYCPPSDK_CACHE_DIR)/Win64 &&  curl -s -L $(WINDOWS_CHECKSUM_SRC) | shasum -a 256 -c -
+	cd $(PLAYCPPSDK_CACHE_DIR)/Linux && curl -s -L $(LINUX_CHECKSUM_SRC) | shasum -a 256 -c -
+	cd $(PLAYCPPSDK_CACHE_DIR)/Android/arm64-v8a && curl -s -L $(ANDROID_ARM64_V8A_CHECKSUM_SRC) | shasum -a 256 -c -
+	cd $(PLAYCPPSDK_CACHE_DIR)/Android/armeabi-v7a && curl -s -L $(ANDROID_ARMEABI_V7A_CHECKSUM_SRC) | shasum -a 256 -c -
+	cd $(PLAYCPPSDK_CACHE_DIR)/Android/x86_64 && curl -s -L $(ANDROID_X86_64_CHECKSUM_SRC) | shasum -a 256 -c -
+	cd $(PLAYCPPSDK_CACHE_DIR)/iOS/arm64 && curl -s -L $(IOS_CHEKSUM_SRC) | shasum -a 256 -c -
 else
-	cd install/mac && curl -s -L $(MAC_CHEKSUM_SRC) | sha256sum -c  -
-	cd install/windows &&  curl -s -L $(WINDOWS_CHECKSUM_SRC) | sha256sum -c  -
-	cd install/linux && curl -s -L $(LINUX_CHECKSUM_SRC) | sha256sum -c  -
-	cd install/android/arm64-v8a && curl -s -L $(ANDROID_ARM64_V8A_CHECKSUM_SRC) | sha256sum -c  -
-	cd install/android/armeabi-v7a && curl -s -L $(ANDROID_ARMEABI_V7A_CHECKSUM_SRC) | sha256sum -c  -
-	cd install/android/x86_64 && curl -s -L $(ANDROID_X86_64_CHECKSUM_SRC) | sha256sum -c  -
-	cd install/ios && curl -s -L $(IOS_CHEKSUM_SRC) | sha256sum -c  -
+	cd $(PLAYCPPSDK_CACHE_DIR)/Mac && curl -s -L $(MAC_CHEKSUM_SRC) | sha256sum -c  -
+	cd $(PLAYCPPSDK_CACHE_DIR)/Win64 &&  curl -s -L $(WINDOWS_CHECKSUM_SRC) | sha256sum -c  -
+	cd $(PLAYCPPSDK_CACHE_DIR)/Linux && curl -s -L $(LINUX_CHECKSUM_SRC) | sha256sum -c  -
+	cd $(PLAYCPPSDK_CACHE_DIR)/Android/arm64-v8a && curl -s -L $(ANDROID_ARM64_V8A_CHECKSUM_SRC) | sha256sum -c  -
+	cd $(PLAYCPPSDK_CACHE_DIR)/Android/armeabi-v7a && curl -s -L $(ANDROID_ARMEABI_V7A_CHECKSUM_SRC) | sha256sum -c  -
+	cd $(PLAYCPPSDK_CACHE_DIR)/Android/x86_64 && curl -s -L $(ANDROID_X86_64_CHECKSUM_SRC) | sha256sum -c  -
+	cd $(PLAYCPPSDK_CACHE_DIR)/iOS/arm64 && curl -s -L $(IOS_CHEKSUM_SRC) | sha256sum -c  -
 endif
 
+prepare:
+	mkdir -p $(PLAYCPPSDK_TARGET_DIR)/Mac
+	mkdir -p $(PLAYCPPSDK_TARGET_DIR)/Win64
+	mkdir -p $(PLAYCPPSDK_TARGET_DIR)/Linux
+	mkdir -p $(PLAYCPPSDK_TARGET_DIR)/Android/arm64-v8a
+	mkdir -p $(PLAYCPPSDK_TARGET_DIR)/Android/armeabi-v7a
+	mkdir -p $(PLAYCPPSDK_TARGET_DIR)/Android/x86_64
+	mkdir -p $(PLAYCPPSDK_TARGET_DIR)/iOS/arm64
 
 uncompress: prepare
-	tar xvf install/mac/$(MAC_FILE) -C ./Source/ThirdParty/PlayCppSdkLibrary/Lib/Mac --strip-components=2 sdk/lib/libplay_cpp_sdk.a
-	unzip -j install/windows/$(WINDOWS_FILE) sdk/lib/play_cpp_sdk.lib -d ./Source/ThirdParty/PlayCppSdkLibrary/Lib/Win64
-	tar xvf install/linux/$(LINUX_FILE) -C ./Source/ThirdParty/PlayCppSdkLibrary/Lib/Linux --strip-components=2 sdk/lib/libplay_cpp_sdk.a
-	tar xvf install/android/arm64-v8a/$(ARM64_V8A_FILE) -C ./Source/ThirdParty/PlayCppSdkLibrary/Lib/Android/arm64-v8a --strip-components=2 sdk/lib/libplay_cpp_sdk.a
-	tar xvf install/android/armeabi-v7a/$(ARMEABI_V7A_FILE) -C ./Source/ThirdParty/PlayCppSdkLibrary/Lib/Android/armeabi-v7a --strip-components=2 sdk/lib/libplay_cpp_sdk.a
-	tar xvf install/android/x86_64/$(X86_64_FILE) -C ./Source/ThirdParty/PlayCppSdkLibrary/Lib/Android/x86_64 --strip-components=2 sdk/lib/libplay_cpp_sdk.a
-	tar xvf install/ios/$(IOS_FILE) -C ./Source/ThirdParty/PlayCppSdkLibrary/Lib/iOS/arm64 --strip-components=2 sdk/lib/libplay_cpp_sdk.a
+	tar xvf $(PLAYCPPSDK_CACHE_DIR)/Mac/$(MAC_FILE) -C $(PLAYCPPSDK_TARGET_DIR)/Mac --strip-components=2 sdk/lib/libplay_cpp_sdk.a
+	unzip -j $(PLAYCPPSDK_CACHE_DIR)/Win64/$(WINDOWS_FILE) sdk/lib/play_cpp_sdk.lib -d $(PLAYCPPSDK_TARGET_DIR)/Win64
+	tar xvf $(PLAYCPPSDK_CACHE_DIR)/Linux/$(LINUX_FILE) -C $(PLAYCPPSDK_TARGET_DIR)/Linux --strip-components=2 sdk/lib/libplay_cpp_sdk.a
+	tar xvf $(PLAYCPPSDK_CACHE_DIR)/Android/arm64-v8a/$(ARM64_V8A_FILE) -C $(PLAYCPPSDK_TARGET_DIR)/Android/arm64-v8a --strip-components=2 sdk/lib/libplay_cpp_sdk.a
+	tar xvf $(PLAYCPPSDK_CACHE_DIR)/Android/armeabi-v7a/$(ARMEABI_V7A_FILE) -C $(PLAYCPPSDK_TARGET_DIR)/Android/armeabi-v7a --strip-components=2 sdk/lib/libplay_cpp_sdk.a
+	tar xvf $(PLAYCPPSDK_CACHE_DIR)/Android/x86_64/$(X86_64_FILE) -C $(PLAYCPPSDK_TARGET_DIR)/Android/x86_64 --strip-components=2 sdk/lib/libplay_cpp_sdk.a
+	tar xvf $(PLAYCPPSDK_CACHE_DIR)/iOS/arm64/$(IOS_FILE) -C $(PLAYCPPSDK_TARGET_DIR)/iOS/arm64 --strip-components=2 sdk/lib/libplay_cpp_sdk.a
 
 
 # FIXME Build Android/IOS with RunUAT.sh
