@@ -40,4 +40,4 @@ the unreal source codes, until the issue is fixed by Epic Games).
 
 ## More information about Cronos Play
 If you are a game developer, please visit [Cronos Play](https://cronos.org/play) or fill this
-[Contact Form](https://airtable.com/shrFiQnLrcpeBp2lS) for more information.
+[Contact Form](https://airtable.com/shrCt6wWy87WrEXr8) for more information.
