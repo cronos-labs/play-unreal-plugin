@@ -365,7 +365,7 @@ class CRONOSPLAYUNREAL_API APlayCppSdkActor : public AActor {
     void OnNewSession(FWalletConnectEnsureSessionResult SessionResult,
                       FString Result);
     /**
-     * On NewSessionReady delegate, called if session is restored
+     * On NewSessionReady delegate, called if session is created
      */
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayCppSdk")
     FOnNewSessionReady OnNewSessionReady;
