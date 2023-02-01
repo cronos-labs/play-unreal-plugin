@@ -104,37 +104,15 @@ void APlayCppSdkActor::ConnectWalletConnect(FString description, FString url,
                                             TArray<FString> icon_urls,
                                             FString name, int64 chain_id,
                                             EConnectionType connection_type) {
-    FString Jsondata;
-    bool IsRestored;
-    FString RestoreClientOutputMessage;
-    RestoreClient(Jsondata, IsRestored, RestoreClientOutputMessage);
-    if (IsRestored) {
-        // Setup Callback
-        bool IsSetupCallback;
-        FString SetupCallbackOutputMessage;
-        OnSetupCallbackDelegate.BindDynamic(
-            this, &APlayCppSdkActor::OnWalletconnectSessionInfo);
-        SetupCallback(OnSetupCallbackDelegate, IsSetupCallback,
-                      SetupCallbackOutputMessage);
-        if (IsSetupCallback) {
-            // Ensure session
-            OnEnsureSessionDelegate.BindDynamic(
-                this, &APlayCppSdkActor::OnRestoreSession);
-            EnsureSession(OnEnsureSessionDelegate);
-        } else {
-            UE_LOG(LogTemp, Error, TEXT("Setup Callbacked failed: %s"),
-                   *(SetupCallbackOutputMessage));
-        }
-    } else {
-        OnInitializeWalletConnectDelegate.BindDynamic(
-            this, &APlayCppSdkActor::OnInitializeWalletConnectFinished);
-
-        // set the connection type
-        _connection_type = connection_type;
-
-        InitializeWalletConnect(description, url, icon_urls, name, chain_id,
-                                OnInitializeWalletConnectDelegate);
-    }
+    OnRestoreClientDelegate.BindDynamic(
+        this, &APlayCppSdkActor::OnRestoreClientFinished);
+    RestoreClient(OnRestoreClientDelegate);
+    _description = description;
+    _url = url;
+    _icon_urls = icon_urls;
+    _name = name;
+    _chain_id = chain_id;
+    _connection_type = connection_type;
 }
 
 void APlayCppSdkActor::InitializeWalletConnect(
@@ -263,6 +241,8 @@ void APlayCppSdkActor::OnInitializeWalletConnectFinished(bool succeed,
                 break;
             }
 
+            UE_LOG(LogTemp, Display, TEXT("Setup Callbacked succeeded"));
+
             // Ensure session
             OnEnsureSessionDelegate.BindDynamic(
                 this, &APlayCppSdkActor::OnNewSession);
@@ -278,37 +258,72 @@ void APlayCppSdkActor::OnInitializeWalletConnectFinished(bool succeed,
     }
 }
 
-// TODO Turn into AsyncTask
-void APlayCppSdkActor::RestoreClient(FString &Jsondata, bool &success,
-                                     FString &output_message) {
-    try {
-        if (NULL != _coreClient) {
-            success = false;
-            output_message = TEXT("Client Already Exists");
-            return;
+void APlayCppSdkActor::RestoreClient(FRestoreClientDelegate Out) {
+    AsyncTask(
+        ENamedThreads::AnyHiPriThreadNormalTask,
+        [this, Out]() {
+            bool success;
+            FString message;
+            try {
+                FString jsondata;
+                success = FFileHelper::LoadFileToString(
+                    jsondata,
+                    *(FPaths::ProjectSavedDir() + "sessioninfo.json"));
+                // if load file success
+                // if session file is not empty
+                if (success && !jsondata.IsEmpty()) {
+                    std::string sessioninfostring = TCHAR_TO_UTF8(*jsondata);
+                    Box<WalletconnectClient> tmpClient =
+                        walletconnect_restore_client(sessioninfostring);
+                    _coreClient = tmpClient.into_raw();
+                    assert(_coreClient != NULL);
+
+                    success = true;
+                } else {
+                    success = false;
+                }
+
+            } catch (const rust::cxxbridge1::Error &e) {
+                success = false;
+                message =
+                    FString::Printf(TEXT("PlayCppSdk RestoreClient Error: %s"),
+                                    UTF8_TO_TCHAR(e.what()));
+            }
+
+            AsyncTask(ENamedThreads::GameThread, [Out, success, message]() {
+                Out.ExecuteIfBound(success, message);
+            });
         }
 
-        success = FFileHelper::LoadFileToString(
-            Jsondata, *(FPaths::ProjectSavedDir() + "sessioninfo.json"));
-        // if load file failed, return
-        if (!success)
-            return;
-        // if nothing in session file, return
-        if (Jsondata.IsEmpty())
-            return;
+    );
+}
 
-        std::string sessioninfostring = TCHAR_TO_UTF8(*Jsondata);
-        Box<WalletconnectClient> tmpClient =
-            walletconnect_restore_client(sessioninfostring);
-        _coreClient = tmpClient.into_raw();
-        assert(_coreClient != NULL);
+void APlayCppSdkActor::OnRestoreClientFinished(bool succeed, FString message) {
+    if (succeed) {
+        UE_LOG(LogTemp, Log, TEXT("RestoreClient succeeded"));
 
-        success = true;
-    } catch (const rust::cxxbridge1::Error &e) {
-        success = false;
-        output_message =
-            FString::Printf(TEXT("PlayCppSdk RestoreClient Error: %s"),
-                            UTF8_TO_TCHAR(e.what()));
+        // Setup Callback
+        bool IsSetupCallback;
+        FString SetupCallbackOutputMessage;
+        OnSetupCallbackDelegate.BindDynamic(
+            this, &APlayCppSdkActor::OnWalletconnectSessionInfo);
+        SetupCallback(OnSetupCallbackDelegate, IsSetupCallback,
+                      SetupCallbackOutputMessage);
+        if (IsSetupCallback) {
+            // Ensure session
+            OnEnsureSessionDelegate.BindDynamic(
+                this, &APlayCppSdkActor::OnRestoreSession);
+            EnsureSession(OnEnsureSessionDelegate);
+        } else {
+            UE_LOG(LogTemp, Error, TEXT("Setup Callbacked failed: %s"),
+                   *(SetupCallbackOutputMessage));
+        }
+
+    } else {
+        OnInitializeWalletConnectDelegate.BindDynamic(
+            this, &APlayCppSdkActor::OnInitializeWalletConnectFinished);
+        InitializeWalletConnect(_description, _url, _icon_urls, _name, _chain_id,
+                                OnInitializeWalletConnectDelegate);
     }
 }
 
@@ -317,11 +332,14 @@ void APlayCppSdkActor::EnsureSession(FEnsureSessionDelegate Out) {
     AsyncTask(ENamedThreads::AnyHiPriThreadNormalTask, [this, Out]() {
         FWalletConnectEnsureSessionResult output;
         FString result;
+        UE_LOG(LogTemp, Display, TEXT("EnsureSession..."));
         try {
 
             WalletConnectEnsureSessionResult sessionresult;
             if (_coreClient != NULL) {
+                UE_LOG(LogTemp, Display, TEXT("EnsureSession blocking..."));
                 sessionresult = _coreClient->ensure_session_blocking();
+                UE_LOG(LogTemp, Display, TEXT("EnsureSession done..."));
                 output.addresses.Empty();
                 for (int i = 0; i < sessionresult.addresses.size(); i++) {
                     FWalletConnectAddress newaddress;
@@ -364,6 +382,7 @@ void APlayCppSdkActor::OnRestoreSession(
     }
     UE_LOG(LogTemp, Log, TEXT("OnRestoreSession Chain id: %d"),
            SessionResult.chain_id);
+    this->OnRestoreSessionReady.ExecuteIfBound(SessionResult, Result);
 }
 
 void APlayCppSdkActor::OnNewSession(
@@ -381,6 +400,7 @@ void APlayCppSdkActor::OnNewSession(
     }
     UE_LOG(LogTemp, Log, TEXT("OnNewSession Chain id: %d"),
            SessionResult.chain_id);
+    this->OnNewSessionReady.ExecuteIfBound(SessionResult, Result);
 }
 
 void APlayCppSdkActor::ClearSession(bool &success) {
