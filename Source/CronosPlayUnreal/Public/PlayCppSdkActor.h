@@ -154,6 +154,20 @@ DECLARE_DYNAMIC_DELEGATE_OneParam(FWalletconnectSignPersonalDelegate,
 DECLARE_DYNAMIC_DELEGATE_TwoParams(FInitializeWalletConnectDelegate, bool,
                                    Succeed, FString, message);
 
+/// called when new session is created
+DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnNewSessionReady,
+                                   FWalletConnectEnsureSessionResult,
+                                   SessionResult, FString, Result);
+
+/// restore wallet connect delegate
+DECLARE_DYNAMIC_DELEGATE_TwoParams(FRestoreClientDelegate, bool, Succeed,
+                                   FString, message);
+
+/// called when session is restored
+DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnRestoreSessionReady,
+                                   FWalletConnectEnsureSessionResult,
+                                   SessionResult, FString, Result);
+
 /// wallet connect ensure session delegate
 DECLARE_DYNAMIC_DELEGATE_TwoParams(FEnsureSessionDelegate,
                                    FWalletConnectEnsureSessionResult,
@@ -201,6 +215,12 @@ class CRONOSPLAYUNREAL_API APlayCppSdkActor : public AActor {
     FWalletConnectEnsureSessionResult _session_result;
 
     /**
+     * RestoreClient delegate, called after calling
+     * `RestoreClient`
+     */
+    FRestoreClientDelegate OnRestoreClientDelegate;
+
+    /**
      * InitializeWalletConnect delegate, called after calling
      * `InitializeWalletConnect`
      */
@@ -211,6 +231,14 @@ class CRONOSPLAYUNREAL_API APlayCppSdkActor : public AActor {
      */
     FEnsureSessionDelegate OnEnsureSessionDelegate;
 
+    /**
+     * Used for `ConnectWalletConnect`
+     */
+    FString _description;
+    FString _url;
+    TArray<FString> _icon_urls;
+    FString _name;
+    int64 _chain_id;
     EConnectionType _connection_type = EConnectionType::URI_STRING;
 
     /**
@@ -336,10 +364,21 @@ class CRONOSPLAYUNREAL_API APlayCppSdkActor : public AActor {
     UFUNCTION()
     void OnNewSession(FWalletConnectEnsureSessionResult SessionResult,
                       FString Result);
+    /**
+     * On NewSessionReady delegate, called if session is created
+     */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayCppSdk")
+    FOnNewSessionReady OnNewSessionReady;
 
     UFUNCTION()
     void OnRestoreSession(FWalletConnectEnsureSessionResult SessionResult,
                           FString Result);
+
+    /**
+     * On RestoreSessionReady delegate, called if session is restored
+     */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayCppSdk")
+    FOnRestoreSessionReady OnRestoreSessionReady;
 
     /**
      * Clear Session
@@ -416,15 +455,15 @@ class CRONOSPLAYUNREAL_API APlayCppSdkActor : public AActor {
 
     /**
      * restore session information from string(json)
-     * @param jsondata session information string(json)
-     * @param success   succeed or fail
-     * @param output_message  error message
+     * @param Out RestoreClient callback
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "RestoreClient", Keywords = "PlayCppSdk"),
               Category = "PlayCppSdk")
-    void RestoreClient(FString &jsondata, bool &success,
-                       FString &output_message);
+    void RestoreClient(FRestoreClientDelegate Out);
+
+    UFUNCTION()
+    void OnRestoreClientFinished(bool succeed, FString message);
 
     /**
      * sign general message
