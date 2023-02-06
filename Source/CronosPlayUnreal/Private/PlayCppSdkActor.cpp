@@ -19,21 +19,6 @@ using namespace std;
 using namespace rust;
 using namespace com::crypto::game_sdk;
 
-FWalletConnectSessionInfo::FWalletConnectSessionInfo() {
-
-    sessionstate = EWalletconnectSessionState::
-        StateDisconnected; // NOLINT : by unreal engine macro, can be ignored
-    connected = false;
-    accounts.Empty();
-    chain_id.Empty();
-    bridge.Empty();
-    key.Empty();
-    client_id.Empty();
-    client_meta.Empty();
-    peer_id.Empty();
-    peer_meta.Empty();
-    handshake_topic.Empty();
-}
 
 ::com::crypto::game_sdk::WalletconnectClient *APlayCppSdkActor::_coreClient =
     NULL;
