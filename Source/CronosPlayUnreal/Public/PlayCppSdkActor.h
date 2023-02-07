@@ -60,9 +60,11 @@ enum class EConnectionType : uint8 {
 /// wallet connect session info
 USTRUCT(BlueprintType)
 struct FWalletConnectSessionInfo {
-    GENERATED_BODY()
+    GENERATED_USTRUCT_BODY()
+    FWalletConnectSessionInfo()
+        : sessionstate(EWalletconnectSessionState::StateDisconnected),
+          connected(false), accounts(TArray<FString>{}), chain_id("0") {}
 
-    FWalletConnectSessionInfo();
     /// state
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayCppSdk")
     EWalletconnectSessionState sessionstate;
