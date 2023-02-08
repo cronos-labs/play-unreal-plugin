@@ -22,7 +22,7 @@ using namespace com::crypto::game_sdk;
 
 ::com::crypto::game_sdk::WalletconnectClient *APlayCppSdkActor::_coreClient =
     NULL;
-const APlayCppSdkActor *APlayCppSdkActor::_sdk = NULL;
+APlayCppSdkActor *APlayCppSdkActor::_sdk = NULL;
 
 class UserWalletConnectCallback : public WalletConnectCallback {
   public:
@@ -32,7 +32,7 @@ class UserWalletConnectCallback : public WalletConnectCallback {
     void onUpdated(const WalletConnectSessionInfo &sessioninfo) const;
 };
 
-const APlayCppSdkActor *APlayCppSdkActor::getInstance() { return _sdk; }
+APlayCppSdkActor *APlayCppSdkActor::getInstance() { return _sdk; }
 
 // Sets default values
 APlayCppSdkActor::APlayCppSdkActor() {
@@ -618,9 +618,12 @@ void APlayCppSdkActor::SignEip155Transaction(
     });
 }
 
-void APlayCppSdkActor::sendEvent(FWalletConnectSessionInfo info) const {
-
+void APlayCppSdkActor::sendEvent(FWalletConnectSessionInfo info) {
+    UE_LOG(LogTemp, Log, TEXT("send event: %s"),
+           *UEnum::GetValueAsString(this->_session_info.sessionstate));
     AsyncTask(ENamedThreads::GameThread, [this, info]() {
+        UE_LOG(LogTemp, Log, TEXT("Call GameThread in send event"));
+        this->_session_info = info;
         this->OnReceiveWalletconnectSessionInfoDelegate.ExecuteIfBound(info);
     });
 }
