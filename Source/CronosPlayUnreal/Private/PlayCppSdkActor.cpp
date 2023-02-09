@@ -337,10 +337,17 @@ void APlayCppSdkActor::EnsureSession(FEnsureSessionDelegate Out) {
                     }
                     assert(20 == newaddress.address.Num());
                     output.addresses.Add(newaddress);
+                    _session_info.accounts.Add(UUtlis::ToHex(newaddress.address));
                 }
                 assert(output.addresses.Num() ==
                        sessionresult.addresses.size());
                 output.chain_id = sessionresult.chain_id;
+
+                _session_info.sessionstate =
+                    EWalletconnectSessionState::StateRestored;
+                _session_info.connected = true;
+                _session_info.chain_id = FString::FromInt(sessionresult.chain_id);
+
                 SetWalletConnectEnsureSessionResult(output);
             } else {
                 result = FString::Printf(
@@ -427,12 +434,6 @@ void APlayCppSdkActor::SetupCallback(
 void APlayCppSdkActor::OnWalletconnectSessionInfo(
     FWalletConnectSessionInfo SessionInfo) {
     switch (SessionInfo.sessionstate) {
-    case EWalletconnectSessionState::StateConnecting:
-        break;
-    case EWalletconnectSessionState::StateConnected:
-        break;
-    case EWalletconnectSessionState::StateUpdated:
-        break;
     case EWalletconnectSessionState::StateDisconnected:
         bool success;
         this->ClearSession(success);

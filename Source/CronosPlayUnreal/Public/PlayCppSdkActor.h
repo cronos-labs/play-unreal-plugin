@@ -44,10 +44,12 @@ DECLARE_DYNAMIC_DELEGATE_TwoParams(FCronosSignedTransactionDelegate,
 /// wallet connect session state
 UENUM(BlueprintType)
 enum class EWalletconnectSessionState : uint8 {
+    StateInit UMETA(DisplayName = "Init"),
     StateDisconnected UMETA(DisplayName = "Disconnected"),
     StateConnecting UMETA(DisplayName = "Connecting"),
     StateConnected UMETA(DisplayName = "Connected"),
-    StateUpdated UMETA(DisplayName = "Updated")
+    StateUpdated UMETA(DisplayName = "Updated"),
+    StateRestored UMETA(DisplayName = "Restored")
 };
 
 UENUM(BlueprintType)
@@ -62,7 +64,7 @@ USTRUCT(BlueprintType)
 struct FWalletConnectSessionInfo {
     GENERATED_USTRUCT_BODY()
     FWalletConnectSessionInfo()
-        : sessionstate(EWalletconnectSessionState::StateDisconnected),
+        : sessionstate(EWalletconnectSessionState::StateInit),
           connected(false), accounts(TArray<FString>{}), chain_id("0") {}
 
     /// state
@@ -212,7 +214,8 @@ class CRONOSPLAYUNREAL_API APlayCppSdkActor : public AActor {
 
     static APlayCppSdkActor *_sdk;
 
-    // Internal session info, it will be updated every time walletconnect status changes
+    // Internal session info, it will be updated every time walletconnect status
+    // changes
     FWalletConnectSessionInfo _session_info;
 
     // Internal session result, it will be set after successfully calling
