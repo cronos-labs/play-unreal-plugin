@@ -7,7 +7,34 @@ on:
     branches: [main]
 
 jobs:
+  compile_commands:
+    runs-on: ubuntu-22.04
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup
+      run: |
+        sudo chmod 777 $GITHUB_WORKSPACE
+        sudo rm -rf /usr/share/dotnet
+        sudo rm -rf /opt/ghc
+        sudo rm -rf "/usr/local/share/boost"
+        sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+        sudo rm -rf /usr/local/lib/android
+        make
+
+    - uses: addnab/docker-run-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ secrets.USER }}
+        password: ${{ secrets.PAT }}
+        image: ghcr.io/epicgames/unreal-engine:dev-slim-5.0
+        options: -v ${{ github.workspace }}:/home/ue4/play-unreal-plugin -e HOME=/home/ue4
+        run: |
+          cd ~/play-unreal-plugin
+          make compile_commands
+
   cpp-linter:
+    needs: compile_commands
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -19,6 +46,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           style: file
+          database: build/compile_commands.json
 
       - name: Fail fast?!
         if: steps.linter.outputs.checks-failed > 0

@@ -120,3 +120,20 @@ else ifeq ($(UNAME), Linux)
 	-Plugin=$(PWD)/CronosPlayUnreal.uplugin \
 	-Package=$(PWD)/Output
 endif
+
+cmake:
+ifeq ($(UNAME), Darwin)
+	/Users/Shared/Epic\ Games/UE_5.1/Engine/Build/BatchFiles/Mac/GenerateProjectFiles.sh \
+    -project=$(PWD)/CronosPlayUnreal.uplugin -game -CMakefile
+else ifeq ($(UNAME), Linux)
+	/home/ue4/UnrealEngine/Engine/Build/BatchFiles/Linux/GenerateProjectFiles.sh \
+    -project=$(PWD)/CronosPlayUnreal.uplugin -game -CMakefile
+endif
+
+compile_commands: cmake
+	mkdir -p build
+	cd build && cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ..
+
+clean:
+	rm CMakeLists.txt
+	rm -rf build
