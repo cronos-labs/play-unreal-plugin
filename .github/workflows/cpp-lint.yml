@@ -31,6 +31,8 @@ jobs:
         options: -v ${{ github.workspace }}:/home/ue4/play-unreal-plugin -e HOME=/home/ue4
         run: |
           cd ~/play-unreal-plugin
+          sudo apt update
+          sudo apt install cmake
           make compile_commands
 
   cpp-linter:
