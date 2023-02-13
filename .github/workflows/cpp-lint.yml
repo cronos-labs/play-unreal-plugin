@@ -27,7 +27,7 @@ jobs:
         registry: ghcr.io
         username: ${{ secrets.USER }}
         password: ${{ secrets.PAT }}
-        image: ghcr.io/epicgames/unreal-engine:dev-slim-5.0
+        image: ghcr.io/epicgames/unreal-engine:dev-slim-5.1
         options: -v ${{ github.workspace }}:/home/ue4/play-unreal-plugin -e HOME=/home/ue4
         run: |
           cd ~/play-unreal-plugin
