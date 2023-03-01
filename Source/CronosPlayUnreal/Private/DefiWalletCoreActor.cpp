@@ -618,14 +618,7 @@ void ADefiWalletCoreActor::GetEthBalance(FString address, FString &output,
                                          bool &success,
                                          FString &output_message) {
     try {
-        if (NULL == _coreWallet) {
-            success = false;
-            output_message = TEXT("Invalid Wallet");
-            return;
-        }
-
-        assert(_coreWallet != NULL);
-        std::string mycronosrpc = TCHAR_TO_UTF8(*myCronosRpc); /* 8545 port */
+        std::string mycronosrpc = TCHAR_TO_UTF8(*myCronosRpc);
         std::string targetaddress = TCHAR_TO_UTF8(*address);
         rust::cxxbridge1::String result =
             get_eth_balance(targetaddress, mycronosrpc).to_string();
