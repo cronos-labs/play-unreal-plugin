@@ -77,6 +77,7 @@ void APlayCppSdkActor::DestroyClient() { destroyCoreClient(); }
 void APlayCppSdkActor::Destroyed() {
     Super::Destroyed();
 
+    UE_LOG(LogTemp, Log, TEXT("PlayCppActor Destroyed"));
     DestroyClient();
 
     _sdk = NULL;
@@ -400,9 +401,14 @@ void APlayCppSdkActor::ClearSession(bool &success) {
     IFileManager &FileManager = IFileManager::Get();
     success =
         FileManager.Delete(*(FPaths::ProjectSavedDir() + "sessioninfo.json"));
-    _coreClient = NULL;
+    destroyCoreClient();
     FWalletConnectEnsureSessionResult session_result;
     _session_result = session_result;
+    _session_info.sessionstate =
+        EWalletconnectSessionState::StateInit;
+    _session_info.connected = false;
+    _session_info.chain_id = FString::FromInt(0);
+
 }
 
 void APlayCppSdkActor::SetupCallback(
@@ -440,6 +446,7 @@ void APlayCppSdkActor::OnWalletconnectSessionInfo(
         this->ClearSession(success);
         if (success) {
             UE_LOG(LogTemp, Log, TEXT("sessioninfo.json was deleted"));
+
         } else {
             UE_LOG(LogTemp, Log,
                    TEXT("can not delete sessioninfo.json, please try again"));
