@@ -31,5 +31,14 @@ public class CronosPlayUnreal : ModuleRules {
                            "Projects", "PlayCppSdkLibrary" });
 
         DynamicallyLoadedModuleNames.AddRange(new string[] {});
+
+        string PluginPath = Utils.MakePathRelativeTo(ModuleDirectory,
+                                                     Target.RelativeEnginePath);
+        if (Target.Platform == UnrealTargetPlatform.Android) {
+            PrivateDependencyModuleNames.Add("Launch");
+            AdditionalPropertiesForReceipt.Add(
+                "AndroidPlugin",
+                System.IO.Path.Combine(PluginPath, "Android.xml"));
+        }
     }
 }

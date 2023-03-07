@@ -64,8 +64,8 @@ USTRUCT(BlueprintType)
 struct FWalletConnectSessionInfo {
     GENERATED_USTRUCT_BODY()
     FWalletConnectSessionInfo()
-        : sessionstate(EWalletconnectSessionState::StateInit),
-          connected(false), accounts(TArray<FString>{}), chain_id("0") {}
+        : sessionstate(EWalletconnectSessionState::StateInit), connected(false),
+          accounts(TArray<FString>{}), chain_id("0") {}
 
     /// state
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayCppSdk")

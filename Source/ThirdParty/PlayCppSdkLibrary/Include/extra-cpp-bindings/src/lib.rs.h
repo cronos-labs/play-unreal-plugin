@@ -932,18 +932,27 @@ struct ImageUrl final {
 /// The wallet registry entry
 ///
 struct WalletEntry final {
+    /// wallet id
+    ///
+    ::rust::String id;
     /// its name
     ///
     ::rust::String name;
     /// icon URLs
     ///
     ::com::crypto::game_sdk::ImageUrl image_url;
-    /// native link (Android/Desktop), empty if none
+    /// mobile native link, empty if none
     ///
-    ::rust::String native_link;
-    /// universal link (iOS), empty if none
+    ::rust::String mobile_native_link;
+    /// mobile universal link, empty if none
     ///
-    ::rust::String universal_link;
+    ::rust::String mobile_universal_link;
+    /// desktop native link, empty if none
+    ///
+    ::rust::String desktop_native_link;
+    /// desktop universal link, empty if none
+    ///
+    ::rust::String desktop_universal_link;
 
     using IsRelocatable = ::std::true_type;
 };
@@ -954,12 +963,8 @@ struct WalletEntry final {
 /// The target platform
 ///
 enum class Platform : ::std::uint8_t {
-    Android = 0,
-    Ios = 1,
-    Linux = 2,
-    Mac = 3,
-    Windows = 4,
-    Browser = 5,
+    Mobile = 0,
+    Desktop = 1,
 };
 #endif // CXXBRIDGE1_ENUM_com$crypto$game_sdk$Platform
 
@@ -1317,17 +1322,32 @@ struct WalletconnectClient final : public ::rust::Opaque {
 #endif // CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletconnectClient
 
 /// filter wallets by platform
-/// (registry_local_path can be empty string if it is not needed to store the
-/// cached registry result)
+/// (`registry_local_path` can be empty string if it is not needed to store the
+/// `cached` registry result)
 ::rust::Vec<::com::crypto::game_sdk::WalletEntry>
 filter_wallets(bool cached, ::rust::String registry_local_path,
                ::com::crypto::game_sdk::Platform platform);
 
 /// get all possible wallets
-/// (registry_local_path can be empty string if it is not needed to store the
-/// cached registry result)
+/// (`registry_local_path` can be empty string if it is not needed to store the
+/// `cached` registry result)
 ::rust::Vec<::com::crypto::game_sdk::WalletEntry>
 get_all_wallets(bool cached, ::rust::String registry_local_path);
+
+/// check wallet by `id` for supported `platform` listing or not
+/// Check wallet id at https://explorer.walletconnect.com/
+/// (`registry_local_path` can be empty string if it is not needed to store the
+/// `cached` registry result)
+bool check_wallet(bool cached, ::rust::String registry_local_path,
+                  ::rust::String id,
+                  ::com::crypto::game_sdk::Platform platform);
+
+/// get a wallet by `id`
+/// Check wallet id at https://explorer.walletconnect.com/
+/// (`registry_local_path` can be empty string if it is not needed to store the
+/// `cached` registry result)
+::com::crypto::game_sdk::WalletEntry
+get_wallet(bool cached, ::rust::String registry_local_path, ::rust::String id);
 
 ::com::crypto::game_sdk::WalletQrcode
 generate_qrcode(::rust::String qrcodestring);

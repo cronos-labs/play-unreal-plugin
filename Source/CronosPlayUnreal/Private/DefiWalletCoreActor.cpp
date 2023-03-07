@@ -5,6 +5,8 @@
 #include <iostream>
 #include <sstream>
 
+#include "Json.h"
+
 #include "GenericPlatform/GenericPlatformHttp.h"
 #include "Interfaces/IPluginManager.h"
 #include "Kismet/GameplayStatics.h"
@@ -13,6 +15,12 @@
 #include "PlayCppSdkLibrary/Include/defi-wallet-core-cpp/src/lib.rs.h"
 #include "PlayCppSdkLibrary/Include/rust/cxx.h"
 #include "TxBuilder.h"
+
+#define SECURE_STORAGE_CLASS "com/cronos/play/SecureStorage"
+
+#if PLATFORM_ANDROID
+#include "Android/AndroidApplication.h"
+#endif
 
 using namespace std;
 using namespace org::defi_wallet_core;
@@ -74,10 +82,6 @@ void ADefiWalletCoreActor::Tick(float DeltaTime) { Super::Tick(DeltaTime); }
 
 void ADefiWalletCoreActor::Destroyed() {
     Super::Destroyed();
-
-    if (GEngine)
-        GEngine->AddOnScreenDebugMessage(
-            -1, 15.0f, FColor::Yellow, TEXT("ADefiWalletCoreActor  Destroyed"));
 
     DestroyWallet();
 
@@ -352,9 +356,9 @@ void ADefiWalletCoreActor::DestroyWallet() {
 }
 
 /**
- * CAUTION: use only for testing & development purpose
- * storing mnemonics need caution, please not to expose user mnemonics for
- * public such as github, logs, files , etc.
+ * CAUTION: because mnemonics are not safe to be stored.
+ * use only for testing & development purpose
+ * use RestoreWalletSaveToSecureStorage for production
  *
  * WARNING!!!: never transfer menmonics to 3rd party library or networking, ipc,
  * logs or any kind of remote and zeroize after copying
@@ -400,6 +404,230 @@ void ADefiWalletCoreActor::RestoreWallet(FString mnemonics, FString password,
                             UTF8_TO_TCHAR(e.what()));
     }
 }
+
+TSharedPtr<FJsonObject> parseJson(FString json) {
+    TSharedRef<TJsonReader<TCHAR>> Reader =
+        TJsonReaderFactory<TCHAR>::Create(json);
+    TSharedPtr<FJsonObject> JsonObject;
+    FJsonSerializer::Deserialize(Reader, JsonObject);
+    return JsonObject;
+}
+
+#if PLATFORM_ANDROID
+
+jclass getSecureStorageClass(JNIEnv *env) {
+    string secureStorageClass = SECURE_STORAGE_CLASS;
+    jclass kotlinClass =
+        FAndroidApplication::FindJavaClass(secureStorageClass.c_str());
+    return kotlinClass;
+}
+jobject getContext(JNIEnv *env) {
+    jclass activityThreadClass =
+        FAndroidApplication::FindJavaClass("android/app/ActivityThread");
+    jmethodID currentActivityThreadMethod =
+        env->GetStaticMethodID(activityThreadClass, "currentActivityThread",
+                               "()Landroid/app/ActivityThread;");
+    jobject activityThread = env->CallStaticObjectMethod(
+        activityThreadClass, currentActivityThreadMethod);
+    jmethodID getApplicationMethod = env->GetMethodID(
+        activityThreadClass, "getApplication", "()Landroid/app/Application;");
+    jobject context =
+        env->CallObjectMethod(activityThread, getApplicationMethod);
+    return context;
+}
+int secureStorageWriteBasic(JNIEnv *env, string userkey, string uservalue) {
+
+    jobject context = getContext(env);
+    jclass secureStorageClass = getSecureStorageClass(env);
+    jmethodID functionMethod = env->GetStaticMethodID(
+        secureStorageClass, "writeSecureStorage",
+        "(Landroid/content/Context;Ljava/lang/String;Ljava/lang/String;)I");
+    jstring key = env->NewStringUTF(userkey.c_str());
+    jstring value = env->NewStringUTF(uservalue.c_str());
+    jint ret = env->CallStaticIntMethod(secureStorageClass, functionMethod,
+                                        context, key, value);
+
+    return (int)ret;
+}
+
+string secureStorageReadBasic(JNIEnv *env, string userkey) {
+    jobject context = getContext(env);
+    jclass secureStorageClass = getSecureStorageClass(env);
+    jmethodID functionMethod = env->GetStaticMethodID(
+        secureStorageClass, "readSecureStorage",
+        "(Landroid/content/Context;Ljava/lang/String;)Ljava/lang/String;");
+    jstring userkeyarg = env->NewStringUTF(userkey.c_str());
+    jobject ret = env->CallStaticObjectMethod(
+        secureStorageClass, functionMethod, context, userkeyarg);
+    string retstring = string(env->GetStringUTFChars((jstring)ret, 0));
+
+    return retstring;
+}
+
+void ADefiWalletCoreActor::RestoreWalletSaveToSecureStorage(
+    FString mnemonics, FString password, FString servicename, FString username,
+    FString &output, bool &success, FString &output_message) {
+
+    try {
+        if (NULL != _coreWallet) {
+            success = false;
+            output_message = TEXT("Wallet Already Exists");
+            return;
+        }
+
+        char tmp[1000];
+        snprintf(tmp, sizeof(tmp), "%s_%s", TCHAR_TO_UTF8(*servicename),
+                 TCHAR_TO_UTF8(*username));
+        string keyvalue(tmp);
+
+        snprintf(tmp, sizeof(tmp),
+                 "{\\\"mnemonic\\\":\\\"%s\\\",\\\"password\\\":\\\"%s\\\"}",
+                 TCHAR_TO_UTF8(*mnemonics), TCHAR_TO_UTF8(*password));
+
+        string datavalue(tmp);
+        JNIEnv *env = FAndroidApplication::GetJavaEnv(true);
+        int ret = secureStorageWriteBasic(env, keyvalue, datavalue);
+        if (ret == 0) {
+            success = false;
+            output_message = TEXT("Save Secure Storage Failed");
+            return;
+        }
+        rust::cxxbridge1::Box<org::defi_wallet_core::Wallet> tmpWallet =
+            restore_wallet(TCHAR_TO_UTF8(*mnemonics), TCHAR_TO_UTF8(*password));
+
+        _coreWallet = tmpWallet.into_raw();
+        assert(_coreWallet != NULL);
+        rust::cxxbridge1::String result =
+            _coreWallet->get_address(CoinType::CryptoOrgMainnet, 0);
+        output = UTF8_TO_TCHAR(result.c_str());
+        success = true;
+    } catch (const rust::cxxbridge1::Error &e) {
+        success = false;
+        output = TEXT("");
+        output_message = FString::Printf(
+            TEXT("CronosPlayUnreal RestoreWalletSaveToSecureStorage Error: %s"),
+            UTF8_TO_TCHAR(e.what()));
+    }
+}
+
+void ADefiWalletCoreActor::RestoreWalletLoadFromSecureStorage(
+    FString servicename, FString username, FString &output, bool &success,
+    FString &output_message) {
+
+    try {
+        if (NULL != _coreWallet) {
+            success = false;
+            output_message = TEXT("Wallet Already Exists");
+            return;
+        }
+        char tmp[1000];
+        snprintf(tmp, sizeof(tmp), "%s_%s", TCHAR_TO_UTF8(*servicename),
+                 TCHAR_TO_UTF8(*username));
+        string keyvalue(tmp);
+        // success: {"result":"value","success":"1","error":""}
+        // fail: {"result":"","success":"0","error":"encrypt file not found"}
+        JNIEnv *env = FAndroidApplication::GetJavaEnv(true);
+        string datavalue = secureStorageReadBasic(env, keyvalue);
+        TSharedPtr<FJsonObject> resultjsonobject =
+            parseJson(UTF8_TO_TCHAR(datavalue.c_str()));
+        FString SuccessValue =
+            resultjsonobject->GetStringField(TEXT("success"));
+        FString ErrorValue = resultjsonobject->GetStringField(TEXT("error"));
+        if (SuccessValue == TEXT("0")) {
+            success = false;
+            // format TEXT
+            output_message = FString::Printf(
+                TEXT("CronosPlayUnreal RestoreWalletLoadFromSecureStorage "
+                     "Error: %s"),
+                *ErrorValue);
+            return;
+        }
+        // {"mnemonic":"value","password":"value"}
+        FString InfoValue = resultjsonobject->GetStringField(TEXT("result"));
+        TSharedPtr<FJsonObject> infojsonobject = parseJson(InfoValue);
+        FString mnemonics = infojsonobject->GetStringField(TEXT("mnemonic"));
+        FString password = infojsonobject->GetStringField(TEXT("password"));
+        rust::cxxbridge1::Box<org::defi_wallet_core::Wallet> tmpWallet =
+            restore_wallet(TCHAR_TO_UTF8(*mnemonics), TCHAR_TO_UTF8(*password));
+        _coreWallet = tmpWallet.into_raw();
+        assert(_coreWallet != NULL);
+        rust::cxxbridge1::String result =
+            _coreWallet->get_address(CoinType::CryptoOrgMainnet, 0);
+        output = UTF8_TO_TCHAR(result.c_str());
+        success = true;
+    } catch (const rust::cxxbridge1::Error &e) {
+        success = false;
+        output = TEXT("");
+        output_message = FString::Printf(
+            TEXT("CronosPlayUnreal RestoreWalletLoadFromSecureStorage Error: "
+                 "%s"),
+            UTF8_TO_TCHAR(e.what()));
+    }
+}
+
+#else
+
+void ADefiWalletCoreActor::RestoreWalletSaveToSecureStorage(
+    FString mnemonics, FString password, FString servicename, FString username,
+    FString &output, bool &success, FString &output_message) {
+    try {
+        if (NULL != _coreWallet) {
+            success = false;
+            output_message = TEXT("Wallet Already Exists");
+            return;
+        }
+
+        rust::cxxbridge1::Box<org::defi_wallet_core::Wallet> tmpWallet =
+            restore_wallet_save_to_securestorage(
+                TCHAR_TO_UTF8(*mnemonics), TCHAR_TO_UTF8(*password),
+                TCHAR_TO_UTF8(*servicename), TCHAR_TO_UTF8(*username));
+        _coreWallet = tmpWallet.into_raw();
+
+        assert(_coreWallet != NULL);
+        rust::cxxbridge1::String result =
+            _coreWallet->get_address(CoinType::CryptoOrgMainnet, 0);
+        output = UTF8_TO_TCHAR(result.c_str());
+        success = true;
+    } catch (const rust::cxxbridge1::Error &e) {
+        success = false;
+        output = TEXT("");
+        output_message = FString::Printf(
+            TEXT("CronosPlayUnreal RestoreWalletSaveToSecureStorage Error: %s"),
+            UTF8_TO_TCHAR(e.what()));
+    }
+}
+
+void ADefiWalletCoreActor::RestoreWalletLoadFromSecureStorage(
+    FString servicename, FString username, FString &output, bool &success,
+    FString &output_message) {
+    try {
+        if (NULL != _coreWallet) {
+            success = false;
+            output_message = TEXT("Wallet Already Exists");
+            return;
+        }
+
+        rust::cxxbridge1::Box<org::defi_wallet_core::Wallet> tmpWallet =
+            restore_wallet_load_from_securestorage(TCHAR_TO_UTF8(*servicename),
+                                                   TCHAR_TO_UTF8(*username));
+        _coreWallet = tmpWallet.into_raw();
+
+        assert(_coreWallet != NULL);
+        rust::cxxbridge1::String result =
+            _coreWallet->get_address(CoinType::CryptoOrgMainnet, 0);
+        output = UTF8_TO_TCHAR(result.c_str());
+        success = true;
+    } catch (const rust::cxxbridge1::Error &e) {
+        success = false;
+        output = TEXT("");
+        output_message = FString::Printf(
+            TEXT("CronosPlayUnreal RestoreWalletLoadFromSecureStorage Error: "
+                 "%s"),
+            UTF8_TO_TCHAR(e.what()));
+    }
+}
+
+#endif
 
 /**
  * CAUTION: use only for testing & development purpose

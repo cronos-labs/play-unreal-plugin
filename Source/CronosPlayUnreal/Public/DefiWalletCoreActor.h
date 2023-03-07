@@ -181,7 +181,7 @@ class CRONOSPLAYUNREAL_API ADefiWalletCoreActor : public AActor {
      * @param password salt in mnemonics restoration
      * @param output generated address (index=0)
      * @param success whether succeed or not
-     * @param message error message, "" if succeed
+     * @param output_message error message, "" if succeed
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "RestoreWallet", Keywords = "Wallet"),
@@ -190,13 +190,50 @@ class CRONOSPLAYUNREAL_API ADefiWalletCoreActor : public AActor {
                        bool &success, FString &output_message);
 
     /**
+     * Restore wallet with mnemonics and password
+     * and save to secure storage
+     * @param mnemonics mnemonics to restore
+     * @param password salt in mnemonics restoration
+     * @param servicename service name for secure storage
+     * @param username username for secure storage
+     * @param output generated address (index=0)
+     * @param success whether succeed or not
+     * @param output_message error message, "" if succeed
+     */
+    UFUNCTION(BlueprintCallable,
+              meta = (DisplayName = "RestoreWalletSaveToSecureStorage",
+                      Keywords = "Wallet"),
+              Category = "CronosPlayUnreal")
+    void RestoreWalletSaveToSecureStorage(FString mnemonics, FString password,
+                                          FString servicename, FString username,
+                                          FString &output, bool &success,
+                                          FString &output_message);
+
+    /**
+     * Restore wallet from secure storage
+     * @param servicename service name for secure storage
+     * @param username username for secure storage
+     * @param output generated address (index=0)
+     * @param success whether succeed or not
+     * @param output_message error message, "" if succeed
+     */
+    UFUNCTION(BlueprintCallable,
+              meta = (DisplayName = "RestoreWalletLoadFromSecureStorage",
+                      Keywords = "Wallet"),
+              Category = "CronosPlayUnreal")
+    void RestoreWalletLoadFromSecureStorage(FString servicename,
+                                            FString username, FString &output,
+                                            bool &success,
+                                            FString &output_message);
+
+    /**
      * Create a new wallet with password and wordcount (Only for testing &
      * development purpose).
      * @param password salt in mnemonics restoration
      * @param wordcount mnemonics word count (12, 18, 24)
      * @param output generated address (index=0)
      * @param success whether succeed or not
-     * @param message error message, "" if succeed
+     * @param output_message error message, "" if succeed
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "InitializeNewWallet", Keywords = "Wallet"),
@@ -210,7 +247,7 @@ class CRONOSPLAYUNREAL_API ADefiWalletCoreActor : public AActor {
      * development purpose).
      * @param output backup mnemonics
      * @param success whether succeed or not
-     * @param message error message, "" if succeed
+     * @param output_message error message, "" if succeed
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "GetBackupMnemonicPhrase",
@@ -226,7 +263,7 @@ class CRONOSPLAYUNREAL_API ADefiWalletCoreActor : public AActor {
      * @param wordcount mnemonics word count (12, 18, 24)
      * @param output generated mnemonics
      * @param success whether succeed or not
-     * @param message error message, "" if succeed
+     * @param output_message error message, "" if succeed
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "GenerateMnemonics", Keywords = "Wallet"),
@@ -244,7 +281,7 @@ class CRONOSPLAYUNREAL_API ADefiWalletCoreActor : public AActor {
      * @param amountdenom   amount denom to send
      * @param output transaction hash
      * @param success whether succeed or not
-     * @param message error message, "" if succeed
+     * @param output_message error message, "" if succeed
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "SendAmount", Keywords = "Wallet"),
@@ -258,7 +295,7 @@ class CRONOSPLAYUNREAL_API ADefiWalletCoreActor : public AActor {
      * @param index  wallet index which starts from 0
      * @param output address string
      * @param success whether succeed or not
-     * @param message error message, "" if succeed
+     * @param output_message error message, "" if succeed
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "GetAddress", Keywords = "Wallet"),
@@ -269,7 +306,7 @@ class CRONOSPLAYUNREAL_API ADefiWalletCoreActor : public AActor {
     /**
      * Cosmos get balance.
      * @param success whether succeed or not
-     * @param message error message, "" if succeed
+     * @param output_message error message, "" if succeed
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "GetBalance", Keywords = "Wallet"),
@@ -283,7 +320,7 @@ class CRONOSPLAYUNREAL_API ADefiWalletCoreActor : public AActor {
      * @param nftowner nft owner
      * @param output nft supply
      * @param success whether succeed or not
-     * @param message error message, "" if succeed
+     * @param output_message error message, "" if succeed
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "GetNFTSupply", Keywords = "Wallet"),
@@ -297,7 +334,7 @@ class CRONOSPLAYUNREAL_API ADefiWalletCoreActor : public AActor {
      * @param nftowner nft owner
      * @param output cosmos nft owner
      * @param success whether succeed or not
-     * @param message error message, "" if succeed
+     * @param output_message error message, "" if succeed
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "GetNFTOwner", Keywords = "Wallet"),
@@ -310,7 +347,7 @@ class CRONOSPLAYUNREAL_API ADefiWalletCoreActor : public AActor {
      * @param denomid denom id
      * @param output cosmos nft collection
      * @param success whether succeed or not
-     * @param message error message, "" if succeed
+     * @param output_message error message, "" if succeed
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "GetNFTCollection", Keywords = "Wallet"),
@@ -323,7 +360,7 @@ class CRONOSPLAYUNREAL_API ADefiWalletCoreActor : public AActor {
      * @param denomid denom id
      * @param output cosmos nft denom
      * @param success whether succeed or not
-     * @param message error message, "" if succeed
+     * @param output_message error message, "" if succeed
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "GetNFTDenom", Keywords = "Wallet"),
@@ -336,7 +373,7 @@ class CRONOSPLAYUNREAL_API ADefiWalletCoreActor : public AActor {
      * @param denomname denom name
      * @param output cosmos nft denom
      * @param success whether succeed or not
-     * @param message error message, "" if succeed
+     * @param output_message error message, "" if succeed
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "GetNFTDenomByName", Keywords = "Wallet"),
@@ -348,7 +385,7 @@ class CRONOSPLAYUNREAL_API ADefiWalletCoreActor : public AActor {
      * Get all nft denoms
      * @param output cosmos nft denom
      * @param success whether succeed or not
-     * @param message error message, "" if succeed
+     * @param output_message error message, "" if succeed
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "GetNFTAllDenoms", Keywords = "Wallet"),
@@ -362,7 +399,7 @@ class CRONOSPLAYUNREAL_API ADefiWalletCoreActor : public AActor {
      * @param tokenid token id
      * @param cosmos nft token
      * @param success whether succeed or not
-     * @param message error message, "" if succeed
+     * @param output_message error message, "" if succeed
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "GetNFTToken", Keywords = "Wallet"),
@@ -375,7 +412,7 @@ class CRONOSPLAYUNREAL_API ADefiWalletCoreActor : public AActor {
      * @param index wallet index which starts from 0
      * @param output get eth address
      * @param success whether succeed or not
-     * @param message error message, "" if succeed
+     * @param output_message error message, "" if succeed
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "GetEthAddress", Keywords = "Wallet"),
@@ -388,7 +425,7 @@ class CRONOSPLAYUNREAL_API ADefiWalletCoreActor : public AActor {
      * @param address eth address
      * @param output get balance
      * @param success whether succeed or not
-     * @param message error message, "" if succeed
+     * @param output_message error message, "" if succeed
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "GetEthBalance", Keywords = "Wallet"),
@@ -417,7 +454,7 @@ class CRONOSPLAYUNREAL_API ADefiWalletCoreActor : public AActor {
      * @param gasPrice gas price in wei, eg. 1wei= 1/(10^18)eth
      * 1wei=1/(10^9)gwei
      * @param success whether succeed or not
-     * @param message error message, "" if succeed
+     * @param output_message error message, "" if succeed
      * @return signed transaction as bytes
      */
     UFUNCTION(BlueprintCallable,
@@ -454,7 +491,7 @@ class CRONOSPLAYUNREAL_API ADefiWalletCoreActor : public AActor {
      * @param document document to sign
      * @param signature get signature
      * @param success whether succeed or not
-     * @param message error message, "" if succeed
+     * @param output_message error message, "" if succeed
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "SignLogin", Keywords = "Wallet"),
@@ -468,7 +505,7 @@ class CRONOSPLAYUNREAL_API ADefiWalletCoreActor : public AActor {
      * @param document: document to verify
      * @param signature signature to verify
      * @param success whether succeed or not
-     * @param message error message, "" if succeed
+     * @param output_message error message, "" if succeed
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "VerifyLogin", Keywords = "Wallet"),
@@ -482,7 +519,7 @@ class CRONOSPLAYUNREAL_API ADefiWalletCoreActor : public AActor {
      * @param accountAddress account address to fetch balance
      * @param balance get balance of account address
      * @param success whether succeed or not
-     * @param message error message, "" if succeed
+     * @param output_message error message, "" if succeed
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "Erc20Balance", Keywords = "Wallet"),
@@ -496,7 +533,7 @@ class CRONOSPLAYUNREAL_API ADefiWalletCoreActor : public AActor {
      * @param accountAddress account address to fetch balance
      * @param balance to get balance of this address
      * @param success whether succeed or not
-     * @param message error message, "" if succeed
+     * @param output_message error message, "" if succeed
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "Erc721Balance", Keywords = "Wallet"),
@@ -512,7 +549,7 @@ class CRONOSPLAYUNREAL_API ADefiWalletCoreActor : public AActor {
      * @param tokenID toiken id to fetch balance
      * @param balance to get balance
      * @param success whether succeed or not
-     * @param message error message, "" if succeed
+     * @param output_message error message, "" if succeed
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "Erc1155Balance", Keywords = "Wallet"),
@@ -528,7 +565,7 @@ class CRONOSPLAYUNREAL_API ADefiWalletCoreActor : public AActor {
      * @param tokenIDs toiken ids to fetch balance
      * @param balanceofbatch balances
      * @param success whether succeed or not
-     * @param message error message, "" if succeed
+     * @param output_message error message, "" if succeed
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "Erc1155BalanceOfBatch",
@@ -545,7 +582,7 @@ class CRONOSPLAYUNREAL_API ADefiWalletCoreActor : public AActor {
      * @param contractAddress erc20 contract address
      * @param name get name
      * @param success whether succeed or not
-     * @param message error message, "" if succeed
+     * @param output_message error message, "" if succeed
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "Erc20Name", Keywords = "Wallet"),
@@ -558,7 +595,7 @@ class CRONOSPLAYUNREAL_API ADefiWalletCoreActor : public AActor {
      * @param contractAddress erc20 contract address
      * @param symbol get symbol
      * @param success whether succeed or not
-     * @param message error message, "" if succeed
+     * @param output_message error message, "" if succeed
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "Erc20Symbol", Keywords = "Wallet"),
@@ -571,7 +608,7 @@ class CRONOSPLAYUNREAL_API ADefiWalletCoreActor : public AActor {
      * @param contractAddress erc20 contract address
      * @param decimals get decimals
      * @param success whether succeed or not
-     * @param message error message, "" if succeed
+     * @param output_message error message, "" if succeed
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "Erc20Decimals", Keywords = "Wallet"),
@@ -584,7 +621,7 @@ class CRONOSPLAYUNREAL_API ADefiWalletCoreActor : public AActor {
      * @param contractAddress erc20 contract address
      * @param totalSupply get total supply
      * @param success whether succeed or not
-     * @param message error message, "" if succeed
+     * @param output_message error message, "" if succeed
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "Erc20TotalSupply", Keywords = "Wallet"),
@@ -597,7 +634,7 @@ class CRONOSPLAYUNREAL_API ADefiWalletCoreActor : public AActor {
      * @param contractAddress erc721 contract address
      * @param name get name
      * @param success whether succeed or not
-     * @param message error message, "" if succeed
+     * @param output_message error message, "" if succeed
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "Erc721Name", Keywords = "Wallet"),
@@ -610,7 +647,7 @@ class CRONOSPLAYUNREAL_API ADefiWalletCoreActor : public AActor {
      * @param contractAddress contract address
      * @param symbol get symbol
      * @param success whether succeed or not
-     * @param message error message, "" if succeed
+     * @param output_message error message, "" if succeed
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "Erc721Symbol", Keywords = "Wallet"),
@@ -624,7 +661,7 @@ class CRONOSPLAYUNREAL_API ADefiWalletCoreActor : public AActor {
      * @param tokenID token id
      * @param uri  get uri
      * @param success whether succeed or not
-     * @param message error message, "" if succeed
+     * @param output_message error message, "" if succeed
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "Erc721Uri", Keywords = "Wallet"),
@@ -638,7 +675,7 @@ class CRONOSPLAYUNREAL_API ADefiWalletCoreActor : public AActor {
      * @param tokenID token id
      * @param result approved
      * @param success whether succeed or not
-     * @param message error message, "" if succeed
+     * @param output_message error message, "" if succeed
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "Erc721GetApproved", Keywords = "Wallet"),
@@ -654,7 +691,7 @@ class CRONOSPLAYUNREAL_API ADefiWalletCoreActor : public AActor {
      * @param erc721approvedaddress  approved address
      * @param result is approved for all
      * @param success whether succeed or not
-     * @param message error message, "" if succeed
+     * @param output_message error message, "" if succeed
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "Erc721IsApprovedForAll",
@@ -670,7 +707,7 @@ class CRONOSPLAYUNREAL_API ADefiWalletCoreActor : public AActor {
      * @param tokenID token id
      * @param ercowner get owner
      * @param success whether succeed or not
-     * @param message error message, "" if succeed
+     * @param output_message error message, "" if succeed
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "Erc721Owner", Keywords = "Wallet"),
@@ -683,7 +720,7 @@ class CRONOSPLAYUNREAL_API ADefiWalletCoreActor : public AActor {
      * @param contractAddress erc 721 contract address
      * @param totalsupply total suppy
      * @param success whether succeed or not
-     * @param message error message, "" if succeed
+     * @param output_message error message, "" if succeed
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "Erc721TotalSupply", Keywords = "Wallet"),
@@ -691,14 +728,14 @@ class CRONOSPLAYUNREAL_API ADefiWalletCoreActor : public AActor {
     void Erc721TotalSupply(FString contractAddress, FString &totalsupply,
                            bool &success, FString &output_message);
 
-    /*
+    /**
      *  Returns a token ID at a given index of all the tokens stored by the
      * contract. Use along with totalSupply to enumerate all tokens.
      * @param contractAddress erc 721 contract address
      * @param erc721index which index
      * @param token a token ID at a given index
      * @param success whether succeed or not
-     * @param message error message, "" if succeed
+     * @param output_message error message, "" if succeed
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "Erc721TokenByIndex", Keywords = "Wallet"),
@@ -707,7 +744,7 @@ class CRONOSPLAYUNREAL_API ADefiWalletCoreActor : public AActor {
                             FString &token, bool &success,
                             FString &output_message);
 
-    /*
+    /**
      * Returns a token ID owned by owner at a given index of its token list. Use
      * along with balanceOf to enumerate all of owner's tokens.
      * @param contractAddress erc 721 contract address
@@ -715,7 +752,7 @@ class CRONOSPLAYUNREAL_API ADefiWalletCoreActor : public AActor {
      * @param erc721index which index
      * @param token a token ID at a given index
      * @param success whether succeed or not
-     * @param message error message, "" if succeed
+     * @param output_message error message, "" if succeed
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "Erc721TokenOwnerByIndex",
@@ -731,7 +768,7 @@ class CRONOSPLAYUNREAL_API ADefiWalletCoreActor : public AActor {
      * @param tokenID token ID
      * @param uri  get uri
      * @param success whether succeed or not
-     * @param message error message, "" if succeed
+     * @param output_message error message, "" if succeed
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "Erc1155Uri", Keywords = "Wallet"),
@@ -746,7 +783,7 @@ class CRONOSPLAYUNREAL_API ADefiWalletCoreActor : public AActor {
      * @param erc1155approvedaddress  approved address
      * @param result is approved for all
      * @param success whether succeed or not
-     * @param message error message, "" if succeed
+     * @param output_message error message, "" if succeed
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "Erc1155IsApprovedForAll",
@@ -812,7 +849,7 @@ class CRONOSPLAYUNREAL_API ADefiWalletCoreActor : public AActor {
      * @param erc20spender erc20 spender
      * @param result allowance
      * @param success whether succeed or not
-     * @param message error message, "" if succeed
+     * @param output_message error message, "" if succeed
      */
 
     UFUNCTION(BlueprintCallable,

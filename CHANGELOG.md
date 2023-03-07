@@ -1,5 +1,17 @@
 # Changelog
 
+## [Unreleased]
+- Add SecureStorageOption for Wallets for desktop, mobile
+- Add merge group event on ci actions
+- Fix Cpp Linter
+- Add StateInit and StateRestored for Walletconnect
+- Fix WalletConnectSessionInfo is not correctly constructed
+- Fix Function RestoreClient is not aysnc
+- Add codeowners file
+- Fix Outdated Cronos Play Application Form link
+- Fix Linux/Mac Makefile to cache mac/linux build
+
+
 ## [v0.0.10-alpha] - 2023-1-09
 - Add DynamicContractObject: which is created from DefiWalletActor
 - Add DynamicContractObject::Send : for modifying contract
