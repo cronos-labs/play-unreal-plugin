@@ -1,6 +1,9 @@
 # Changelog
 
 ## [Unreleased]
+
+
+## [v0.0.11-alpha] - 2023-3-07
 - Add SecureStorageOption for Wallets for desktop, mobile
 - Add merge group event on ci actions
 - Fix Cpp Linter
