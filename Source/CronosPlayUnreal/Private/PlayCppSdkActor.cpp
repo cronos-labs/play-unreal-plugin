@@ -404,10 +404,7 @@ void APlayCppSdkActor::ClearSession(bool &success) {
     destroyCoreClient();
     FWalletConnectEnsureSessionResult session_result;
     _session_result = session_result;
-    _session_info.sessionstate =
-        EWalletconnectSessionState::StateInit;
-    _session_info.connected = false;
-    _session_info.chain_id = FString::FromInt(0);
+    InitWalletconnectSessionState();
 
 }
 
