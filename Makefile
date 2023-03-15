@@ -2,13 +2,13 @@ UNAME := $(shell uname)
 PWD = $(shell pwd)
 
 # Set the play cpp sdk version
-PLAYCPPSDK=v0.0.16-alpha
+PLAYCPPSDK=v0.0.17-alpha-testing
 # Set the play-cpp-sdk cache path
 PLAYCPPSDK_CACHE_DIR=./install/$(PLAYCPPSDK)
 # Set the play-cpp-sdk target path
 PLAYCPPSDK_TARGET_DIR=./Source/ThirdParty/PlayCppSdkLibrary/Lib
 # Set NDK versions (to see what NDK_VERSION is available, please check play-cpp-sdk release page)
-NDK_VERSION=21.4.7075529
+NDK_VERSION=23.2.8568313
 # Set names of play cpp sdk library files
 MAC_FILE=play_cpp_sdk_Darwin_x86_64.tar.gz
 WINDOWS_FILE=play_cpp_sdk_Windows_x86_64.zip

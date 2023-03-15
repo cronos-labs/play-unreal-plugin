@@ -1,5 +1,5 @@
 REM Set the play cpp sdk version
-set PLAYCPPSDK=v0.0.16-alpha
+set PLAYCPPSDK=v0.0.17-alpha-testing
 
 REM Set the play-cpp-sdk cache path
 set PLAYCPPSDK_CACHE_DIR=C:\play-cpp-sdk\%PLAYCPPSDK%
@@ -8,7 +8,7 @@ REM Set the play-cpp-sdk target path
 set PLAYCPPSDK_TARGET_DIR=Source\ThirdParty\PlayCppSdkLibrary\Lib
 
 REM Set NDK versions (to see what NDK_VERSION is available, please check play-cpp-sdk release page)
-set NDK_VERSION=21.4.7075529
+set NDK_VERSION=23.2.8568313
 
 REM Set names of play cpp sdk library files
 set MAC_FILE=play_cpp_sdk_Darwin_x86_64.tar.gz
