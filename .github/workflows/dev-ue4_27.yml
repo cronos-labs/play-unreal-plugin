@@ -27,7 +27,7 @@ jobs:
         sudo rm -rf "/usr/local/share/boost"
         sudo rm -rf "$AGENT_TOOLSDIRECTORY"
         sudo rm -rf /usr/local/lib/android
-        make
+        TARGET=4.27 make
 
     - uses: addnab/docker-run-action@v3
       with:

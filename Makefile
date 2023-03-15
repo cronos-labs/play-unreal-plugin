@@ -2,13 +2,32 @@ UNAME := $(shell uname)
 PWD = $(shell pwd)
 
 # Set the play cpp sdk version
-PLAYCPPSDK=v0.0.16-alpha
+PLAYCPPSDK=v0.0.17-alpha-testing-r23a
 # Set the play-cpp-sdk cache path
 PLAYCPPSDK_CACHE_DIR=./install/$(PLAYCPPSDK)
 # Set the play-cpp-sdk target path
 PLAYCPPSDK_TARGET_DIR=./Source/ThirdParty/PlayCppSdkLibrary/Lib
 # Set NDK versions (to see what NDK_VERSION is available, please check play-cpp-sdk release page)
-NDK_VERSION=21.4.7075529
+UE4_27_NDK_VERSION=23.0.7599858
+UE5_0_NDK_VERSION=23.0.7599858
+UE5_1_NDK_VERSION=25.1.8937393
+
+ifeq ($(TARGET), 4.27)
+	NDK_VERSION=$(UE4_27_NDK_VERSION)
+else ifeq ($(TARGET), 5.0)
+	NDK_VERSION=$(UE5_0_NDK_VERSION)
+else ifeq ($(TARGET), 5.1)
+	NDK_VERSION=$(UE5_1_NDK_VERSION)
+else ifeq ($(TARGET),)
+	NDK_VERSION=$(UE5_1_NDK_VERSION)
+else
+	NDK_VERSION=$(UE5_1_NDK_VERSION)
+endif
+
+ifndef NDK_VERSION
+# NDK_VERSION=23.0.7599858
+NDK_VERSION=25.1.8937393
+endif
 # Set names of play cpp sdk library files
 MAC_FILE=play_cpp_sdk_Darwin_x86_64.tar.gz
 WINDOWS_FILE=play_cpp_sdk_Windows_x86_64.zip
@@ -44,26 +63,40 @@ IOS_CHEKSUM_SRC=https://github.com/cronos-labs/play-cpp-sdk/releases/download/$(
 
 all: download checkhash uncompress
 
+CACHE_OS_LIST := Mac Win64 Linux Android/arm64-v8a Android/armeabi-v7a Android/x86_64 iOS/arm64
 download:
-ifneq (,$(wildcard $(PLAYCPPSDK_CACHE_DIR)))
-	echo "$(PLAYCPPSDK_CACHE_DIR) exists"
-else
-	mkdir -p $(PLAYCPPSDK_CACHE_DIR)/Mac
-	mkdir -p $(PLAYCPPSDK_CACHE_DIR)/Win64
-	mkdir -p $(PLAYCPPSDK_CACHE_DIR)/Linux
-	mkdir -p $(PLAYCPPSDK_CACHE_DIR)/Android/arm64-v8a
-	mkdir -p $(PLAYCPPSDK_CACHE_DIR)/Android/armeabi-v7a
-	mkdir -p $(PLAYCPPSDK_CACHE_DIR)/Android/x86_64
-	mkdir -p $(PLAYCPPSDK_CACHE_DIR)/iOS/arm64
-
-	cd $(PLAYCPPSDK_CACHE_DIR)/Mac && curl -s -O -L $(MAC_SRC)
-	cd $(PLAYCPPSDK_CACHE_DIR)/Win64 && curl -s -O -L $(WINDOWS_SRC)
-	cd $(PLAYCPPSDK_CACHE_DIR)/Linux && curl -s -O -L $(LINUX_SRC)
-	cd $(PLAYCPPSDK_CACHE_DIR)/Android/arm64-v8a && curl -s -O -L $(ANDROID_ARM64_V8A_SRC)
-	cd $(PLAYCPPSDK_CACHE_DIR)/Android/armeabi-v7a && curl -s -O -L $(ANDROID_ARMEABI_V7A_SRC)
-	cd $(PLAYCPPSDK_CACHE_DIR)/Android/x86_64 && curl -s -O -L $(ANDROID_X86_64_SRC)
-	cd $(PLAYCPPSDK_CACHE_DIR)/iOS/arm64 && curl -s -O -L $(IOS_SRC)
-endif
+	for os in $(CACHE_OS_LIST); do	\
+		if [ "$$os" = "Mac" ]; then \
+			cache_file=$(MAC_FILE); \
+			cache_src=$(MAC_SRC); \
+		elif [ "$$os" = "Win64" ]; then \
+			cache_file=$(WINDOWS_FILE); \
+			cache_src=$(WINDOWS_SRC); \
+		elif [ "$$os" = "Linux" ]; then \
+			cache_file=$(LINUX_FILE); \
+			cache_src=$(LINUX_SRC); \
+		elif [ "$$os" = "Android/arm64-v8a" ]; then \
+			cache_file=$(ARM64_V8A_FILE); \
+			cache_src=$(ANDROID_ARM64_V8A_SRC); \
+		elif [ "$$os" = "Android/armeabi-v7a" ]; then \
+			cache_file=$(ARMEABI_V7A_FILE); \
+			cache_src=$(ANDROID_ARMEABI_V7A_SRC); \
+		elif [ "$$os" = "Android/x86_64" ]; then \
+			cache_file=$(X86_64_FILE); \
+			cache_src=$(ANDROID_X86_64_SRC); \
+		elif [ "$$os" = "iOS/arm64" ]; then \
+			cache_file=$(IOS_FILE); \
+			cache_src=$(IOS_SRC); \
+		fi; \
+		cache_dir=$(PLAYCPPSDK_CACHE_DIR)/$$os/$$cache_file; \
+		if [ -f $$cache_dir ]; then \
+			echo "$$cache_dir exists"; \
+		else \
+			mkdir -p $(PLAYCPPSDK_CACHE_DIR)/$$os; \
+			echo "$$cache_dir not exists"; \
+			curl -L -o $$cache_dir $$cache_src; \
+		fi \
+	done
 
 checkhash:
 ifeq ($(UNAME), Darwin)
