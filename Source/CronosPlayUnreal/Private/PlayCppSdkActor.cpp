@@ -405,7 +405,6 @@ void APlayCppSdkActor::ClearSession(bool &success) {
     FWalletConnectEnsureSessionResult session_result;
     _session_result = session_result;
     InitWalletconnectSessionState();
-
 }
 
 void APlayCppSdkActor::SetupCallback(

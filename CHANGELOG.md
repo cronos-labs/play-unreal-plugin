@@ -1,6 +1,37 @@
 # Changelog
 
 ## [Unreleased]
+- Change sync apis to async
+  Change GetEthBalance to async
+  Change GetBalance to async
+  Change GetNFTSupply to async
+  Change GetNFTOwner to async
+  Change GetNFTCollection to async
+  Change GetNFTDenom to async
+  Change GetNFTDenomByName to async
+  Change GetNFTAllDenoms to async
+  Change SendAmount to async
+  Change GetNFTToken to async
+  Change Erc20Balance to async
+  Change Erc721Balance to async
+  Change Erc1155Balance to async
+  Change Erc1155BalanceOfBatch to async
+  Change Erc721Name to async
+  Change Erc721Symbol to async
+  Change Erc721Uri to async
+  Change Erc721GetApproved to async
+  Change Erc721IsApprovedForAll to async
+  Change Erc1155Uri to async
+  Change Erc1155IsApprovedForAll to async
+  Change Erc721Owner to async
+  Change Erc721TotalSupply to async
+  Change Erc721TokenByIndex to async
+  Change Erc721TokenOwnerByIndex to async
+  Change Erc20Name to async
+  Change Erc20Symbol to async
+  Change Erc20Decimals to async
+  Change Erc20TotalSupply to async
+  Change Erc20Allowance to async
 
 
 ## [v0.0.11-alpha] - 2023-3-07

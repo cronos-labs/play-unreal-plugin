@@ -29,7 +29,85 @@ destroyErc721();
 destroyErc1155();
 */
 
-// callback
+DECLARE_DYNAMIC_DELEGATE_ThreeParams(FErc721IsApprovedForAllDelegate, bool,
+                                     Output, bool, Success, FString,
+                                     OutputMesssage);
+
+DECLARE_DYNAMIC_DELEGATE_ThreeParams(FErc1155IsApprovedForAllDelegate, bool,
+                                     Output, bool, Success, FString,
+                                     OutputMesssage);
+
+DECLARE_DYNAMIC_DELEGATE_ThreeParams(FGetNFTSupplyDelegate, int64, Output, bool,
+                                     Success, FString, OutputMesssage);
+
+DECLARE_DYNAMIC_DELEGATE_ThreeParams(FErc20DecimalsDelegate, int64, Output,
+                                     bool, Success, FString, OutputMesssage);
+
+DECLARE_DYNAMIC_DELEGATE_ThreeParams(FErc1155BalanceOfBatchDelegate,
+                                     TArray<FString>, Output, bool, Success,
+                                     FString, OutputMesssage);
+
+DECLARE_DYNAMIC_DELEGATE_ThreeParams(FErc721NameDelegate, FString, Output, bool,
+                                     Success, FString, OutputMesssage);
+
+DECLARE_DYNAMIC_DELEGATE_ThreeParams(FErc20AllowanceDelegate, FString, Output,
+                                     bool, Success, FString, OutputMesssage);
+
+DECLARE_DYNAMIC_DELEGATE_ThreeParams(FErc1155UriDelegate, FString, Output, bool,
+                                     Success, FString, OutputMesssage);
+
+DECLARE_DYNAMIC_DELEGATE_ThreeParams(FErc721TokenOwnerByIndexDelegate, FString,
+                                     Output, bool, Success, FString,
+                                     OutputMesssage);
+
+DECLARE_DYNAMIC_DELEGATE_ThreeParams(FErc721TokenByIndexDelegate, FString,
+                                     Output, bool, Success, FString,
+                                     OutputMesssage);
+
+DECLARE_DYNAMIC_DELEGATE_ThreeParams(FErc721TotalSupplyDelegate, FString,
+                                     Output, bool, Success, FString,
+                                     OutputMesssage);
+
+DECLARE_DYNAMIC_DELEGATE_ThreeParams(FErc721OwnerDelegate, FString, Output,
+                                     bool, Success, FString, OutputMesssage);
+
+DECLARE_DYNAMIC_DELEGATE_ThreeParams(FErc721GetApprovedDelegate, FString,
+                                     Output, bool, Success, FString,
+                                     OutputMesssage);
+
+DECLARE_DYNAMIC_DELEGATE_ThreeParams(FErc721UriDelegate, FString, Output, bool,
+                                     Success, FString, OutputMesssage);
+
+DECLARE_DYNAMIC_DELEGATE_ThreeParams(FErc721SymbolDelegate, FString, Output,
+                                     bool, Success, FString, OutputMesssage);
+
+DECLARE_DYNAMIC_DELEGATE_ThreeParams(FErc20TotalSupplyDelegate, FString, Output,
+                                     bool, Success, FString, OutputMesssage);
+
+DECLARE_DYNAMIC_DELEGATE_ThreeParams(FErc20SymbolDelegate, FString, Output,
+                                     bool, Success, FString, OutputMesssage);
+
+DECLARE_DYNAMIC_DELEGATE_ThreeParams(FErc20NameDelegate, FString, Output, bool,
+                                     Success, FString, OutputMesssage);
+
+DECLARE_DYNAMIC_DELEGATE_ThreeParams(FErc1155BalanceDelegate, FString, Output,
+                                     bool, Success, FString, OutputMesssage);
+
+DECLARE_DYNAMIC_DELEGATE_ThreeParams(FErc721BalanceDelegate, FString, Output,
+                                     bool, Success, FString, OutputMesssage);
+
+DECLARE_DYNAMIC_DELEGATE_ThreeParams(FErc20BalanceDelegate, FString, Output,
+                                     bool, Success, FString, OutputMesssage);
+
+DECLARE_DYNAMIC_DELEGATE_ThreeParams(FGetEthBalanceDelegate, FString, Output,
+                                     bool, Success, FString, OutputMesssage);
+
+DECLARE_DYNAMIC_DELEGATE_ThreeParams(FSendAmountDelegate, FString, Output, bool,
+                                     Success, FString, OutputMesssage);
+
+DECLARE_DYNAMIC_DELEGATE_ThreeParams(FGetBalanceDelegate, FString, Output, bool,
+                                     Success, FString, OutputMesssage);
+
 // eth
 DECLARE_DYNAMIC_DELEGATE_TwoParams(FSendEthTransferDelegate,
                                    FCronosTransactionReceiptRaw, TxResult,
@@ -84,6 +162,14 @@ struct FCosmosNFTDenom {
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CronosPlayUnreal")
     FString Creator;
 };
+// nft
+DECLARE_DYNAMIC_DELEGATE_ThreeParams(FGetNFTDenomDelegate, FCosmosNFTDenom,
+                                     Output, bool, Success, FString,
+                                     OutputMesssage);
+
+DECLARE_DYNAMIC_DELEGATE_ThreeParams(FGetNFTAllDenomsDelegate,
+                                     TArray<FCosmosNFTDenom>, Output, bool,
+                                     Success, FString, OutputMesssage);
 
 /**
  * Cosmos NFT Token
@@ -107,6 +193,9 @@ struct FCosmosNFTToken {
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CronosPlayUnreal")
     FString Owner;
 };
+DECLARE_DYNAMIC_DELEGATE_ThreeParams(FGetNFTTokenDelegate, FCosmosNFTToken,
+                                     Output, bool, Success, FString,
+                                     OutputMesssage);
 
 /**
  * Cosmos NFT Collection
@@ -124,6 +213,10 @@ struct FCosmosNFTCollection {
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CronosPlayUnreal")
     TArray<FCosmosNFTToken> NFTs;
 };
+// nft
+DECLARE_DYNAMIC_DELEGATE_ThreeParams(FGetNFTCollectionDelegate,
+                                     FCosmosNFTCollection, Output, bool,
+                                     Success, FString, OutputMesssage);
 
 /**
  * Cosmos ID Collection
@@ -160,6 +253,10 @@ struct FCosmosNFTOwner {
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CronosPlayUnreal")
     TArray<FCosmosNFTIDCollection> IDCollections;
 };
+// nft
+DECLARE_DYNAMIC_DELEGATE_ThreeParams(FGetNFTOwnerDelegate, FCosmosNFTOwner,
+                                     Output, bool, Success, FString,
+                                     OutputMesssage);
 
 UCLASS()
 class CRONOSPLAYUNREAL_API ADefiWalletCoreActor : public AActor {
@@ -279,16 +376,16 @@ class CRONOSPLAYUNREAL_API ADefiWalletCoreActor : public AActor {
      * @param toaddress receiver address
      * @param amount amount to send
      * @param amountdenom   amount denom to send
-     * @param output transaction hash
-     * @param success whether succeed or not
-     * @param output_message error message, "" if succeed
+     * @param output callback
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "SendAmount", Keywords = "Wallet"),
               Category = "CronosPlayUnreal")
     void SendAmount(int32 walletIndex, FString fromaddress, FString toaddress,
-                    int64 amount, FString amountdenom, FString &output,
-                    bool &success, FString &output_message);
+                    int64 amount, FString amountdenom, FSendAmountDelegate Out);
+    rust::cxxbridge1::Vec<uint8_t>
+    MakeTxForSendAmount(int32 walletIndex, FString fromaddress,
+                        FString toaddress, int64 amount, FString amountdenom);
 
     /**
      * Cosmos get address with specified index.
@@ -306,113 +403,92 @@ class CRONOSPLAYUNREAL_API ADefiWalletCoreActor : public AActor {
     /**
      * Cosmos get balance.
      * @param success whether succeed or not
-     * @param output_message error message, "" if succeed
+     * @param Out callback
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "GetBalance", Keywords = "Wallet"),
               Category = "CronosPlayUnreal")
-    void GetBalance(FString address, FString denom, FString &output,
-                    bool &success, FString &output_message);
+    void GetBalance(FString address, FString denom, FGetBalanceDelegate Out);
 
     /**
      * Cosmos get nft supply.
      * @param denomid denom id
      * @param nftowner nft owner
-     * @param output nft supply
-     * @param success whether succeed or not
-     * @param output_message error message, "" if succeed
+     * @param Out callback
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "GetNFTSupply", Keywords = "Wallet"),
               Category = "CronosPlayUnreal")
-    void GetNFTSupply(FString denomid, FString nftowner, int64 &output,
-                      bool &success, FString &output_message);
+    void GetNFTSupply(FString denomid, FString nftowner,
+                      FGetNFTSupplyDelegate Out);
 
     /**
      * Cosmos get nft owner.
      * @param denomid denom id
      * @param nftowner nft owner
-     * @param output cosmos nft owner
-     * @param success whether succeed or not
-     * @param output_message error message, "" if succeed
+     * @param Out callback
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "GetNFTOwner", Keywords = "Wallet"),
               Category = "CronosPlayUnreal")
-    void GetNFTOwner(FString denomid, FString nftowner, FCosmosNFTOwner &output,
-                     bool &success, FString &output_message);
+    void GetNFTOwner(FString denomid, FString nftowner,
+                     FGetNFTOwnerDelegate Out);
 
     /**
      * Cosmos get nft collection.
      * @param denomid denom id
-     * @param output cosmos nft collection
-     * @param success whether succeed or not
-     * @param output_message error message, "" if succeed
+     * @param Out callback
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "GetNFTCollection", Keywords = "Wallet"),
               Category = "CronosPlayUnreal")
-    void GetNFTCollection(FString denomid, FCosmosNFTCollection &output,
-                          bool &success, FString &output_message);
+    void GetNFTCollection(FString denomid, FGetNFTCollectionDelegate Out);
 
     /**
      * Cosmos get nft denom.
      * @param denomid denom id
-     * @param output cosmos nft denom
-     * @param success whether succeed or not
-     * @param output_message error message, "" if succeed
+     * @param Out callback
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "GetNFTDenom", Keywords = "Wallet"),
               Category = "CronosPlayUnreal")
-    void GetNFTDenom(FString denomid, FCosmosNFTDenom &output, bool &success,
-                     FString &output_message);
+    void GetNFTDenom(FString denomid, FGetNFTDenomDelegate Out);
 
     /**
      * Cosmos get nft denom by name
      * @param denomname denom name
-     * @param output cosmos nft denom
-     * @param success whether succeed or not
-     * @param output_message error message, "" if succeed
+     * @param Out callback
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "GetNFTDenomByName", Keywords = "Wallet"),
               Category = "CronosPlayUnreal")
-    void GetNFTDenomByName(FString denomname, FCosmosNFTDenom &output,
-                           bool &success, FString &output_message);
-
+    void GetNFTDenomByName(FString denomname, FGetNFTDenomDelegate Out);
     /**
      * Get all nft denoms
-     * @param output cosmos nft denom
-     * @param success whether succeed or not
-     * @param output_message error message, "" if succeed
+     * @param Out callback
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "GetNFTAllDenoms", Keywords = "Wallet"),
               Category = "CronosPlayUnreal")
-    void GetNFTAllDenoms(TArray<FCosmosNFTDenom> &output, bool &success,
-                         FString &output_message);
+    void GetNFTAllDenoms(FGetNFTAllDenomsDelegate Out);
 
     /**
      * Get nft token
      * @param denomid denom id
      * @param tokenid token id
-     * @param cosmos nft token
-     * @param success whether succeed or not
-     * @param output_message error message, "" if succeed
+     * @param Out callback
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "GetNFTToken", Keywords = "Wallet"),
               Category = "CronosPlayUnreal")
-    void GetNFTToken(FString denomid, FString tokenid, FCosmosNFTToken &output,
-                     bool &success, FString &output_message);
+
+    void GetNFTToken(FString denomid, FString tokenid,
+                     FGetNFTTokenDelegate Out);
 
     /**
      * Get eth address with index
      * @param index wallet index which starts from 0
-     * @param output get eth address
-     * @param success whether succeed or not
-     * @param output_message error message, "" if succeed
+     * @param Out callback
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "GetEthAddress", Keywords = "Wallet"),
@@ -423,15 +499,12 @@ class CRONOSPLAYUNREAL_API ADefiWalletCoreActor : public AActor {
     /**
      * Get eth balance
      * @param address eth address
-     * @param output get balance
-     * @param success whether succeed or not
-     * @param output_message error message, "" if succeed
+     * @param Out callback
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "GetEthBalance", Keywords = "Wallet"),
               Category = "CronosPlayUnreal")
-    void GetEthBalance(FString address, FString &output, bool &success,
-                       FString &output_message);
+    void GetEthBalance(FString address, FGetEthBalanceDelegate Out);
 
     /**
      * Broadcast signed eth tx
@@ -517,232 +590,192 @@ class CRONOSPLAYUNREAL_API ADefiWalletCoreActor : public AActor {
      * Get erc-20 balance
      * @param contractAddress erc20 contract address
      * @param accountAddress account address to fetch balance
-     * @param balance get balance of account address
-     * @param success whether succeed or not
-     * @param output_message error message, "" if succeed
+     * @param Out callback
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "Erc20Balance", Keywords = "Wallet"),
               Category = "CronosPlayUnreal")
     void Erc20Balance(FString contractAddress, FString accountAddress,
-                      FString &balance, bool &success, FString &output_message);
+                      FErc20BalanceDelegate Out);
 
     /**
      * Get erc-721 balance, minted token total count of this address
      * @param contractAddress erc721 contract address
      * @param accountAddress account address to fetch balance
-     * @param balance to get balance of this address
-     * @param success whether succeed or not
-     * @param output_message error message, "" if succeed
+     * @param Out callback
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "Erc721Balance", Keywords = "Wallet"),
               Category = "CronosPlayUnreal")
     void Erc721Balance(FString contractAddress, FString accountAddress,
-                       FString &balance, bool &success,
-                       FString &output_message);
+                       FErc721BalanceDelegate Out);
 
     /**
      * Get erc-1155 balance
      * @param contractAddress erc1155 contract address
      * @param accountAddress account address to fetch balance
      * @param tokenID toiken id to fetch balance
-     * @param balance to get balance
-     * @param success whether succeed or not
-     * @param output_message error message, "" if succeed
+     * @param Out callback
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "Erc1155Balance", Keywords = "Wallet"),
               Category = "CronosPlayUnreal")
     void Erc1155Balance(FString contractAddress, FString accountAddress,
-                        FString tokenID, FString &balance, bool &success,
-                        FString &output_message);
+                        FString tokenID, FErc1155BalanceDelegate Out);
 
     /**
      * Get erc-1155 balance of batch
      * @param contractAddress erc1155 contract address
      * @param accountAddresses account addresses to fetch balance
      * @param tokenIDs toiken ids to fetch balance
-     * @param balanceofbatch balances
-     * @param success whether succeed or not
-     * @param output_message error message, "" if succeed
+     * @param Out callback
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "Erc1155BalanceOfBatch",
                       Keywords = "Wallet"),
               Category = "CronosPlayUnreal")
+
     void Erc1155BalanceOfBatch(FString contractAddress,
                                TArray<FString> accountAddresses,
                                TArray<FString> tokenIDs,
-                               TArray<FString> &balanceofbatch, bool &success,
-                               FString &output_message);
+                               FErc1155BalanceOfBatchDelegate Out);
 
     /**
      * Get erc-20 name
      * @param contractAddress erc20 contract address
-     * @param name get name
-     * @param success whether succeed or not
-     * @param output_message error message, "" if succeed
+     * @param Out callback
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "Erc20Name", Keywords = "Wallet"),
               Category = "CronosPlayUnreal")
-    void Erc20Name(FString contractAddress, FString &name, bool &success,
-                   FString &output_message);
+    void Erc20Name(FString contractAddress, FErc20NameDelegate Out);
 
     /**
      * Get erc-20 symbol
      * @param contractAddress erc20 contract address
-     * @param symbol get symbol
-     * @param success whether succeed or not
-     * @param output_message error message, "" if succeed
+     * @param Out callback
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "Erc20Symbol", Keywords = "Wallet"),
               Category = "CronosPlayUnreal")
-    void Erc20Symbol(FString contractAddress, FString &symbol, bool &success,
-                     FString &output_message);
+    void Erc20Symbol(FString contractAddress, FErc20SymbolDelegate Out);
 
     /**
      * Get erc-20 decimals
      * @param contractAddress erc20 contract address
-     * @param decimals get decimals
-     * @param success whether succeed or not
-     * @param output_message error message, "" if succeed
+     * @param Out callback
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "Erc20Decimals", Keywords = "Wallet"),
               Category = "CronosPlayUnreal")
-    void Erc20Decimals(FString contractAddress, int32 &decimals, bool &success,
-                       FString &output_message);
+    void Erc20Decimals(FString contractAddress, FErc20DecimalsDelegate Out);
 
     /**
      * Get erc-20 total supply
      * @param contractAddress erc20 contract address
-     * @param totalSupply get total supply
-     * @param success whether succeed or not
-     * @param output_message error message, "" if succeed
+     * @param Out callback
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "Erc20TotalSupply", Keywords = "Wallet"),
               Category = "CronosPlayUnreal")
-    void Erc20TotalSupply(FString contractAddress, FString &totalSupply,
-                          bool &success, FString &output_message);
+    void Erc20TotalSupply(FString contractAddress,
+                          FErc20TotalSupplyDelegate Out);
 
     /**
      * Get erc-721 name
      * @param contractAddress erc721 contract address
-     * @param name get name
-     * @param success whether succeed or not
-     * @param output_message error message, "" if succeed
+     * @param Out callback
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "Erc721Name", Keywords = "Wallet"),
               Category = "CronosPlayUnreal")
-    void Erc721Name(FString contractAddress, FString &name, bool &success,
-                    FString &output_message);
+    void Erc721Name(FString contractAddress, FErc721NameDelegate Out);
 
     /**
      * Get erc-721 symbol
      * @param contractAddress contract address
-     * @param symbol get symbol
-     * @param success whether succeed or not
-     * @param output_message error message, "" if succeed
+     * @param Out callback
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "Erc721Symbol", Keywords = "Wallet"),
               Category = "CronosPlayUnreal")
-    void Erc721Symbol(FString contractAddress, FString &symbol, bool &success,
-                      FString &output_message);
+    void Erc721Symbol(FString contractAddress, FErc721SymbolDelegate Out);
 
     /**
      * Get erc-721 uri
      * @param contractAddress erc721 contract address
      * @param tokenID token id
-     * @param uri  get uri
-     * @param success whether succeed or not
-     * @param output_message error message, "" if succeed
+     * @param Out callback
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "Erc721Uri", Keywords = "Wallet"),
               Category = "CronosPlayUnreal")
-    void Erc721Uri(FString contractAddress, FString tokenID, FString &uri,
-                   bool &success, FString &output_message);
+    void Erc721Uri(FString contractAddress, FString tokenID,
+                   FErc721UriDelegate Out);
 
     /**
      * Get erc-721 Approved
      * @param contractAddress erc721 contract address
      * @param tokenID token id
-     * @param result approved
-     * @param success whether succeed or not
-     * @param output_message error message, "" if succeed
+     * @param Out callback
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "Erc721GetApproved", Keywords = "Wallet"),
               Category = "CronosPlayUnreal")
     void Erc721GetApproved(FString contractAddress, FString tokenID,
-                           FString &result, bool &success,
-                           FString &output_message);
+                           FErc721GetApprovedDelegate Out);
 
     /**
      * Get erc-721 IsApprovedForAll
      * @param contractAddress erc721 contract address
      * @param erc721owner owner address
      * @param erc721approvedaddress  approved address
-     * @param result is approved for all
-     * @param success whether succeed or not
-     * @param output_message error message, "" if succeed
+     * @param Out callback
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "Erc721IsApprovedForAll",
                       Keywords = "Wallet"),
               Category = "CronosPlayUnreal")
     void Erc721IsApprovedForAll(FString contractAddress, FString erc721owner,
-                                FString erc721approvedaddress, bool &result,
-                                bool &success, FString &output_message);
+                                FString erc721approvedaddress,
+                                FErc721IsApprovedForAllDelegate Out);
 
     /**
      * Get erc-721 owner
      * @param contractAddress erc 721 contract address
      * @param tokenID token id
-     * @param ercowner get owner
-     * @param success whether succeed or not
-     * @param output_message error message, "" if succeed
+     * @param Out callback
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "Erc721Owner", Keywords = "Wallet"),
               Category = "CronosPlayUnreal")
+
     void Erc721Owner(FString contractAddress, FString tokenID,
-                     FString &ercowner, bool &success, FString &output_message);
+                     FErc721OwnerDelegate Out);
 
     /**
      * Get erc-721 total suppy
      * @param contractAddress erc 721 contract address
-     * @param totalsupply total suppy
-     * @param success whether succeed or not
-     * @param output_message error message, "" if succeed
+     * @param Out callback
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "Erc721TotalSupply", Keywords = "Wallet"),
               Category = "CronosPlayUnreal")
-    void Erc721TotalSupply(FString contractAddress, FString &totalsupply,
-                           bool &success, FString &output_message);
+    void Erc721TotalSupply(FString contractAddress,
+                           FErc721TotalSupplyDelegate Out);
 
     /**
      *  Returns a token ID at a given index of all the tokens stored by the
      * contract. Use along with totalSupply to enumerate all tokens.
      * @param contractAddress erc 721 contract address
      * @param erc721index which index
-     * @param token a token ID at a given index
-     * @param success whether succeed or not
-     * @param output_message error message, "" if succeed
+     * @param Out callback
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "Erc721TokenByIndex", Keywords = "Wallet"),
               Category = "CronosPlayUnreal")
     void Erc721TokenByIndex(FString contractAddress, FString erc721index,
-                            FString &token, bool &success,
-                            FString &output_message);
+                            FErc721TokenByIndexDelegate Out);
 
     /**
      * Returns a token ID owned by owner at a given index of its token list. Use
@@ -750,48 +783,42 @@ class CRONOSPLAYUNREAL_API ADefiWalletCoreActor : public AActor {
      * @param contractAddress erc 721 contract address
      * @param erc721owner owner
      * @param erc721index which index
-     * @param token a token ID at a given index
-     * @param success whether succeed or not
-     * @param output_message error message, "" if succeed
+     * @param Out callback
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "Erc721TokenOwnerByIndex",
                       Keywords = "Wallet"),
               Category = "CronosPlayUnreal")
     void Erc721TokenOwnerByIndex(FString contractAddress, FString erc721owner,
-                                 FString erc721index, FString &token,
-                                 bool &success, FString &output_message);
+                                 FString erc721index,
+                                 FErc721TokenOwnerByIndexDelegate Out);
 
     /**
      * Get erc-1155 uri
      * @param contractAddress erc1155 contract address
      * @param tokenID token ID
-     * @param uri  get uri
-     * @param success whether succeed or not
-     * @param output_message error message, "" if succeed
+     * @param Out callback
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "Erc1155Uri", Keywords = "Wallet"),
               Category = "CronosPlayUnreal")
-    void Erc1155Uri(FString contractAddress, FString tokenID, FString &uri,
-                    bool &success, FString &output_message);
+    void Erc1155Uri(FString contractAddress, FString tokenID,
+                    FErc1155UriDelegate Out);
 
     /**
      * Get erc-1155 IsApprovedForAll
      * @param contractAddress erc1155 contract address
      * @param erc1155owner owner address
      * @param erc1155approvedaddress  approved address
-     * @param result is approved for all
-     * @param success whether succeed or not
-     * @param output_message error message, "" if succeed
+     * @param Out callback
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "Erc1155IsApprovedForAll",
                       Keywords = "Wallet"),
               Category = "CronosPlayUnreal")
     void Erc1155IsApprovedForAll(FString contractAddress, FString erc1155owner,
-                                 FString erc1155approvedaddress, bool &result,
-                                 bool &success, FString &output_message);
+                                 FString erc1155approvedaddress,
+                                 FErc1155IsApprovedForAllDelegate Out);
 
     /**
      * erc20 Moves `amount` tokens from the caller’s account to `to_address`.
@@ -847,17 +874,14 @@ class CRONOSPLAYUNREAL_API ADefiWalletCoreActor : public AActor {
      * @param contractAddress erc20 contract
      * @param erc20owner erc20 owner
      * @param erc20spender erc20 spender
-     * @param result allowance
-     * @param success whether succeed or not
-     * @param output_message error message, "" if succeed
+     * @param Out callback
      */
 
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "Erc20Allowance", Keywords = "Wallet"),
               Category = "CronosPlayUnreal")
     void Erc20Allowance(FString contractAddress, FString erc20owner,
-                        FString erc20spender, FString &result, bool &success,
-                        FString &output_message);
+                        FString erc20spender, FErc20AllowanceDelegate Out);
 
     /**
      * erc721 Moves `amount` tokens from `from_address` to `to_address` using
