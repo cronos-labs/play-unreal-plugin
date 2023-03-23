@@ -7,7 +7,7 @@ set PLAYCPPSDK_CACHE_DIR=C:\play-cpp-sdk\%PLAYCPPSDK%
 REM Set the play-cpp-sdk target path
 set PLAYCPPSDK_TARGET_DIR=Source\ThirdParty\PlayCppSdkLibrary\Lib
 
-REM Set NDK versions (to see what NDK_VERSION is available, please check play-cpp-sdk release p5.0age)
+REM Set NDK versions (to see what NDK_VERSION is available, please check play-cpp-sdk release page)
 set UE4_27_NDK_VERSION=23.0.7599858
 set UE5_0_NDK_VERSION=23.0.7599858
 set UE5_1_NDK_VERSION=25.1.8937393
