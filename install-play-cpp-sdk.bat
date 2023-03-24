@@ -1,5 +1,5 @@
 REM Set the play cpp sdk version
-set PLAYCPPSDK=v0.0.16-alpha
+set PLAYCPPSDK=v0.0.17-alpha-testing-r23a
 
 REM Set the play-cpp-sdk cache path
 set PLAYCPPSDK_CACHE_DIR=C:\play-cpp-sdk\%PLAYCPPSDK%
@@ -8,7 +8,22 @@ REM Set the play-cpp-sdk target path
 set PLAYCPPSDK_TARGET_DIR=Source\ThirdParty\PlayCppSdkLibrary\Lib
 
 REM Set NDK versions (to see what NDK_VERSION is available, please check play-cpp-sdk release page)
-set NDK_VERSION=21.4.7075529
+set UE4_27_NDK_VERSION=23.0.7599858
+set UE5_0_NDK_VERSION=23.0.7599858
+set UE5_1_NDK_VERSION=25.1.8937393
+
+set TARGET=%1
+if "%TARGET%"=="4.27" (
+  set NDK_VERSION=%UE4_27_NDK_VERSION%
+) else if "%TARGET%"=="5.0" (
+  set NDK_VERSION=%UE5_0_NDK_VERSION%
+) else if "%TARGET%"=="5.1" (
+  set NDK_VERSION=%UE5_1_NDK_VERSION%
+) else if "%TARGET%"=="" (
+  set NDK_VERSION=%UE5_1_NDK_VERSION%
+) else (
+  echo "UE %TARGET% is not supported."
+)
 
 REM Set names of play cpp sdk library files
 set MAC_FILE=play_cpp_sdk_Darwin_x86_64.tar.gz
@@ -41,28 +56,43 @@ set ANDROID_ARMEABI_V7A_CHECKSUM_SRC=https://github.com/cronos-labs/play-cpp-sdk
 set ANDROID_X86_64_SRC=https://github.com/cronos-labs/play-cpp-sdk/releases/download/%PLAYCPPSDK%/%X86_64_FILE%
 set ANDROID_X86_64_CHECKSUM_SRC=https://github.com/cronos-labs/play-cpp-sdk/releases/download/%PLAYCPPSDK%/%ANDROID_X86_64_CHECKSUM_FILE%
 set IOS_SRC=https://github.com/cronos-labs/play-cpp-sdk/releases/download/%PLAYCPPSDK%/%IOS_FILE%
-set IOS_CHEKSUM_SRC=https://github.com/cronos-labs/play-cpp-sdk/releases/download/%PLAYCPPSDK%/%IOS_CHECKSUM_FILE%
+set IOS_CHECKSUM_SRC=https://github.com/cronos-labs/play-cpp-sdk/releases/download/%PLAYCPPSDK%/%IOS_CHECKSUM_FILE%
 
 REM rmdir %PLAYCPPSDK_CACHE_DIR%\ /s /q
+setlocal EnableDelayedExpansion
 
-if exist %PLAYCPPSDK_CACHE_DIR% (
-   echo "%PLAYCPPSDK_CACHE_DIR% exists"
-) else (
-    mkdir %PLAYCPPSDK_CACHE_DIR%\Mac
-    mkdir %PLAYCPPSDK_CACHE_DIR%\Win64
-    mkdir %PLAYCPPSDK_CACHE_DIR%\Linux
-    mkdir %PLAYCPPSDK_CACHE_DIR%\Android\arm64-v8a
-    mkdir %PLAYCPPSDK_CACHE_DIR%\Android\armeabi-v7a
-    mkdir %PLAYCPPSDK_CACHE_DIR%\Android\x86_64
-    mkdir %PLAYCPPSDK_CACHE_DIR%\iOS\arm64
+set CACHE_OS_LIST=Mac Win64 Linux Android\arm64-v8a Android\armeabi-v7a Android\x86_64 iOS\arm64
+for %%i in (%CACHE_OS_LIST%) do (
+    if "%%i"=="Mac" (
+        set CACHE_FILE=%MAC_FILE%
+        set CACHE_SRC=%MAC_SRC%
+    ) else if "%%i"=="Win64" (
+        set CACHE_FILE=%WINDOWS_FILE%
+        set CACHE_SRC=%WINDOWS_SRC%
+    ) else if "%%i"=="Linux" (
+        set CACHE_FILE=%Linux_FILE%
+        set CACHE_SRC=%Linux_SRC%
+    ) else if "%%i"=="Android\arm64-v8a" (
+        set CACHE_FILE=%ARM64_V8A_FILE%
+        set CACHE_SRC=%ANDROID_ARM64_V8A_SRC%
+    ) else if "%%i"=="Android\armeabi-v7a" (
+        set CACHE_FILE=%ARMEABI_V7A_FILE%
+        set CACHE_SRC=%ANDROID_ARMEABI_V7A_SRC%
+    ) else if "%%i"=="Android\x86_64" (
+        set CACHE_FILE=%X86_64_FILE%
+        set CACHE_SRC=%ANDROID_X86_64_SRC%
+    ) else if "%%i"=="iOS\arm64" (
+        set CACHE_FILE=%IOS_FILE%
+        set CACHE_SRC=%IOS_SRC%
+    )
 
-    powershell -Command "Invoke-WebRequest %MAC_SRC% -OutFile %PLAYCPPSDK_CACHE_DIR%\Mac\%MAC_FILE%"
-    powershell -Command "Invoke-WebRequest %WINDOWS_SRC% -OutFile %PLAYCPPSDK_CACHE_DIR%\Win64\%WINDOWS_FILE%"
-    powershell -Command "Invoke-WebRequest %LINUX_SRC% -OutFile %PLAYCPPSDK_CACHE_DIR%\Linux\%LINUX_FILE%"
-    powershell -Command "Invoke-WebRequest %ANDROID_ARM64_V8A_SRC% -OutFile %PLAYCPPSDK_CACHE_DIR%\Android\arm64-v8a\%ARM64_V8A_FILE%"
-    powershell -Command "Invoke-WebRequest %ANDROID_ARMEABI_V7A_SRC% -OutFile %PLAYCPPSDK_CACHE_DIR%\Android\armeabi-v7a\%ARMEABI_V7A_FILE%"
-    powershell -Command "Invoke-WebRequest %ANDROID_X86_64_SRC% -OutFile %PLAYCPPSDK_CACHE_DIR%\Android\x86_64\%X86_64_FILE%"
-    powershell -Command "Invoke-WebRequest %IOS_SRC% -OutFile %PLAYCPPSDK_CACHE_DIR%\iOS\arm64\%IOS_FILE%"
+    set CACHE_DIR=%PLAYCPPSDK_CACHE_DIR%\%%i\!CACHE_FILE!
+    if exist !CACHE_DIR! (
+        echo "%CACHE_DIR% exists"
+    ) else (
+        mkdir %PLAYCPPSDK_CACHE_DIR%\%%i
+        powershell -Command "Invoke-WebRequest !CACHE_SRC! -OutFile !CACHE_DIR!"
+    )
 )
 
 if not exist %PLAYCPPSDK_TARGET_DIR%\Mac mkdir %PLAYCPPSDK_TARGET_DIR%\Mac
