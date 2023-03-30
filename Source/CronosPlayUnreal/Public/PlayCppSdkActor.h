@@ -146,9 +146,27 @@ struct FWalletSignTXEip155Result {
     FString result;
 };
 
+/// wallet connect send tx result
+USTRUCT(BlueprintType)
+struct FWalletSendTXEip155Result {
+    GENERATED_USTRUCT_BODY()
+
+    /// transaction hash, if successful
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayCppSdk")
+    TArray<uint8> tx_hash;
+
+    /// error message, if successful, ""
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayCppSdk")
+    FString result;
+};
+
 /// sign eip155 tx delegate
 DECLARE_DYNAMIC_DELEGATE_OneParam(FWalletconnectSignEip155TransactionDelegate,
                                   FWalletSignTXEip155Result, SigningResult);
+
+/// send eip155 tx delegate
+DECLARE_DYNAMIC_DELEGATE_OneParam(FWalletconnectSendEip155TransactionDelegate,
+                                  FWalletSendTXEip155Result, SigningResult);
 
 /// sign personal delegate
 DECLARE_DYNAMIC_DELEGATE_OneParam(FWalletconnectSignPersonalDelegate,
@@ -512,6 +530,18 @@ class CRONOSPLAYUNREAL_API APlayCppSdkActor : public AActor {
               Category = "PlayCppSdk")
     void SignEip155Transaction(FWalletConnectTxEip155 info,
                                FWalletconnectSignEip155TransactionDelegate Out);
+
+    /**
+     * send EIP155 tx
+     * @param info EIP 155 tx information
+     * @param Out sign legacy tx result callback
+     */
+    UFUNCTION(BlueprintCallable,
+              meta = (DisplayName = "SignEip155Transaction",
+                      Keywords = "PlayCppSdk"),
+              Category = "PlayCppSdk")
+    void SendEip155Transaction(FWalletConnectTxEip155 info,
+                               FWalletconnectSendEip155TransactionDelegate Out);
 
     /**
      * send wallet-connect information to unreal game thread

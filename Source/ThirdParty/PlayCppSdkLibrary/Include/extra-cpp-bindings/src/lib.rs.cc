@@ -1391,8 +1391,15 @@ struct WalletconnectClient final : public ::rust::Opaque {
         ::com::crypto::game_sdk::WalletConnectErc1155Approve const &info);
 
     /// build cronos(eth) eip155 transaction
-    ///
+    /// Supported Wallets: Trust Wallet, Crypto.com Desktop Defi Wallet
     ::rust::Vec<::std::uint8_t> sign_eip155_transaction_blocking(
+        ::com::crypto::game_sdk::WalletConnectTxEip155 const &info,
+        ::std::array<::std::uint8_t, 20> address);
+
+    /// send cronos(eth) eip155 transaction
+    /// Supported Wallets: Trust Wallet, MetaMask and Crypto.com Mobile Defi
+    /// Wallet
+    ::rust::Vec<::std::uint8_t> send_eip155_transaction_blocking(
         ::com::crypto::game_sdk::WalletConnectTxEip155 const &info,
         ::std::array<::std::uint8_t, 20> address);
 
@@ -1669,6 +1676,13 @@ com$crypto$game_sdk$cxxbridge1$WalletconnectClient$erc1155_approve(
 
 ::rust::repr::PtrLen
 com$crypto$game_sdk$cxxbridge1$WalletconnectClient$sign_eip155_transaction_blocking(
+    ::com::crypto::game_sdk::WalletconnectClient &self,
+    ::com::crypto::game_sdk::WalletConnectTxEip155 const &info,
+    ::std::array<::std::uint8_t, 20> *address,
+    ::rust::Vec<::std::uint8_t> *return$) noexcept;
+
+::rust::repr::PtrLen
+com$crypto$game_sdk$cxxbridge1$WalletconnectClient$send_eip155_transaction_blocking(
     ::com::crypto::game_sdk::WalletconnectClient &self,
     ::com::crypto::game_sdk::WalletConnectTxEip155 const &info,
     ::std::array<::std::uint8_t, 20> *address,
@@ -2097,6 +2111,22 @@ WalletconnectClient::sign_eip155_transaction_blocking(
     ::rust::MaybeUninit<::rust::Vec<::std::uint8_t>> return$;
     ::rust::repr::PtrLen error$ =
         com$crypto$game_sdk$cxxbridge1$WalletconnectClient$sign_eip155_transaction_blocking(
+            *this, info, &address$.value, &return$.value);
+    if (error$.ptr) {
+        throw ::rust::impl<::rust::Error>::error(error$);
+    }
+    return ::std::move(return$.value);
+}
+
+::rust::Vec<::std::uint8_t>
+WalletconnectClient::send_eip155_transaction_blocking(
+    ::com::crypto::game_sdk::WalletConnectTxEip155 const &info,
+    ::std::array<::std::uint8_t, 20> address) {
+    ::rust::ManuallyDrop<::std::array<::std::uint8_t, 20>> address$(
+        ::std::move(address));
+    ::rust::MaybeUninit<::rust::Vec<::std::uint8_t>> return$;
+    ::rust::repr::PtrLen error$ =
+        com$crypto$game_sdk$cxxbridge1$WalletconnectClient$send_eip155_transaction_blocking(
             *this, info, &address$.value, &return$.value);
     if (error$.ptr) {
         throw ::rust::impl<::rust::Error>::error(error$);

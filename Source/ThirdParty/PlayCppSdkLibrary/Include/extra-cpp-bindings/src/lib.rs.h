@@ -1305,8 +1305,15 @@ struct WalletconnectClient final : public ::rust::Opaque {
         ::com::crypto::game_sdk::WalletConnectErc1155Approve const &info);
 
     /// build cronos(eth) eip155 transaction
-    ///
+    /// Supported Wallets: Trust Wallet, Crypto.com Desktop Defi Wallet
     ::rust::Vec<::std::uint8_t> sign_eip155_transaction_blocking(
+        ::com::crypto::game_sdk::WalletConnectTxEip155 const &info,
+        ::std::array<::std::uint8_t, 20> address);
+
+    /// send cronos(eth) eip155 transaction
+    /// Supported Wallets: Trust Wallet, MetaMask and Crypto.com Mobile Defi
+    /// Wallet
+    ::rust::Vec<::std::uint8_t> send_eip155_transaction_blocking(
         ::com::crypto::game_sdk::WalletConnectTxEip155 const &info,
         ::std::array<::std::uint8_t, 20> address);
 

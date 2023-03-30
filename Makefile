@@ -139,7 +139,7 @@ uncompress: prepare
 # FIXME Build Android/IOS with RunUAT.sh
 RunUAT:
 ifeq ($(UNAME), Darwin)
-	/Users/Shared/Epic\ Games/UE_4.27/Engine/Build/BatchFiles/RunUAT.sh \
+	/Users/Shared/Epic\ Games/UE_5.1/Engine/Build/BatchFiles/RunUAT.sh \
 	BuildPlugin \
 	-Rocket \
 	-TargetPlatforms=Mac \
