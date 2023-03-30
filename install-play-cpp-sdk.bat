@@ -1,5 +1,5 @@
 REM Set the play cpp sdk version
-set PLAYCPPSDK=v0.0.17-alpha
+set PLAYCPPSDK=v0.0.18-alpha
 
 REM Set the play-cpp-sdk cache path
 set PLAYCPPSDK_CACHE_DIR=C:\play-cpp-sdk\%PLAYCPPSDK%
