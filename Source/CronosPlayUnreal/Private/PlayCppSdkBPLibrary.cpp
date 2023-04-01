@@ -67,7 +67,7 @@ void UPlayCppSdkBPLibrary::GetTokensBlocking(FString blockscoutBaseUrl,
             output.Add(detail);
         }
         success = true;
-    } catch (const rust::cxxbridge1::Error &e) {
+    } catch (const std::exception &e) {
         success = false;
         output_message =
             FString::Printf(TEXT("PlayCppSdk GetTokensBlocking Error: %s"),
@@ -91,7 +91,7 @@ void UPlayCppSdkBPLibrary::GetTokenTransfersBlocking(
             myblockscoutBaseUrl, myaddress, mycontractAddress, myoption);
         convertRawTx(history, output);
         success = true;
-    } catch (const rust::cxxbridge1::Error &e) {
+    } catch (const std::exception &e) {
         success = false;
         output_message = FString::Printf(
             TEXT("PlayCppSdk GetTokenTransfersBlocking Error: %s"),
@@ -114,7 +114,7 @@ void UPlayCppSdkBPLibrary::GetErc20TransferHistoryBlocking(
             myaddress, mycontractaddress, myoption, myapikey);
         convertRawTx(history, output);
         success = true;
-    } catch (const rust::cxxbridge1::Error &e) {
+    } catch (const std::exception &e) {
         success = false;
         output_message = FString::Printf(
             TEXT("PlayCppSdk GetErc20TransferHistoryBlocking Error: %s"),
@@ -136,7 +136,7 @@ void UPlayCppSdkBPLibrary::GetErc721TransferHistoryBlocking(
             myaddress, mycontractaddress, myoption, myapikey);
         convertRawTx(history, output);
         success = true;
-    } catch (const rust::cxxbridge1::Error &e) {
+    } catch (const std::exception &e) {
         success = false;
         output_message = FString::Printf(
             TEXT("PlayCppSdk GetErc721TransferHistoryBlocking Error: %s"),
@@ -154,7 +154,7 @@ void UPlayCppSdkBPLibrary::GetTransactionHistoryBlocking(
             get_transaction_history_blocking(myaddress, myapikey);
         convertRawTx(history, output);
         success = true;
-    } catch (const rust::cxxbridge1::Error &e) {
+    } catch (const std::exception &e) {
         success = false;
         output_message = FString::Printf(
             TEXT("PlayCppSdk GetTransactionHistoryBlocking Error: %s"),
@@ -197,7 +197,7 @@ UTexture2D *UPlayCppSdkBPLibrary::GenerateQrCode(FString string) {
         texture->Filter = TextureFilter::TF_Nearest;
         return texture;
 
-    } catch (const rust::cxxbridge1::Error &e) {
+    } catch (const std::exception &e) {
         UE_LOG(LogTemp, Error, TEXT("PlayCppSdk GenerateQrCode Error: %s"),
                UTF8_TO_TCHAR(e.what()));
         return nullptr;
@@ -212,7 +212,7 @@ void UPlayCppSdkBPLibrary::SetupUserAgent(FString UserAgent) {
     UPlayCppSdkDownloader::UserAgent = UserAgent;
     try {
         org::defi_wallet_core::set_cronos_httpagent(TCHAR_TO_UTF8(*UserAgent));
-    } catch (const rust::cxxbridge1::Error &e) {
+    } catch (const std::exception &e) {
         // This captured exception only means the user agent is already set,
         // instead of an error
         UE_LOG(LogTemp, Display,

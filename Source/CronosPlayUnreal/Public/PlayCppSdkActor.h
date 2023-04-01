@@ -240,8 +240,7 @@ class CRONOSPLAYUNREAL_API APlayCppSdkActor : public AActor {
     FEnsureSessionDelegate OnEnsureSessionDelegate;
 
     FORCEINLINE void InitWalletconnectSessionState() {
-        _session_info.sessionstate =
-            EWalletconnectSessionState::StateInit;
+        _session_info.sessionstate = EWalletconnectSessionState::StateInit;
         _session_info.connected = false;
         _session_info.chain_id = FString::FromInt(0);
     }

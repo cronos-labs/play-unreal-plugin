@@ -170,7 +170,7 @@ void APlayCppSdkActor::InitializeWalletConnect(
                     break;
                 }
 
-            } catch (const rust::cxxbridge1::Error &e) {
+            } catch (const std::exception &e) {
 
                 success = false;
                 message = FString::Printf(
@@ -268,7 +268,7 @@ void APlayCppSdkActor::RestoreClient(FRestoreClientDelegate Out) {
                     success = false;
                 }
 
-            } catch (const rust::cxxbridge1::Error &e) {
+            } catch (const std::exception &e) {
                 success = false;
                 message =
                     FString::Printf(TEXT("PlayCppSdk RestoreClient Error: %s"),
@@ -356,7 +356,7 @@ void APlayCppSdkActor::EnsureSession(FEnsureSessionDelegate Out) {
                     TEXT("PlayCppSdk EnsureSession Error Invalid Client"));
             }
 
-        } catch (const rust::cxxbridge1::Error &e) {
+        } catch (const std::exception &e) {
             result = FString::Printf(TEXT("PlayCppSdk EnsureSession Error: %s"),
                                      UTF8_TO_TCHAR(e.what()));
         }
@@ -405,7 +405,6 @@ void APlayCppSdkActor::ClearSession(bool &success) {
     FWalletConnectEnsureSessionResult session_result;
     _session_result = session_result;
     InitWalletconnectSessionState();
-
 }
 
 void APlayCppSdkActor::SetupCallback(
@@ -427,7 +426,7 @@ void APlayCppSdkActor::SetupCallback(
         _coreClient->setup_callback_blocking(std::move(usercallback));
 
         success = true;
-    } catch (const rust::cxxbridge1::Error &e) {
+    } catch (const std::exception &e) {
         success = false;
         output_message =
             FString::Printf(TEXT("PlayCppSdk EnsureSession Error: %s"),
@@ -466,7 +465,7 @@ void APlayCppSdkActor::GetConnectionString(FString &output, bool &success,
         output = UTF8_TO_TCHAR(qrcode.c_str());
 
         success = true;
-    } catch (const rust::cxxbridge1::Error &e) {
+    } catch (const std::exception &e) {
         success = false;
         output_message = FString::Printf(TEXT("PlayCppSdk GetQrcode Error: %s"),
                                          UTF8_TO_TCHAR(e.what()));
@@ -507,7 +506,7 @@ void APlayCppSdkActor::SaveClient(FString &output, bool &success,
             FFileHelper::EEncodingOptions::ForceUTF8);
         UE_LOG(LogTemp, Log, TEXT("Saved sessioninfo.json to: %s"),
                *(FPaths::ProjectSavedDir() + "sessioninfo.json"));
-    } catch (const rust::cxxbridge1::Error &e) {
+    } catch (const std::exception &e) {
         success = false;
         output_message = FString::Printf(
             TEXT("PlayCppSdk SaveClient Error: %s"), UTF8_TO_TCHAR(e.what()));
@@ -555,7 +554,7 @@ void APlayCppSdkActor::SignPersonal(FString user_message,
                       copyVecToTArray(sig1, output.signature);
                       assert(sig1.size() == output.Num());
 
-                  } catch (const rust::cxxbridge1::Error &e) {
+                  } catch (const std::exception &e) {
                       output.result = FString::Printf(
                           TEXT("PlayCppSdk SignPersonal Error: %s"),
                           UTF8_TO_TCHAR(e.what()));
@@ -613,7 +612,7 @@ void APlayCppSdkActor::SignEip155Transaction(
                     TEXT("PlayCppSdk SignEip155Transaction Invalid Client"));
             }
 
-        } catch (const rust::cxxbridge1::Error &e) {
+        } catch (const std::exception &e) {
             output.result = FString::Printf(
                 TEXT("PlayCppSdk SignEip155Transaction Error: %s"),
                 UTF8_TO_TCHAR(e.what()));
@@ -732,7 +731,7 @@ void APlayCppSdkActor::Erc721TransferFrom(
                     copyVecToTArray(rawtx, txresult.SignedTx);
                 }
 
-            } catch (const rust::cxxbridge1::Error &e) {
+            } catch (const std::exception &e) {
                 result = FString::Printf(
                     TEXT("CronosPlayUnreal Erc721SafeTransferFrom Error: %s"),
                     UTF8_TO_TCHAR(e.what()));
@@ -776,7 +775,7 @@ void APlayCppSdkActor::Erc721Approve(FString contractAddress,
                                     txresult.SignedTx);
                 }
 
-            } catch (const rust::cxxbridge1::Error &e) {
+            } catch (const std::exception &e) {
                 result = FString::Printf(
                     TEXT("CronosPlayUnreal Erc721SafeTransferFrom Error: %s"),
                     UTF8_TO_TCHAR(e.what()));
@@ -820,7 +819,7 @@ void APlayCppSdkActor::Erc1155SafeTransferFrom(
                     copyVecToTArray(rawtx, txresult.SignedTx);
                 }
 
-            } catch (const rust::cxxbridge1::Error &e) {
+            } catch (const std::exception &e) {
                 result = FString::Printf(
                     TEXT("CronosPlayUnreal Erc1155SafeTransferFrom Error: %s"),
                     UTF8_TO_TCHAR(e.what()));
@@ -863,7 +862,7 @@ void APlayCppSdkActor::Erc1155Approve(FString contractAddress,
                                     txresult.SignedTx);
                 }
 
-            } catch (const rust::cxxbridge1::Error &e) {
+            } catch (const std::exception &e) {
                 result = FString::Printf(
                     TEXT("CronosPlayUnreal Erc1155Approve Error: %s"),
                     UTF8_TO_TCHAR(e.what()));
@@ -909,7 +908,7 @@ void APlayCppSdkActor::Erc20TransferFrom(FString contractAddress,
                                     txresult.SignedTx);
                 }
 
-            } catch (const rust::cxxbridge1::Error &e) {
+            } catch (const std::exception &e) {
                 result = FString::Printf(
                     TEXT("CronosPlayUnreal Erc1155SafeTransferFrom Error: %s"),
                     UTF8_TO_TCHAR(e.what()));
@@ -970,7 +969,7 @@ void APlayCppSdkActor::Erc20Approve(FString contractAddress,
                                     txresult.SignedTx);
                 }
 
-            } catch (const rust::cxxbridge1::Error &e) {
+            } catch (const std::exception &e) {
                 result = FString::Printf(
                     TEXT("CronosPlayUnreal Erc1155Approve Error: %s"),
                     UTF8_TO_TCHAR(e.what()));
