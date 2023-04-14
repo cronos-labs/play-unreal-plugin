@@ -41,7 +41,7 @@ FString UDynamicContractObject::DynamicContractReadJson(
         rust::String abijson = read_json(myfilepath, mykeyname);
         ret = UTF8_TO_TCHAR(abijson.c_str());
         success = true;
-    } catch (const rust::cxxbridge1::Error &e) {
+    } catch (const std::exception &e) {
         success = false;
         output_message = FString::Printf(
             TEXT("PlayCppSdk DynamicContractReadJson Error: %s"),
@@ -77,7 +77,7 @@ void UDynamicContractObject::EncodeDynamicContract(FString functionName,
 
         success = true;
 
-    } catch (const rust::cxxbridge1::Error &e) {
+    } catch (const std::exception &e) {
         success = false;
         output_message =
             FString::Printf(TEXT("PlayCppSdk EncodeDynamicContract Error: %s"),
@@ -107,7 +107,7 @@ void UDynamicContractObject::CallDynamicContract(
                     _coreContract->call(myfunctionname, myfunctionargs).c_str();
                 jsonoutput = UTF8_TO_TCHAR(response.c_str());
             }
-        } catch (const rust::cxxbridge1::Error &e) {
+        } catch (const std::exception &e) {
             result = FString::Printf(
                 TEXT("CronosPlayUnreal CallDynamicContract Error: %s"),
                 UTF8_TO_TCHAR(e.what()));
@@ -140,7 +140,7 @@ void UDynamicContractObject::SendDynamicContract(
 
                 convertCronosTXReceipt(receipt, txresult);
             }
-        } catch (const rust::cxxbridge1::Error &e) {
+        } catch (const std::exception &e) {
             result = FString::Printf(
                 TEXT("CronosPlayUnreal SendDynamicContract Error: %s"),
                 UTF8_TO_TCHAR(e.what()));
@@ -197,7 +197,7 @@ void UDynamicContractObject::NewSigningEthContract(FString contractaddress,
         _coreContract = tmpContract.into_raw();
 
         success = true;
-    } catch (const rust::cxxbridge1::Error &e) {
+    } catch (const std::exception &e) {
         success = false;
         output_message = FString::Printf(
             TEXT("CronosPlayUnreal NewSigningEthContract Error: %s"),
@@ -232,7 +232,7 @@ void UDynamicContractObject::NewEthContract(FString contractaddress,
         _coreContract = tmpContract.into_raw();
 
         success = true;
-    } catch (const rust::cxxbridge1::Error &e) {
+    } catch (const std::exception &e) {
         success = false;
         output_message =
             FString::Printf(TEXT("CronosPlayUnreal NewEthContract Error: %s"),

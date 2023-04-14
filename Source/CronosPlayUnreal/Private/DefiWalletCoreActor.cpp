@@ -102,7 +102,7 @@ void ADefiWalletCoreActor::GetNFTSupply(FString denomid, FString nftowner,
                                             TCHAR_TO_UTF8(*nftowner));
 
         success = true;
-    } catch (const rust::cxxbridge1::Error &e) {
+    } catch (const std::exception &e) {
         success = false;
         output_message =
             FString::Printf(TEXT("CronosPlayUnreal GetNFTSupply Error: %s"),
@@ -141,7 +141,7 @@ void ADefiWalletCoreActor::GetNFTOwner(FString denomid, FString nftowner,
         }
         assert(output.IDCollections.Num() == owner.id_collections.size());
         success = true;
-    } catch (const rust::cxxbridge1::Error &e) {
+    } catch (const std::exception &e) {
         success = false;
         output_message =
             FString::Printf(TEXT("CronosPlayUnreal GetNFTOwner Error: %s"),
@@ -171,7 +171,7 @@ void ADefiWalletCoreActor::GetNFTCollection(FString denomid,
         }
         assert(output.NFTs.Num() == collection.nfts.size());
         success = true;
-    } catch (const rust::cxxbridge1::Error &e) {
+    } catch (const std::exception &e) {
         success = false;
         output_message =
             FString::Printf(TEXT("CronosPlayUnreal GetNFTCollection Error: %s"),
@@ -192,7 +192,7 @@ void ADefiWalletCoreActor::GetNFTDenom(FString denomid, FCosmosNFTDenom &output,
         output = convertDenom(denom);
 
         success = true;
-    } catch (const rust::cxxbridge1::Error &e) {
+    } catch (const std::exception &e) {
         success = false;
         output_message =
             FString::Printf(TEXT("CronosPlayUnreal GetNFTDenom Error: %s"),
@@ -214,7 +214,7 @@ void ADefiWalletCoreActor::GetNFTDenomByName(FString denomname,
         output = convertDenom(denom);
 
         success = true;
-    } catch (const rust::cxxbridge1::Error &e) {
+    } catch (const std::exception &e) {
         success = false;
         output_message = FString::Printf(
             TEXT("CronosPlayUnreal GetNFTDenomByName Error: %s"),
@@ -241,7 +241,7 @@ void ADefiWalletCoreActor::GetNFTAllDenoms(TArray<FCosmosNFTDenom> &output,
         assert(output.Num() == denoms.size());
 
         success = true;
-    } catch (const rust::cxxbridge1::Error &e) {
+    } catch (const std::exception &e) {
         success = false;
         output_message =
             FString::Printf(TEXT("CronosPlayUnreal GetNFTAllDenoms Error: %s"),
@@ -265,7 +265,7 @@ void ADefiWalletCoreActor::GetNFTToken(FString denomid, FString tokenid,
         output.Data = UTF8_TO_TCHAR(nft.data.c_str());
         output.Owner = UTF8_TO_TCHAR(nft.owner.c_str());
         success = true;
-    } catch (const rust::cxxbridge1::Error &e) {
+    } catch (const std::exception &e) {
         success = false;
         output_message =
             FString::Printf(TEXT("CronosPlayUnreal GetNFTToken Error: %s"),
@@ -334,7 +334,7 @@ void ADefiWalletCoreActor::SendAmount(int32 walletIndex, FString fromaddress,
 
         success = true;
         output = UTF8_TO_TCHAR(txhash.c_str());
-    } catch (const rust::cxxbridge1::Error &e) {
+    } catch (const std::exception &e) {
         success = false;
         output_message =
             FString::Printf(TEXT("CronosPlayUnreal SendAmount Error: %s"),
@@ -396,7 +396,7 @@ void ADefiWalletCoreActor::RestoreWallet(FString mnemonics, FString password,
             _coreWallet->get_address(CoinType::CryptoOrgMainnet, 0);
         output = UTF8_TO_TCHAR(result.c_str());
         success = true;
-    } catch (const rust::cxxbridge1::Error &e) {
+    } catch (const std::exception &e) {
         success = false;
         output = TEXT("");
         output_message =
@@ -501,7 +501,7 @@ void ADefiWalletCoreActor::RestoreWalletSaveToSecureStorage(
             _coreWallet->get_address(CoinType::CryptoOrgMainnet, 0);
         output = UTF8_TO_TCHAR(result.c_str());
         success = true;
-    } catch (const rust::cxxbridge1::Error &e) {
+    } catch (const std::exception &e) {
         success = false;
         output = TEXT("");
         output_message = FString::Printf(
@@ -555,7 +555,7 @@ void ADefiWalletCoreActor::RestoreWalletLoadFromSecureStorage(
             _coreWallet->get_address(CoinType::CryptoOrgMainnet, 0);
         output = UTF8_TO_TCHAR(result.c_str());
         success = true;
-    } catch (const rust::cxxbridge1::Error &e) {
+    } catch (const std::exception &e) {
         success = false;
         output = TEXT("");
         output_message = FString::Printf(
@@ -588,7 +588,7 @@ void ADefiWalletCoreActor::RestoreWalletSaveToSecureStorage(
             _coreWallet->get_address(CoinType::CryptoOrgMainnet, 0);
         output = UTF8_TO_TCHAR(result.c_str());
         success = true;
-    } catch (const rust::cxxbridge1::Error &e) {
+    } catch (const std::exception &e) {
         success = false;
         output = TEXT("");
         output_message = FString::Printf(
@@ -617,7 +617,7 @@ void ADefiWalletCoreActor::RestoreWalletLoadFromSecureStorage(
             _coreWallet->get_address(CoinType::CryptoOrgMainnet, 0);
         output = UTF8_TO_TCHAR(result.c_str());
         success = true;
-    } catch (const rust::cxxbridge1::Error &e) {
+    } catch (const std::exception &e) {
         success = false;
         output = TEXT("");
         output_message = FString::Printf(
@@ -678,7 +678,7 @@ void ADefiWalletCoreActor::InitializeNewWallet(FString password,
         zeroize_buffer((char *)result.data(), 0, result.size());
 
         success = true;
-    } catch (const rust::cxxbridge1::Error &e) {
+    } catch (const std::exception &e) {
         success = false;
         output = TEXT("");
         output_message =
@@ -714,7 +714,7 @@ void ADefiWalletCoreActor::GetBackupMnemonicPhrase(FString &output,
         zeroize_buffer((char *)result.data(), 0, result.size());
 
         success = true;
-    } catch (const rust::cxxbridge1::Error &e) {
+    } catch (const std::exception &e) {
         success = false;
         output = TEXT("");
         output_message = FString::Printf(
@@ -761,7 +761,7 @@ void ADefiWalletCoreActor::GenerateMnemonics(FString password,
         zeroize_buffer((char *)result.data(), 0, result.size());
 
         success = true;
-    } catch (const rust::cxxbridge1::Error &e) {
+    } catch (const std::exception &e) {
         success = false;
         output = TEXT("");
         output_message = FString::Printf(
@@ -784,7 +784,7 @@ void ADefiWalletCoreActor::GetAddress(int32 index, FString &output,
             _coreWallet->get_address(CoinType::CryptoOrgMainnet, index);
         output = UTF8_TO_TCHAR(result.c_str());
         success = true;
-    } catch (const rust::cxxbridge1::Error &e) {
+    } catch (const std::exception &e) {
         success = false;
         output = TEXT("");
         output_message =
@@ -810,7 +810,7 @@ void ADefiWalletCoreActor::GetBalance(FString address, FString denom,
 
         output = UTF8_TO_TCHAR(balance.c_str());
         success = true;
-    } catch (const rust::cxxbridge1::Error &e) {
+    } catch (const std::exception &e) {
         success = false;
         output = TEXT("");
         output_message =
@@ -833,7 +833,7 @@ void ADefiWalletCoreActor::GetEthAddress(int32 index, FString &output,
         rust::cxxbridge1::String result = _coreWallet->get_eth_address(index);
         output = UTF8_TO_TCHAR(result.c_str());
         success = true;
-    } catch (const rust::cxxbridge1::Error &e) {
+    } catch (const std::exception &e) {
         success = false;
         output = TEXT("");
         output_message =
@@ -852,7 +852,7 @@ void ADefiWalletCoreActor::GetEthBalance(FString address, FString &output,
             get_eth_balance(targetaddress, mycronosrpc).to_string();
         output = UTF8_TO_TCHAR(result.c_str());
         success = true;
-    } catch (const rust::cxxbridge1::Error &e) {
+    } catch (const std::exception &e) {
         success = false;
         output = TEXT("");
         output_message =
@@ -884,7 +884,7 @@ void ADefiWalletCoreActor::BroadcastEthTxAsync(FWalletBroadcastDelegate Out,
                                             receipt.transaction_hash.size());
 
                 txhashtext = UTF8_TO_TCHAR(txhash.c_str());
-            } catch (const rust::cxxbridge1::Error &e) {
+            } catch (const std::exception &e) {
                 result = FString::Printf(
                     TEXT("CronosPlayUnreal BroadcastEthTxAsync Error: %s"),
                     UTF8_TO_TCHAR(e.what()));
@@ -966,7 +966,7 @@ void ADefiWalletCoreActor::SendEthAmount(
 
                 convertCronosTXReceipt(receipt, txresult);
             }
-        } catch (const rust::cxxbridge1::Error &e) {
+        } catch (const std::exception &e) {
             result =
                 FString::Printf(TEXT("CronosPlayUnreal SendAmount Error: %s"),
                                 UTF8_TO_TCHAR(e.what()));
@@ -1041,7 +1041,7 @@ TArray<uint8> ADefiWalletCoreActor::SignEthAmount(
         assert(output.size() == signedtx.size());
 
         success = true;
-    } catch (const rust::cxxbridge1::Error &e) {
+    } catch (const std::exception &e) {
         success = false;
         output_message =
             FString::Printf(TEXT("CronosPlayUnreal SendAmount Error: %s"),
@@ -1089,7 +1089,7 @@ void ADefiWalletCoreActor::SignLogin(int32 walletIndex, FString document,
         }
 
         success = true;
-    } catch (const rust::cxxbridge1::Error &e) {
+    } catch (const std::exception &e) {
         success = false;
         output_message =
             FString::Printf(TEXT("CronosPlayUnreal SignLogin Error: %s"),
@@ -1119,7 +1119,7 @@ void ADefiWalletCoreActor::VerifyLogin(FString document,
         rust::Slice<const uint8_t> slice{signature.data(), signature.size()};
         logininfo->verify_logininfo(slice);
         success = true;
-    } catch (const rust::cxxbridge1::Error &e) {
+    } catch (const std::exception &e) {
         success = false;
         output_message =
             FString::Printf(TEXT("CronosPlayUnreal VerifyLogin Error: %s"),
@@ -1159,7 +1159,7 @@ void ADefiWalletCoreActor::Erc20Balance(FString contractAddress,
         balance = UTF8_TO_TCHAR(erc20_balance.to_string().c_str());
         success = true;
 
-    } catch (const rust::cxxbridge1::Error &e) {
+    } catch (const std::exception &e) {
         success = false;
         output_message =
             FString::Printf(TEXT("CronosPlayUnreal Erc20Balance Error: %s"),
@@ -1182,7 +1182,7 @@ void ADefiWalletCoreActor::Erc721Balance(FString contractAddress,
         balance = UTF8_TO_TCHAR(erc721_balance.to_string().c_str());
         success = true;
 
-    } catch (const rust::cxxbridge1::Error &e) {
+    } catch (const std::exception &e) {
         success = false;
         output_message =
             FString::Printf(TEXT("CronosPlayUnreal Erc721Balance Error: %s"),
@@ -1207,7 +1207,7 @@ void ADefiWalletCoreActor::Erc1155Balance(FString contractAddress,
         balance = UTF8_TO_TCHAR(erc1155_balance.to_string().c_str());
         success = true;
 
-    } catch (const rust::cxxbridge1::Error &e) {
+    } catch (const std::exception &e) {
         success = false;
         output_message =
             FString::Printf(TEXT("CronosPlayUnreal Erc1155Balance Error: %s"),
@@ -1244,7 +1244,7 @@ void ADefiWalletCoreActor::Erc1155BalanceOfBatch(
         }
         success = true;
 
-    } catch (const rust::cxxbridge1::Error &e) {
+    } catch (const std::exception &e) {
         success = false;
         output_message = FString::Printf(
             TEXT("CronosPlayUnreal Erc1155BalanceOfBatch Error: %s"),
@@ -1263,7 +1263,7 @@ void ADefiWalletCoreActor::Erc721Name(FString contractAddress, FString &name,
         name = UTF8_TO_TCHAR(erc721name.c_str());
         success = true;
 
-    } catch (const rust::cxxbridge1::Error &e) {
+    } catch (const std::exception &e) {
         success = false;
         output_message =
             FString::Printf(TEXT("CronosPlayUnreal Erc721Name Error: %s"),
@@ -1282,7 +1282,7 @@ void ADefiWalletCoreActor::Erc721Symbol(FString contractAddress,
         rust::cxxbridge1::String erc721symbol = erc721.symbol();
         symbol = UTF8_TO_TCHAR(erc721symbol.c_str());
         success = true;
-    } catch (const rust::cxxbridge1::Error &e) {
+    } catch (const std::exception &e) {
         success = false;
         output_message =
             FString::Printf(TEXT("CronosPlayUnreal Erc721Symbol Error: %s"),
@@ -1303,7 +1303,7 @@ void ADefiWalletCoreActor::Erc721Uri(FString contractAddress, FString tokenID,
         uri = UTF8_TO_TCHAR(erc721uri.c_str());
         success = true;
 
-    } catch (const rust::cxxbridge1::Error &e) {
+    } catch (const std::exception &e) {
         success = false;
         output_message =
             FString::Printf(TEXT("CronosPlayUnreal Erc721Uri Error: %s"),
@@ -1326,7 +1326,7 @@ void ADefiWalletCoreActor::Erc721GetApproved(FString contractAddress,
         result = UTF8_TO_TCHAR(erc721getapproved.c_str());
         success = true;
 
-    } catch (const rust::cxxbridge1::Error &e) {
+    } catch (const std::exception &e) {
         success = false;
         output_message = FString::Printf(
             TEXT("CronosPlayUnreal Erc721GetApproved Error: %s"),
@@ -1349,7 +1349,7 @@ void ADefiWalletCoreActor::Erc721IsApprovedForAll(FString contractAddress,
         result = erc721.is_approved_for_all(myowner, myapprovedaddress);
         success = true;
 
-    } catch (const rust::cxxbridge1::Error &e) {
+    } catch (const std::exception &e) {
         success = false;
         output_message = FString::Printf(
             TEXT("CronosPlayUnreal Erc721IsApprovedForAll Error: %s"),
@@ -1370,7 +1370,7 @@ void ADefiWalletCoreActor::Erc1155Uri(FString contractAddress, FString tokenID,
         uri = UTF8_TO_TCHAR(erc1155uri.c_str());
         success = true;
 
-    } catch (const rust::cxxbridge1::Error &e) {
+    } catch (const std::exception &e) {
         success = false;
         output_message =
             FString::Printf(TEXT("CronosPlayUnreal Erc1155Uri Error: %s"),
@@ -1392,7 +1392,7 @@ void ADefiWalletCoreActor::Erc1155IsApprovedForAll(
         result = erc1155.is_approved_for_all(myowner, myapprovedaddress);
         success = true;
 
-    } catch (const rust::cxxbridge1::Error &e) {
+    } catch (const std::exception &e) {
         success = false;
         output_message = FString::Printf(
             TEXT("CronosPlayUnreal Erc11551IsApprovedForAll Error: %s"),
@@ -1415,7 +1415,7 @@ void ADefiWalletCoreActor::Erc721Owner(FString contractAddress, FString tokenID,
         ercowner = UTF8_TO_TCHAR(erc721owner.c_str());
         success = true;
 
-    } catch (const rust::cxxbridge1::Error &e) {
+    } catch (const std::exception &e) {
         success = false;
         output_message =
             FString::Printf(TEXT("CronosPlayUnreal Erc721Owner Error: %s"),
@@ -1439,7 +1439,7 @@ void ADefiWalletCoreActor::Erc721TotalSupply(FString contractAddress,
         totalsupply = UTF8_TO_TCHAR(erc721totalsupply.c_str());
         success = true;
 
-    } catch (const rust::cxxbridge1::Error &e) {
+    } catch (const std::exception &e) {
         success = false;
         output_message = FString::Printf(
             TEXT("CronosPlayUnreal Erc721TotalSupply Error: %s"),
@@ -1463,7 +1463,7 @@ void ADefiWalletCoreActor::Erc721TokenByIndex(FString contractAddress,
         token = UTF8_TO_TCHAR(erc721token.c_str());
         success = true;
 
-    } catch (const rust::cxxbridge1::Error &e) {
+    } catch (const std::exception &e) {
         success = false;
         output_message = FString::Printf(
             TEXT("CronosPlayUnreal Erc721TokenByIndex Error: %s"),
@@ -1488,7 +1488,7 @@ void ADefiWalletCoreActor::Erc721TokenOwnerByIndex(
         token = UTF8_TO_TCHAR(erc721token.c_str());
         success = true;
 
-    } catch (const rust::cxxbridge1::Error &e) {
+    } catch (const std::exception &e) {
         success = false;
         output_message = FString::Printf(
             TEXT("CronosPlayUnreal Erc721TokenOwnerByIndex Error: %s"),
@@ -1508,7 +1508,7 @@ void ADefiWalletCoreActor::Erc20Name(FString contractAddress, FString &name,
         name = UTF8_TO_TCHAR(erc20name.c_str());
         success = true;
 
-    } catch (const rust::cxxbridge1::Error &e) {
+    } catch (const std::exception &e) {
         success = false;
         output_message =
             FString::Printf(TEXT("CronosPlayUnreal Erc20Name Error: %s"),
@@ -1527,7 +1527,7 @@ void ADefiWalletCoreActor::Erc20Symbol(FString contractAddress, FString &symbol,
         symbol = UTF8_TO_TCHAR(erc20symbol.c_str());
         success = true;
 
-    } catch (const rust::cxxbridge1::Error &e) {
+    } catch (const std::exception &e) {
         success = false;
         output_message =
             FString::Printf(TEXT("CronosPlayUnreal Erc20Symbol Error: %s"),
@@ -1547,7 +1547,7 @@ void ADefiWalletCoreActor::Erc20Decimals(FString contractAddress,
         decimals = (int32)erc20decimals;
         success = true;
 
-    } catch (const rust::cxxbridge1::Error &e) {
+    } catch (const std::exception &e) {
         success = false;
         output_message =
             FString::Printf(TEXT("CronosPlayUnreal Erc20Decimals Error: %s"),
@@ -1569,7 +1569,7 @@ void ADefiWalletCoreActor::Erc20TotalSupply(FString contractAddress,
 
         success = true;
 
-    } catch (const rust::cxxbridge1::Error &e) {
+    } catch (const std::exception &e) {
         success = false;
         output_message =
             FString::Printf(TEXT("CronosPlayUnreal Erc20TotalSupply Error: %s"),
@@ -1640,7 +1640,7 @@ void ADefiWalletCoreActor::Erc20Transfer(FString contractAddress,
                 convertCronosTXReceipt(receipt, txresult);
             }
 
-        } catch (const rust::cxxbridge1::Error &e) {
+        } catch (const std::exception &e) {
             result = FString::Printf(
                 TEXT("CronosPlayUnreal Erc20Transfer Error: %s"),
                 UTF8_TO_TCHAR(e.what()));
@@ -1693,7 +1693,7 @@ void ADefiWalletCoreActor::Erc20TransferFrom(FString contractAddress,
                 convertCronosTXReceipt(receipt, txresult);
             }
 
-        } catch (const rust::cxxbridge1::Error &e) {
+        } catch (const std::exception &e) {
             result = FString::Printf(
                 TEXT("CronosPlayUnreal Erc20TransferFrom Error: %s"),
                 UTF8_TO_TCHAR(e.what()));
@@ -1740,7 +1740,7 @@ void ADefiWalletCoreActor::Erc20Approve(FString contractAddress,
                 convertCronosTXReceipt(receipt, txresult);
             }
 
-        } catch (const rust::cxxbridge1::Error &e) {
+        } catch (const std::exception &e) {
             result =
                 FString::Printf(TEXT("CronosPlayUnreal Erc20Approve Error: %s"),
                                 UTF8_TO_TCHAR(e.what()));
@@ -1771,7 +1771,7 @@ void ADefiWalletCoreActor::Erc20Allowance(FString contractAddress,
 
         success = true;
 
-    } catch (const rust::cxxbridge1::Error &e) {
+    } catch (const std::exception &e) {
         success = false;
         output_message =
             FString::Printf(TEXT("CronosPlayUnreal Erc20Allowance Error: %s"),
@@ -1813,7 +1813,7 @@ void ADefiWalletCoreActor::Erc721TransferFrom(
                                          *privatekey);
                 convertCronosTXReceipt(receipt, txresult);
             }
-        } catch (const rust::cxxbridge1::Error &e) {
+        } catch (const std::exception &e) {
             result = FString::Printf(
                 TEXT("CronosPlayUnreal Erc721TransferFrom Error: %s"),
                 UTF8_TO_TCHAR(e.what()));
@@ -1860,7 +1860,7 @@ void ADefiWalletCoreActor::Erc721SafeTransferFrom(
                 convertCronosTXReceipt(receipt, txresult);
             }
 
-        } catch (const rust::cxxbridge1::Error &e) {
+        } catch (const std::exception &e) {
             result = FString::Printf(
                 TEXT("CronosPlayUnreal Erc721SafeTransferFrom Error: %s"),
                 UTF8_TO_TCHAR(e.what()));
@@ -1917,7 +1917,7 @@ void ADefiWalletCoreActor::Erc721SafeTransferFromWithData(
                 convertCronosTXReceipt(receipt, txresult);
             }
 
-        } catch (const rust::cxxbridge1::Error &e) {
+        } catch (const std::exception &e) {
             result = FString::Printf(
                 TEXT("CronosPlayUnreal Erc721SafeTransferFromWithData Error: "
                      "%s"),
@@ -1968,7 +1968,7 @@ void ADefiWalletCoreActor::Erc721Approve(FString contractAddress,
                 convertCronosTXReceipt(receipt, txresult);
             }
 
-        } catch (const rust::cxxbridge1::Error &e) {
+        } catch (const std::exception &e) {
             result = FString::Printf(
                 TEXT("CronosPlayUnreal Erc721Approve Error: %s"),
                 UTF8_TO_TCHAR(e.what()));
@@ -2026,7 +2026,7 @@ void ADefiWalletCoreActor::Erc1155SafeTransferFrom(
                 convertCronosTXReceipt(receipt, txresult);
             }
 
-        } catch (const rust::cxxbridge1::Error &e) {
+        } catch (const std::exception &e) {
             result = FString::Printf(
                 TEXT("CronosPlayUnreal Erc1155SafeTransferFrom Error: %s"),
                 UTF8_TO_TCHAR(e.what()));
@@ -2091,7 +2091,7 @@ void ADefiWalletCoreActor::Erc1155SafeBatchTransferFrom(
                         myadditionaldata, *privatekey);
                 convertCronosTXReceipt(receipt, txresult);
             }
-        } catch (const rust::cxxbridge1::Error &e) {
+        } catch (const std::exception &e) {
             result = FString::Printf(
                 TEXT("CronosPlayUnreal Erc1155SafeBatchTransferFrom Error: %s"),
                 UTF8_TO_TCHAR(e.what()));
@@ -2139,7 +2139,7 @@ void ADefiWalletCoreActor::Erc1155Approve(FString contractAddress,
                                                  *privatekey);
                 convertCronosTXReceipt(receipt, txresult);
             }
-        } catch (const rust::cxxbridge1::Error &e) {
+        } catch (const std::exception &e) {
             result = FString::Printf(
                 TEXT("CronosPlayUnreal Erc1155Approve Error: %s"),
                 UTF8_TO_TCHAR(e.what()));
