@@ -2,7 +2,7 @@ UNAME := $(shell uname)
 PWD = $(shell pwd)
 
 # Set the play cpp sdk version
-PLAYCPPSDK=v0.0.17-alpha
+PLAYCPPSDK=v0.0.18-alpha
 # Set the play-cpp-sdk cache path
 PLAYCPPSDK_CACHE_DIR=./install/$(PLAYCPPSDK)
 # Set the play-cpp-sdk target path
@@ -139,7 +139,7 @@ uncompress: prepare
 # FIXME Build Android/IOS with RunUAT.sh
 RunUAT:
 ifeq ($(UNAME), Darwin)
-	/Users/Shared/Epic\ Games/UE_4.27/Engine/Build/BatchFiles/RunUAT.sh \
+	/Users/Shared/Epic\ Games/UE_5.1/Engine/Build/BatchFiles/RunUAT.sh \
 	BuildPlugin \
 	-Rocket \
 	-TargetPlatforms=Mac \

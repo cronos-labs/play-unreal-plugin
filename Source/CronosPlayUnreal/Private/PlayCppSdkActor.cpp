@@ -595,7 +595,6 @@ void APlayCppSdkActor::SignEip155Transaction(
             myinfo.to = TCHAR_TO_UTF8(*info.to);
             myinfo.common.gas_limit = TCHAR_TO_UTF8(*info.gas);
             myinfo.common.gas_price = TCHAR_TO_UTF8(*info.gas_price);
-            myinfo.common.chainid = (uint64)myCronosChainID;
             myinfo.value = TCHAR_TO_UTF8(*info.value);
             copyTArrayToVec(info.data, myinfo.data);
             myinfo.common.nonce = TCHAR_TO_UTF8(*info.nonce);
@@ -616,6 +615,63 @@ void APlayCppSdkActor::SignEip155Transaction(
         } catch (const rust::cxxbridge1::Error &e) {
             output.result = FString::Printf(
                 TEXT("PlayCppSdk SignEip155Transaction Error: %s"),
+                UTF8_TO_TCHAR(e.what()));
+        }
+
+        AsyncTask(ENamedThreads::GameThread,
+                  [Out, output]() { Out.ExecuteIfBound(output); });
+    });
+}
+
+void APlayCppSdkActor::SendEip155Transaction(
+    FWalletConnectTxEip155 info,
+    FWalletconnectSendEip155TransactionDelegate Out) {
+    ::com::crypto::game_sdk::WalletconnectClient *coreclient = GetClient();
+    // if no walletconnect session, return
+    if (coreclient == nullptr)
+        return;
+    TArray<uint8> address = GetAddress();
+    int64 chain_id = (uint64)GetChainId();
+    // if no address, return
+    if (address.Num() == 0 || chain_id == 0)
+        return;
+    AsyncTask(ENamedThreads::AnyHiPriThreadNormalTask, [Out, coreclient,
+                                                        address, chain_id, info,
+                                                        this]() {
+        FWalletSendTXEip155Result output;
+
+        try {
+
+            assert(20 == address.Num());
+            ::std::array<::std::uint8_t, 20> dstaddress;
+            for (int i = 0; i < address.Num(); i++) {
+                dstaddress[i] = address[i];
+            }
+
+            WalletConnectTxEip155 myinfo;
+            myinfo.to = TCHAR_TO_UTF8(*info.to);
+            myinfo.common.gas_limit = TCHAR_TO_UTF8(*info.gas);
+            myinfo.common.gas_price = TCHAR_TO_UTF8(*info.gas_price);
+            myinfo.value = TCHAR_TO_UTF8(*info.value);
+            copyTArrayToVec(info.data, myinfo.data);
+            myinfo.common.nonce = TCHAR_TO_UTF8(*info.nonce);
+            myinfo.common.chainid = chain_id;
+            if (_coreClient != NULL) {
+
+                Vec<uint8_t> tx_hash =
+                    _coreClient->send_eip155_transaction_blocking(myinfo,
+                                                                  dstaddress);
+
+                copyVecToTArray(tx_hash, output.tx_hash);
+                assert(tx_hash.size() == output.Num());
+            } else {
+                output.result = FString::Printf(
+                    TEXT("PlayCppSdk SendEip155Transaction Invalid Client"));
+            }
+
+        } catch (const rust::cxxbridge1::Error &e) {
+            output.result = FString::Printf(
+                TEXT("PlayCppSdk SendEip155Transaction Error: %s"),
                 UTF8_TO_TCHAR(e.what()));
         }
 
