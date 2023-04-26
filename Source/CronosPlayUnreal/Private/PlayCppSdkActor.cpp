@@ -792,9 +792,8 @@ void APlayCppSdkActor::Erc721TransferFrom(
                     UTF8_TO_TCHAR(e.what()));
             }
 
-            AsyncTask(ENamedThreads::GameThread, [Out, txresult, result]() {
-                Out.ExecuteIfBound(txresult, result);
-            });
+            AsyncTask(ENamedThreads::GameThread,
+                      [Out, txresult]() { Out.ExecuteIfBound(txresult); });
         });
 }
 
@@ -833,9 +832,8 @@ void APlayCppSdkActor::Erc721SafeTransferFrom(
                     UTF8_TO_TCHAR(e.what()));
             }
 
-            AsyncTask(ENamedThreads::GameThread, [Out, txresult, result]() {
-                Out.ExecuteIfBound(txresult, result);
-            });
+            AsyncTask(ENamedThreads::GameThread,
+                      [Out, txresult]() { Out.ExecuteIfBound(txresult); });
         });
 }
 
@@ -875,9 +873,8 @@ void APlayCppSdkActor::Erc721SafeTransferFromWithAdditionalData(
                     UTF8_TO_TCHAR(e.what()));
             }
 
-            AsyncTask(ENamedThreads::GameThread, [Out, txresult, result]() {
-                Out.ExecuteIfBound(txresult, result);
-            });
+            AsyncTask(ENamedThreads::GameThread,
+                      [Out, txresult]() { Out.ExecuteIfBound(txresult); });
         });
 }
 
@@ -915,9 +912,8 @@ void APlayCppSdkActor::Erc721Approve(
                     UTF8_TO_TCHAR(e.what()));
             }
 
-            AsyncTask(ENamedThreads::GameThread, [Out, txresult, result]() {
-                Out.ExecuteIfBound(txresult, result);
-            });
+            AsyncTask(ENamedThreads::GameThread,
+                      [Out, txresult]() { Out.ExecuteIfBound(txresult); });
         });
 }
 
@@ -955,9 +951,8 @@ void APlayCppSdkActor::Erc721SetApprovalForAll(
                     UTF8_TO_TCHAR(e.what()));
             }
 
-            AsyncTask(ENamedThreads::GameThread, [Out, txresult, result]() {
-                Out.ExecuteIfBound(txresult, result);
-            });
+            AsyncTask(ENamedThreads::GameThread,
+                      [Out, txresult]() { Out.ExecuteIfBound(txresult); });
         });
 }
 void APlayCppSdkActor::Erc1155SafeTransferFrom(
@@ -994,9 +989,8 @@ void APlayCppSdkActor::Erc1155SafeTransferFrom(
                     UTF8_TO_TCHAR(e.what()));
             }
 
-            AsyncTask(ENamedThreads::GameThread, [Out, txresult, result]() {
-                Out.ExecuteIfBound(txresult, result);
-            });
+            AsyncTask(ENamedThreads::GameThread,
+                      [Out, txresult]() { Out.ExecuteIfBound(txresult); });
         });
 }
 
@@ -1033,9 +1027,8 @@ void APlayCppSdkActor::Erc1155Approve(
                     UTF8_TO_TCHAR(e.what()));
             }
 
-            AsyncTask(ENamedThreads::GameThread, [Out, txresult, result]() {
-                Out.ExecuteIfBound(txresult, result);
-            });
+            AsyncTask(ENamedThreads::GameThread,
+                      [Out, txresult]() { Out.ExecuteIfBound(txresult); });
         });
 }
 
@@ -1067,9 +1060,8 @@ void APlayCppSdkActor::Erc20Transfer(
                     UTF8_TO_TCHAR(e.what()));
             }
 
-            AsyncTask(ENamedThreads::GameThread, [Out, txresult, result]() {
-                Out.ExecuteIfBound(txresult, result);
-            });
+            AsyncTask(ENamedThreads::GameThread,
+                      [Out, txresult]() { Out.ExecuteIfBound(txresult); });
         });
 }
 
@@ -1108,9 +1100,8 @@ void APlayCppSdkActor::Erc20TransferFrom(
                     UTF8_TO_TCHAR(e.what()));
             }
 
-            AsyncTask(ENamedThreads::GameThread, [Out, txresult, result]() {
-                Out.ExecuteIfBound(txresult, result);
-            });
+            AsyncTask(ENamedThreads::GameThread,
+                      [Out, txresult]() { Out.ExecuteIfBound(txresult); });
         });
 }
 
@@ -1156,10 +1147,9 @@ void APlayCppSdkActor::Erc20Approve(
                           UTF8_TO_TCHAR(e.what()));
                   }
 
-                  AsyncTask(ENamedThreads::GameThread,
-                            [Out, txresult, result]() {
-                                Out.ExecuteIfBound(txresult, result);
-                            });
+                  AsyncTask(ENamedThreads::GameThread, [Out, txresult]() {
+                      Out.ExecuteIfBound(txresult);
+                  });
               });
 }
 

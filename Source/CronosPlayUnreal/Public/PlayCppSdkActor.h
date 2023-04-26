@@ -150,16 +150,15 @@ DECLARE_DYNAMIC_DELEGATE_OneParam(FWalletconnectSignEip155TransactionDelegate,
 
 /// send eip155 tx delegate
 DECLARE_DYNAMIC_DELEGATE_OneParam(FWalletconnectSendEip155TransactionDelegate,
-                                  FWalletSendTXEip155Result, SigningResult);
+                                  FWalletSendTXEip155Result, TxResult);
 
 /// sign personal delegate
 DECLARE_DYNAMIC_DELEGATE_OneParam(FWalletconnectSignPersonalDelegate,
                                   FWalletSignTXEip155Result, SigningResult);
 
 /// send contract transaciton delegate
-DECLARE_DYNAMIC_DELEGATE_TwoParams(FCronosSendContractTransactionDelegate,
-                                   FWalletSendTXEip155Result, TxResult, FString,
-                                   Result);
+DECLARE_DYNAMIC_DELEGATE_OneParam(FCronosSendContractTransactionDelegate,
+                                  FWalletSendTXEip155Result, TxResult);
 
 /// initialize wallet connect delegate
 DECLARE_DYNAMIC_DELEGATE_TwoParams(FInitializeWalletConnectDelegate, bool,
