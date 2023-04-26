@@ -521,7 +521,7 @@ class CRONOSPLAYUNREAL_API APlayCppSdkActor : public AActor {
      * @param Out sign legacy tx result callback
      */
     UFUNCTION(BlueprintCallable,
-              meta = (DisplayName = "SignEip155Transaction",
+              meta = (DisplayName = "SendEip155Transaction",
                       Keywords = "PlayCppSdk"),
               Category = "PlayCppSdk")
     void SendEip155Transaction(FWalletConnectTxEip155 info,
@@ -560,7 +560,7 @@ class CRONOSPLAYUNREAL_API APlayCppSdkActor : public AActor {
      * @param Out FCronosSignedTransactionDelegate callback
      */
     UFUNCTION(BlueprintCallable,
-              meta = (DisplayName = "Erc721TransferFrom",
+              meta = (DisplayName = "Erc721SafeTransferFrom",
                       Keywords = "PlayCppSdk"),
               Category = "PlayCppSdk")
     void Erc721SafeTransferFrom(FString contractAddress, FString toAddress,
@@ -618,7 +618,8 @@ class CRONOSPLAYUNREAL_API APlayCppSdkActor : public AActor {
      * @param Out FCronosSignedTransactionDelegate callback
      */
     UFUNCTION(BlueprintCallable,
-              meta = (DisplayName = "Erc721Approve", Keywords = "PlayCppSdk"),
+              meta = (DisplayName = "Erc721SetApprovalForAll",
+                      Keywords = "PlayCppSdk"),
               Category = "PlayCppSdk")
     void Erc721SetApprovalForAll(FString contractAddress,
                                  FString approvedAddress, bool approved,
@@ -674,8 +675,7 @@ class CRONOSPLAYUNREAL_API APlayCppSdkActor : public AActor {
      * @param Out FCronosSignedTransactionDelegate callback
      */
     UFUNCTION(BlueprintCallable,
-              meta = (DisplayName = "Erc20TransferFrom",
-                      Keywords = "PlayCppSdk"),
+              meta = (DisplayName = "Erc20Transfer", Keywords = "PlayCppSdk"),
               Category = "PlayCppSdk")
     void Erc20Transfer(FString contractAddress, FString toAddress,
                        FString amount, FString gasLimit, FString gasPrice,
