@@ -25,22 +25,6 @@
 
 #include "PlayCppSdkActor.generated.h"
 
-/**
- Cronos Signed Transaction
- */
-USTRUCT(BlueprintType)
-struct FCronosSignedTransactionRaw {
-    GENERATED_BODY()
-
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayCppSdk")
-    TArray<uint8> SignedTx;
-};
-
-// build signed-tx
-DECLARE_DYNAMIC_DELEGATE_TwoParams(FCronosSignedTransactionDelegate,
-                                   FCronosSignedTransactionRaw, TxResult,
-                                   FString, Result);
-
 /// wallet connect session state
 UENUM(BlueprintType)
 enum class EWalletconnectSessionState : uint8 {
@@ -171,6 +155,11 @@ DECLARE_DYNAMIC_DELEGATE_OneParam(FWalletconnectSendEip155TransactionDelegate,
 /// sign personal delegate
 DECLARE_DYNAMIC_DELEGATE_OneParam(FWalletconnectSignPersonalDelegate,
                                   FWalletSignTXEip155Result, SigningResult);
+
+/// send contract transaciton delegate
+DECLARE_DYNAMIC_DELEGATE_TwoParams(FCronosSendContractTransactionDelegate,
+                                   FWalletSendTXEip155Result, TxResult, FString,
+                                   Result);
 
 /// initialize wallet connect delegate
 DECLARE_DYNAMIC_DELEGATE_TwoParams(FInitializeWalletConnectDelegate, bool,
@@ -541,7 +530,7 @@ class CRONOSPLAYUNREAL_API APlayCppSdkActor : public AActor {
      * @param tokenId token id
      * @param gasLimit gas limit
      * @param gasPrice gas price
-     * @param Out FCronosSignedTransactionDelegate callback
+     * @param Out FCronosSendContractTransactionDelegate callback
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "Erc721TransferFrom",
@@ -549,7 +538,7 @@ class CRONOSPLAYUNREAL_API APlayCppSdkActor : public AActor {
               Category = "PlayCppSdk")
     void Erc721TransferFrom(FString contractAddress, FString toAddress,
                             FString tokenId, FString gasLimit, FString gasPrice,
-                            FCronosSignedTransactionDelegate Out);
+                            FCronosSendContractTransactionDelegate Out);
     /**
      * Transfers `token_id` token from `from_address` to `to_address`.
      * @param contractAddress erc721 contract
@@ -557,7 +546,7 @@ class CRONOSPLAYUNREAL_API APlayCppSdkActor : public AActor {
      * @param tokenId token id
      * @param gasLimit gas limit
      * @param gasPrice gas price
-     * @param Out FCronosSignedTransactionDelegate callback
+     * @param Out FCronosSendContractTransactionDelegate callback
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "Erc721SafeTransferFrom",
@@ -566,7 +555,7 @@ class CRONOSPLAYUNREAL_API APlayCppSdkActor : public AActor {
     void Erc721SafeTransferFrom(FString contractAddress, FString toAddress,
                                 FString tokenId, FString gasLimit,
                                 FString gasPrice,
-                                FCronosSignedTransactionDelegate Out);
+                                FCronosSendContractTransactionDelegate Out);
     /**
      * Transfers `token_id` token from `from_address` to `to_address`.
      * @param contractAddress erc721 contract
@@ -575,7 +564,7 @@ class CRONOSPLAYUNREAL_API APlayCppSdkActor : public AActor {
      * @param additionalData additional data
      * @param gasLimit gas limit
      * @param gasPrice gas price
-     * @param Out FCronosSignedTransactionDelegate callback
+     * @param Out FCronosSendContractTransactionDelegate callback
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "Erc721TransferFrom",
@@ -584,7 +573,7 @@ class CRONOSPLAYUNREAL_API APlayCppSdkActor : public AActor {
     void Erc721SafeTransferFromWithAdditionalData(
         FString contractAddress, FString toAddress, FString tokenId,
         TArray<uint8> additionalData, FString gasLimit, FString gasPrice,
-        FCronosSignedTransactionDelegate Out);
+        FCronosSendContractTransactionDelegate Out);
 
     /**
      * Gives permission to `approved_address` to transfer `token_id` token to
@@ -598,14 +587,14 @@ class CRONOSPLAYUNREAL_API APlayCppSdkActor : public AActor {
      * @param tokenId token id
      * @param gasLimit gas limit
      * @param gasPrice gas price
-     * @param Out FCronosSignedTransactionDelegate callback
+     * @param Out FCronosSendContractTransactionDelegate callback
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "Erc721Approve", Keywords = "PlayCppSdk"),
               Category = "PlayCppSdk")
     void Erc721Approve(FString contractAddress, FString approvedAddress,
                        FString tokenId, FString gasLimit, FString gasPrice,
-                       FCronosSignedTransactionDelegate Out);
+                       FCronosSendContractTransactionDelegate Out);
 
     /**
      * Enable or disable approval for a third party `approved_address` to manage
@@ -615,7 +604,7 @@ class CRONOSPLAYUNREAL_API APlayCppSdkActor : public AActor {
      * @param approved approved or not
      * @param gasLimit gas limit
      * @param gasPrice gas price
-     * @param Out FCronosSignedTransactionDelegate callback
+     * @param Out FCronosSendContractTransactionDelegate callback
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "Erc721SetApprovalForAll",
@@ -624,7 +613,7 @@ class CRONOSPLAYUNREAL_API APlayCppSdkActor : public AActor {
     void Erc721SetApprovalForAll(FString contractAddress,
                                  FString approvedAddress, bool approved,
                                  FString gasLimit, FString gasPrice,
-                                 FCronosSignedTransactionDelegate Out);
+                                 FCronosSendContractTransactionDelegate Out);
 
     /**
      * Transfers `amount` tokens of `token_id` from
@@ -636,7 +625,7 @@ class CRONOSPLAYUNREAL_API APlayCppSdkActor : public AActor {
      * @param additionalData additional data
      * @param gasLimit gas limit
      * @param gasPrice gas price
-     * @param Out FCronosSignedTransactionDelegate callback
+     * @param Out FCronosSendContractTransactionDelegate callback
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "Erc1155SafeTransferFrom",
@@ -646,7 +635,7 @@ class CRONOSPLAYUNREAL_API APlayCppSdkActor : public AActor {
                                  FString tokenId, FString amount,
                                  TArray<uint8> additionalData, FString gasLimit,
                                  FString gasPrice,
-                                 FCronosSignedTransactionDelegate Out);
+                                 FCronosSendContractTransactionDelegate Out);
 
     /**
      * Enable or disable approval for a third party `approved_address` to manage
@@ -656,14 +645,14 @@ class CRONOSPLAYUNREAL_API APlayCppSdkActor : public AActor {
      * @param approved approved or not
      * @param gasLimit gas limit
      * @param gasPrice gas price
-     * @param Out FCronosSignedTransactionDelegate callback
+     * @param Out FCronosSendContractTransactionDelegate callback
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "Erc1155Approve", Keywords = "PlayCppSdk"),
               Category = "PlayCppSdk")
     void Erc1155Approve(FString contractAddress, FString approvedAddress,
                         bool approved, FString gasLimit, FString gasPrice,
-                        FCronosSignedTransactionDelegate Out);
+                        FCronosSendContractTransactionDelegate Out);
 
     /**
      * Moves `amount` tokens from the caller’s account to `to_address`.
@@ -672,14 +661,14 @@ class CRONOSPLAYUNREAL_API APlayCppSdkActor : public AActor {
      * @param amount amount
      * @param gasLimit gas limit
      * @param gasPrice gas price
-     * @param Out FCronosSignedTransactionDelegate callback
+     * @param Out FCronosSendContractTransactionDelegate callback
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "Erc20Transfer", Keywords = "PlayCppSdk"),
               Category = "PlayCppSdk")
     void Erc20Transfer(FString contractAddress, FString toAddress,
                        FString amount, FString gasLimit, FString gasPrice,
-                       FCronosSignedTransactionDelegate Out);
+                       FCronosSendContractTransactionDelegate Out);
     /**
      * Moves `amount` tokens from the caller’s account to `to_address`.
      * @param contractAddress erc20 contract
@@ -687,7 +676,7 @@ class CRONOSPLAYUNREAL_API APlayCppSdkActor : public AActor {
      * @param amount amount
      * @param gasLimit gas limit
      * @param gasPrice gas price
-     * @param Out FCronosSignedTransactionDelegate callback
+     * @param Out FCronosSendContractTransactionDelegate callback
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "Erc20TransferFrom",
@@ -695,7 +684,7 @@ class CRONOSPLAYUNREAL_API APlayCppSdkActor : public AActor {
               Category = "PlayCppSdk")
     void Erc20TransferFrom(FString contractAddress, FString toAddress,
                            FString amount, FString gasLimit, FString gasPrice,
-                           FCronosSignedTransactionDelegate Out);
+                           FCronosSendContractTransactionDelegate Out);
 
     /**
      * Allows `approved_address` to withdraw from your account multiple times,
@@ -705,12 +694,12 @@ class CRONOSPLAYUNREAL_API APlayCppSdkActor : public AActor {
      * @param amount amount
      * @param gasLimit gas limit
      * @param gasPrice gas price
-     * @param Out FCronosSignedTransactionDelegate callback
+     * @param Out FCronosSendContractTransactionDelegate callback
      */
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "Erc20Approve", Keywords = "PlayCppSdk"),
               Category = "PlayCppSdk")
     void Erc20Approve(FString contractAddress, FString approvedAddress,
                       FString amount, FString gasLimit, FString gasPrice,
-                      FCronosSignedTransactionDelegate Out);
+                      FCronosSendContractTransactionDelegate Out);
 };

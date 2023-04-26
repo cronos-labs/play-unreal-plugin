@@ -759,7 +759,8 @@ void StopWalletConnect() { APlayCppSdkActor::destroyCoreClient(); }
 
 void APlayCppSdkActor::Erc721TransferFrom(
     FString contractAddress, FString toAddress, FString tokenId,
-    FString gasLimit, FString gasPrice, FCronosSignedTransactionDelegate Out) {
+    FString gasLimit, FString gasPrice,
+    FCronosSendContractTransactionDelegate Out) {
 
     FString fromAddress = UUtlis::ToHex(GetAddress());
     // if no fromAddress, return
@@ -770,7 +771,6 @@ void APlayCppSdkActor::Erc721TransferFrom(
         ENamedThreads::AnyHiPriThreadNormalTask,
         [this, Out, contractAddress, fromAddress, toAddress, tokenId, gasLimit,
          gasPrice]() {
-            FString result;
             FWalletSendTXEip155Result txresult;
             try {
                 if (NULL == _coreClient) {
@@ -787,7 +787,7 @@ void APlayCppSdkActor::Erc721TransferFrom(
                 }
 
             } catch (const std::exception &e) {
-                result = FString::Printf(
+                txresult.result = FString::Printf(
                     TEXT("CronosPlayUnreal Erc721SafeTransferFrom Error: %s"),
                     UTF8_TO_TCHAR(e.what()));
             }
@@ -800,7 +800,8 @@ void APlayCppSdkActor::Erc721TransferFrom(
 
 void APlayCppSdkActor::Erc721SafeTransferFrom(
     FString contractAddress, FString toAddress, FString tokenId,
-    FString gasLimit, FString gasPrice, FCronosSignedTransactionDelegate Out) {
+    FString gasLimit, FString gasPrice,
+    FCronosSendContractTransactionDelegate Out) {
 
     FString fromAddress = UUtlis::ToHex(GetAddress());
     // if no fromAddress, return
@@ -811,11 +812,10 @@ void APlayCppSdkActor::Erc721SafeTransferFrom(
         ENamedThreads::AnyHiPriThreadNormalTask,
         [this, Out, contractAddress, fromAddress, toAddress, tokenId, gasLimit,
          gasPrice]() {
-            FString result;
             FWalletSendTXEip155Result txresult;
             try {
                 if (NULL == _coreClient) {
-                    result = TEXT("Invalid Walletconnect");
+                    txresult.result = TEXT("Invalid Walletconnect");
                 } else {
                     WalletConnectTxCommon common;
                     setCommon(common, gasLimit, gasPrice);
@@ -828,7 +828,7 @@ void APlayCppSdkActor::Erc721SafeTransferFrom(
                 }
 
             } catch (const std::exception &e) {
-                result = FString::Printf(
+                txresult.result = FString::Printf(
                     TEXT("CronosPlayUnreal Erc721SafeTransferFrom Error: %s"),
                     UTF8_TO_TCHAR(e.what()));
             }
@@ -842,7 +842,7 @@ void APlayCppSdkActor::Erc721SafeTransferFrom(
 void APlayCppSdkActor::Erc721SafeTransferFromWithAdditionalData(
     FString contractAddress, FString toAddress, FString tokenId,
     TArray<uint8> additionalData, FString gasLimit, FString gasPrice,
-    FCronosSignedTransactionDelegate Out) {
+    FCronosSendContractTransactionDelegate Out) {
 
     FString fromAddress = UUtlis::ToHex(GetAddress());
     // if no fromAddress, return
@@ -853,11 +853,10 @@ void APlayCppSdkActor::Erc721SafeTransferFromWithAdditionalData(
         ENamedThreads::AnyHiPriThreadNormalTask,
         [this, Out, contractAddress, fromAddress, toAddress, tokenId, gasLimit,
          gasPrice]() {
-            FString result;
             FWalletSendTXEip155Result txresult;
             try {
                 if (NULL == _coreClient) {
-                    result = TEXT("Invalid Walletconnect");
+                    txresult.result = TEXT("Invalid Walletconnect");
                 } else {
                     WalletConnectTxCommon common;
                     setCommon(common, gasLimit, gasPrice);
@@ -871,7 +870,7 @@ void APlayCppSdkActor::Erc721SafeTransferFromWithAdditionalData(
                 }
 
             } catch (const std::exception &e) {
-                result = FString::Printf(
+                txresult.result = FString::Printf(
                     TEXT("CronosPlayUnreal Erc721SafeTransferFrom Error: %s"),
                     UTF8_TO_TCHAR(e.what()));
             }
@@ -882,10 +881,10 @@ void APlayCppSdkActor::Erc721SafeTransferFromWithAdditionalData(
         });
 }
 
-void APlayCppSdkActor::Erc721Approve(FString contractAddress,
-                                     FString approvedAddress, FString tokenId,
-                                     FString gasLimit, FString gasPrice,
-                                     FCronosSignedTransactionDelegate Out) {
+void APlayCppSdkActor::Erc721Approve(
+    FString contractAddress, FString approvedAddress, FString tokenId,
+    FString gasLimit, FString gasPrice,
+    FCronosSendContractTransactionDelegate Out) {
 
     FString fromAddress = UUtlis::ToHex(GetAddress());
     // if no fromAddress, return
@@ -895,11 +894,10 @@ void APlayCppSdkActor::Erc721Approve(FString contractAddress,
         ENamedThreads::AnyHiPriThreadNormalTask,
         [this, Out, contractAddress, fromAddress, approvedAddress, tokenId,
          gasLimit, gasPrice]() {
-            FString result;
             FWalletSendTXEip155Result txresult;
             try {
                 if (NULL == _coreClient) {
-                    result = TEXT("Invalid Walletconnect");
+                    txresult.result = TEXT("Invalid Walletconnect");
                 } else {
                     WalletConnectTxCommon common;
                     setCommon(common, gasLimit, gasPrice);
@@ -912,7 +910,7 @@ void APlayCppSdkActor::Erc721Approve(FString contractAddress,
                 }
 
             } catch (const std::exception &e) {
-                result = FString::Printf(
+                txresult.result = FString::Printf(
                     TEXT("CronosPlayUnreal Erc721SafeTransferFrom Error: %s"),
                     UTF8_TO_TCHAR(e.what()));
             }
@@ -925,7 +923,8 @@ void APlayCppSdkActor::Erc721Approve(FString contractAddress,
 
 void APlayCppSdkActor::Erc721SetApprovalForAll(
     FString contractAddress, FString approvedAddress, bool approved,
-    FString gasLimit, FString gasPrice, FCronosSignedTransactionDelegate Out) {
+    FString gasLimit, FString gasPrice,
+    FCronosSendContractTransactionDelegate Out) {
 
     FString fromAddress = UUtlis::ToHex(GetAddress());
     // if no fromAddress, return
@@ -935,11 +934,10 @@ void APlayCppSdkActor::Erc721SetApprovalForAll(
         ENamedThreads::AnyHiPriThreadNormalTask,
         [this, Out, contractAddress, fromAddress, approvedAddress, tokenId,
          gasLimit, gasPrice]() {
-            FString result;
             FWalletSendTXEip155Result txresult;
             try {
                 if (NULL == _coreClient) {
-                    result = TEXT("Invalid Walletconnect");
+                    txresult.result = TEXT("Invalid Walletconnect");
                 } else {
                     WalletConnectTxCommon common;
                     setCommon(common, gasLimit, gasPrice);
@@ -952,7 +950,7 @@ void APlayCppSdkActor::Erc721SetApprovalForAll(
                 }
 
             } catch (const std::exception &e) {
-                result = FString::Printf(
+                txresult.result = FString::Printf(
                     TEXT("CronosPlayUnreal Erc721SafeTransferFrom Error: %s"),
                     UTF8_TO_TCHAR(e.what()));
             }
@@ -965,7 +963,7 @@ void APlayCppSdkActor::Erc721SetApprovalForAll(
 void APlayCppSdkActor::Erc1155SafeTransferFrom(
     FString contractAddress, FString toAddress, FString tokenId, FString amount,
     TArray<uint8> additionalData, FString gasLimit, FString gasPrice,
-    FCronosSignedTransactionDelegate Out) {
+    FCronosSendContractTransactionDelegate Out) {
     FString fromAddress = UUtlis::ToHex(GetAddress());
     // if no fromAddress, return
     if (fromAddress.IsEmpty())
@@ -974,11 +972,10 @@ void APlayCppSdkActor::Erc1155SafeTransferFrom(
         ENamedThreads::AnyHiPriThreadNormalTask,
         [this, Out, contractAddress, fromAddress, toAddress, tokenId, amount,
          additionalData, gasLimit, gasPrice]() {
-            FString result;
             FWalletSendTXEip155Result txresult;
             try {
                 if (NULL == _coreClient) {
-                    result = TEXT("Invalid Walletconnect");
+                    txresult.result = TEXT("Invalid Walletconnect");
                 } else {
                     WalletConnectTxCommon common;
                     setCommon(common, gasLimit, gasPrice);
@@ -992,7 +989,7 @@ void APlayCppSdkActor::Erc1155SafeTransferFrom(
                 }
 
             } catch (const std::exception &e) {
-                result = FString::Printf(
+                txresult.result = FString::Printf(
                     TEXT("CronosPlayUnreal Erc1155SafeTransferFrom Error: %s"),
                     UTF8_TO_TCHAR(e.what()));
             }
@@ -1003,10 +1000,10 @@ void APlayCppSdkActor::Erc1155SafeTransferFrom(
         });
 }
 
-void APlayCppSdkActor::Erc1155Approve(FString contractAddress,
-                                      FString approvedAddress, bool approved,
-                                      FString gasLimit, FString gasPrice,
-                                      FCronosSignedTransactionDelegate Out) {
+void APlayCppSdkActor::Erc1155Approve(
+    FString contractAddress, FString approvedAddress, bool approved,
+    FString gasLimit, FString gasPrice,
+    FCronosSendContractTransactionDelegate Out) {
     FString fromAddress = UUtlis::ToHex(GetAddress());
     // if no fromAddress, return
     if (fromAddress.IsEmpty())
@@ -1015,11 +1012,10 @@ void APlayCppSdkActor::Erc1155Approve(FString contractAddress,
         ENamedThreads::AnyHiPriThreadNormalTask,
         [this, Out, contractAddress, fromAddress, approvedAddress, approved,
          gasLimit, gasPrice]() {
-            FString result;
             FWalletSendTXEip155Result txresult;
             try {
                 if (NULL == _coreClient) {
-                    result = TEXT("Invalid Walletconnect");
+                    txresult.result = TEXT("Invalid Walletconnect");
                 } else {
                     WalletConnectTxCommon common;
                     setCommon(common, gasLimit, gasPrice);
@@ -1032,7 +1028,7 @@ void APlayCppSdkActor::Erc1155Approve(FString contractAddress,
                 }
 
             } catch (const std::exception &e) {
-                result = FString::Printf(
+                txresult.result = FString::Printf(
                     TEXT("CronosPlayUnreal Erc1155Approve Error: %s"),
                     UTF8_TO_TCHAR(e.what()));
             }
@@ -1043,18 +1039,17 @@ void APlayCppSdkActor::Erc1155Approve(FString contractAddress,
         });
 }
 
-void APlayCppSdkActor::Erc20Transfer(FString contractAddress, FString toAddress,
-                                     FString amount, FString gasLimit,
-                                     FString gasPrice,
-                                     FCronosSignedTransactionDelegate Out) {
+void APlayCppSdkActor::Erc20Transfer(
+    FString contractAddress, FString toAddress, FString amount,
+    FString gasLimit, FString gasPrice,
+    FCronosSendContractTransactionDelegate Out) {
     AsyncTask(
         ENamedThreads::AnyHiPriThreadNormalTask,
         [this, Out, contractAddress, toAddress, amount, gasLimit, gasPrice]() {
-            FString result;
             FWalletSendTXEip155Result txresult;
             try {
                 if (NULL == _coreClient) {
-                    result = TEXT("Invalid Walletconnect");
+                    txresult.result = TEXT("Invalid Walletconnect");
                 } else {
 
                     WalletConnectTxCommon common;
@@ -1067,7 +1062,7 @@ void APlayCppSdkActor::Erc20Transfer(FString contractAddress, FString toAddress,
                 }
 
             } catch (const std::exception &e) {
-                result = FString::Printf(
+                txresult.result = FString::Printf(
                     TEXT("CronosPlayUnreal Erc1155SafeTransferFrom Error: %s"),
                     UTF8_TO_TCHAR(e.what()));
             }
@@ -1078,10 +1073,10 @@ void APlayCppSdkActor::Erc20Transfer(FString contractAddress, FString toAddress,
         });
 }
 
-void APlayCppSdkActor::Erc20TransferFrom(FString contractAddress,
-                                         FString toAddress, FString amount,
-                                         FString gasLimit, FString gasPrice,
-                                         FCronosSignedTransactionDelegate Out) {
+void APlayCppSdkActor::Erc20TransferFrom(
+    FString contractAddress, FString toAddress, FString amount,
+    FString gasLimit, FString gasPrice,
+    FCronosSendContractTransactionDelegate Out) {
 
     FString fromAddress = UUtlis::ToHex(GetAddress());
     // if no fromAddress, return
@@ -1091,11 +1086,10 @@ void APlayCppSdkActor::Erc20TransferFrom(FString contractAddress,
         ENamedThreads::AnyHiPriThreadNormalTask,
         [this, Out, contractAddress, fromAddress, toAddress, amount, gasLimit,
          gasPrice]() {
-            FString result;
             FWalletSendTXEip155Result txresult;
             try {
                 if (NULL == _coreClient) {
-                    result = TEXT("Invalid Walletconnect");
+                    txresult.result = TEXT("Invalid Walletconnect");
                 } else {
 
                     WalletConnectTxCommon common;
@@ -1109,7 +1103,7 @@ void APlayCppSdkActor::Erc20TransferFrom(FString contractAddress,
                 }
 
             } catch (const std::exception &e) {
-                result = FString::Printf(
+                txresult.result = FString::Printf(
                     TEXT("CronosPlayUnreal Erc1155SafeTransferFrom Error: %s"),
                     UTF8_TO_TCHAR(e.what()));
             }
@@ -1129,10 +1123,10 @@ void APlayCppSdkActor::setCommon(WalletConnectTxCommon &common,
     common.gas_price = TCHAR_TO_UTF8(*gasprice);
 }
 
-void APlayCppSdkActor::Erc20Approve(FString contractAddress,
-                                    FString approvedAddress, FString amount,
-                                    FString gasLimit, FString gasPrice,
-                                    FCronosSignedTransactionDelegate Out) {
+void APlayCppSdkActor::Erc20Approve(
+    FString contractAddress, FString approvedAddress, FString amount,
+    FString gasLimit, FString gasPrice,
+    FCronosSendContractTransactionDelegate Out) {
 
     FString fromAddress = UUtlis::ToHex(GetAddress());
     // if no fromAddress, return
@@ -1141,11 +1135,10 @@ void APlayCppSdkActor::Erc20Approve(FString contractAddress,
     AsyncTask(ENamedThreads::AnyHiPriThreadNormalTask,
               [this, Out, contractAddress, fromAddress, approvedAddress, amount,
                gasLimit, gasPrice]() {
-                  FString result;
                   FWalletSendTXEip155Result txresult;
                   try {
                       if (NULL == _coreClient) {
-                          result = TEXT("Invalid Walletconnect");
+                          txresult.result = TEXT("Invalid Walletconnect");
                       } else {
                           WalletConnectTxCommon common;
                           setCommon(common, gasLimit, gasPrice);
@@ -1158,7 +1151,7 @@ void APlayCppSdkActor::Erc20Approve(FString contractAddress,
                       }
 
                   } catch (const std::exception &e) {
-                      result = FString::Printf(
+                      txresult.result = FString::Printf(
                           TEXT("CronosPlayUnreal Erc1155Approve Error: %s"),
                           UTF8_TO_TCHAR(e.what()));
                   }
