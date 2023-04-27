@@ -762,7 +762,10 @@ void APlayCppSdkActor::Erc721TransferFrom(
     FString gasLimit, FString gasPrice,
     FCronosSendContractTransactionDelegate Out) {
 
-    FString fromAddress = UUtlis::ToHex(GetAddress());
+    TArray<uint8> fromAddressTArray = GetAddress();
+    FString fromAddress = UUtlis::ToHex(fromAddressTArray);
+    std::array<uint8_t, 20> fromAddressArray =
+        UUtlis::ToArray(fromAddressTArray);
     // if no fromAddress, return
     if (fromAddress.IsEmpty())
         return;
@@ -770,7 +773,7 @@ void APlayCppSdkActor::Erc721TransferFrom(
     AsyncTask(
         ENamedThreads::AnyHiPriThreadNormalTask,
         [this, Out, contractAddress, fromAddress, toAddress, tokenId, gasLimit,
-         gasPrice]() {
+         gasPrice, fromAddressArray]() {
             FWalletSendTXEip155Result txresult;
             try {
                 if (NULL == _coreClient) {
@@ -782,7 +785,7 @@ void APlayCppSdkActor::Erc721TransferFrom(
                                         Erc721TransferFromAction(
                                             contractAddress, fromAddress,
                                             toAddress, tokenId),
-                                        common, fromAddress),
+                                        common, fromAddressArray),
                                     txresult.tx_hash);
                 }
 
@@ -802,7 +805,10 @@ void APlayCppSdkActor::Erc721SafeTransferFrom(
     FString gasLimit, FString gasPrice,
     FCronosSendContractTransactionDelegate Out) {
 
-    FString fromAddress = UUtlis::ToHex(GetAddress());
+    TArray<uint8> fromAddressTArray = GetAddress();
+    FString fromAddress = UUtlis::ToHex(fromAddressTArray);
+    std::array<uint8_t, 20> fromAddressArray =
+        UUtlis::ToArray(fromAddressTArray);
     // if no fromAddress, return
     if (fromAddress.IsEmpty())
         return;
@@ -810,7 +816,7 @@ void APlayCppSdkActor::Erc721SafeTransferFrom(
     AsyncTask(
         ENamedThreads::AnyHiPriThreadNormalTask,
         [this, Out, contractAddress, fromAddress, toAddress, tokenId, gasLimit,
-         gasPrice]() {
+         gasPrice, fromAddressArray]() {
             FWalletSendTXEip155Result txresult;
             try {
                 if (NULL == _coreClient) {
@@ -822,7 +828,7 @@ void APlayCppSdkActor::Erc721SafeTransferFrom(
                                         Erc721SafeTransferFromAction(
                                             contractAddress, fromAddress,
                                             toAddress, tokenId),
-                                        common, fromAddress),
+                                        common, fromAddressArray),
                                     txresult.tx_hash);
                 }
 
@@ -842,7 +848,10 @@ void APlayCppSdkActor::Erc721SafeTransferFromWithAdditionalData(
     TArray<uint8> additionalData, FString gasLimit, FString gasPrice,
     FCronosSendContractTransactionDelegate Out) {
 
-    FString fromAddress = UUtlis::ToHex(GetAddress());
+    TArray<uint8> fromAddressTArray = GetAddress();
+    FString fromAddress = UUtlis::ToHex(fromAddressTArray);
+    std::array<uint8_t, 20> fromAddressArray =
+        UUtlis::ToArray(fromAddressTArray);
     // if no fromAddress, return
     if (fromAddress.IsEmpty())
         return;
@@ -850,7 +859,7 @@ void APlayCppSdkActor::Erc721SafeTransferFromWithAdditionalData(
     AsyncTask(
         ENamedThreads::AnyHiPriThreadNormalTask,
         [this, Out, contractAddress, fromAddress, toAddress, tokenId, gasLimit,
-         gasPrice]() {
+         gasPrice, fromAddressArray, additionalData]() {
             FWalletSendTXEip155Result txresult;
             try {
                 if (NULL == _coreClient) {
@@ -863,7 +872,7 @@ void APlayCppSdkActor::Erc721SafeTransferFromWithAdditionalData(
                             Erc721SafeTransferFromWithAdditionalDataAction(
                                 contractAddress, fromAddress, toAddress,
                                 tokenId, additionalData),
-                            common, fromAddress),
+                            common, fromAddressArray),
                         txresult.tx_hash);
                 }
 
@@ -883,14 +892,17 @@ void APlayCppSdkActor::Erc721Approve(
     FString gasLimit, FString gasPrice,
     FCronosSendContractTransactionDelegate Out) {
 
-    FString fromAddress = UUtlis::ToHex(GetAddress());
+    TArray<uint8> fromAddressTArray = GetAddress();
+    FString fromAddress = UUtlis::ToHex(fromAddressTArray);
+    std::array<uint8_t, 20> fromAddressArray =
+        UUtlis::ToArray(fromAddressTArray);
     // if no fromAddress, return
     if (fromAddress.IsEmpty())
         return;
     AsyncTask(
         ENamedThreads::AnyHiPriThreadNormalTask,
         [this, Out, contractAddress, fromAddress, approvedAddress, tokenId,
-         gasLimit, gasPrice]() {
+         gasLimit, gasPrice, fromAddressArray]() {
             FWalletSendTXEip155Result txresult;
             try {
                 if (NULL == _coreClient) {
@@ -902,7 +914,7 @@ void APlayCppSdkActor::Erc721Approve(
                         _coreClient->send_contract_transaction(
                             Erc721ApprovalAction(contractAddress,
                                                  approvedAddress, tokenId),
-                            common, fromAddress),
+                            common, fromAddressArray),
                         txresult.tx_hash);
                 }
 
@@ -922,14 +934,17 @@ void APlayCppSdkActor::Erc721SetApprovalForAll(
     FString gasLimit, FString gasPrice,
     FCronosSendContractTransactionDelegate Out) {
 
-    FString fromAddress = UUtlis::ToHex(GetAddress());
+    TArray<uint8> fromAddressTArray = GetAddress();
+    FString fromAddress = UUtlis::ToHex(fromAddressTArray);
+    std::array<uint8_t, 20> fromAddressArray =
+        UUtlis::ToArray(fromAddressTArray);
     // if no fromAddress, return
     if (fromAddress.IsEmpty())
         return;
     AsyncTask(
         ENamedThreads::AnyHiPriThreadNormalTask,
-        [this, Out, contractAddress, fromAddress, approvedAddress, tokenId,
-         gasLimit, gasPrice]() {
+        [this, Out, contractAddress, fromAddress, approvedAddress, gasLimit,
+         gasPrice, fromAddressArray, approved]() {
             FWalletSendTXEip155Result txresult;
             try {
                 if (NULL == _coreClient) {
@@ -941,7 +956,7 @@ void APlayCppSdkActor::Erc721SetApprovalForAll(
                         _coreClient->send_contract_transaction(
                             Erc721SetApprovalForAllAction(
                                 contractAddress, approvedAddress, approved),
-                            common, fromAddress),
+                            common, fromAddressArray),
                         txresult.tx_hash);
                 }
 
@@ -959,14 +974,17 @@ void APlayCppSdkActor::Erc1155SafeTransferFrom(
     FString contractAddress, FString toAddress, FString tokenId, FString amount,
     TArray<uint8> additionalData, FString gasLimit, FString gasPrice,
     FCronosSendContractTransactionDelegate Out) {
-    FString fromAddress = UUtlis::ToHex(GetAddress());
+    TArray<uint8> fromAddressTArray = GetAddress();
+    FString fromAddress = UUtlis::ToHex(fromAddressTArray);
+    std::array<uint8_t, 20> fromAddressArray =
+        UUtlis::ToArray(fromAddressTArray);
     // if no fromAddress, return
     if (fromAddress.IsEmpty())
         return;
     AsyncTask(
         ENamedThreads::AnyHiPriThreadNormalTask,
         [this, Out, contractAddress, fromAddress, toAddress, tokenId, amount,
-         additionalData, gasLimit, gasPrice]() {
+         additionalData, gasLimit, gasPrice, fromAddressArray]() {
             FWalletSendTXEip155Result txresult;
             try {
                 if (NULL == _coreClient) {
@@ -979,7 +997,7 @@ void APlayCppSdkActor::Erc1155SafeTransferFrom(
                             Erc1155SafeTransferFromAction(
                                 contractAddress, fromAddress, toAddress,
                                 tokenId, amount, additionalData),
-                            common, fromAddress),
+                            common, fromAddressArray),
                         txresult.tx_hash);
                 }
 
@@ -998,14 +1016,17 @@ void APlayCppSdkActor::Erc1155Approve(
     FString contractAddress, FString approvedAddress, bool approved,
     FString gasLimit, FString gasPrice,
     FCronosSendContractTransactionDelegate Out) {
-    FString fromAddress = UUtlis::ToHex(GetAddress());
+    TArray<uint8> fromAddressTArray = GetAddress();
+    FString fromAddress = UUtlis::ToHex(fromAddressTArray);
+    std::array<uint8_t, 20> fromAddressArray =
+        UUtlis::ToArray(fromAddressTArray);
     // if no fromAddress, return
     if (fromAddress.IsEmpty())
         return;
     AsyncTask(
         ENamedThreads::AnyHiPriThreadNormalTask,
         [this, Out, contractAddress, fromAddress, approvedAddress, approved,
-         gasLimit, gasPrice]() {
+         gasLimit, gasPrice, fromAddressArray]() {
             FWalletSendTXEip155Result txresult;
             try {
                 if (NULL == _coreClient) {
@@ -1017,7 +1038,7 @@ void APlayCppSdkActor::Erc1155Approve(
                         _coreClient->send_contract_transaction(
                             Erc1155ApprovalAction(contractAddress,
                                                   approvedAddress, approved),
-                            common, fromAddress),
+                            common, fromAddressArray),
                         txresult.tx_hash);
                 }
 
@@ -1036,9 +1057,18 @@ void APlayCppSdkActor::Erc20Transfer(
     FString contractAddress, FString toAddress, FString amount,
     FString gasLimit, FString gasPrice,
     FCronosSendContractTransactionDelegate Out) {
+
+    TArray<uint8> fromAddressTArray = GetAddress();
+    FString fromAddress = UUtlis::ToHex(fromAddressTArray);
+    std::array<uint8_t, 20> fromAddressArray =
+        UUtlis::ToArray(fromAddressTArray);
+    // if no fromAddress, return
+    if (fromAddress.IsEmpty())
+        return;
     AsyncTask(
         ENamedThreads::AnyHiPriThreadNormalTask,
-        [this, Out, contractAddress, toAddress, amount, gasLimit, gasPrice]() {
+        [this, Out, contractAddress, fromAddressArray, toAddress, amount,
+         gasLimit, gasPrice]() {
             FWalletSendTXEip155Result txresult;
             try {
                 if (NULL == _coreClient) {
@@ -1050,7 +1080,7 @@ void APlayCppSdkActor::Erc20Transfer(
                     copyVecToTArray(_coreClient->send_contract_transaction(
                                         Erc20TransferAction(contractAddress,
                                                             toAddress, amount),
-                                        common, fromAddress),
+                                        common, fromAddressArray),
                                     txresult.tx_hash);
                 }
 
@@ -1070,14 +1100,17 @@ void APlayCppSdkActor::Erc20TransferFrom(
     FString gasLimit, FString gasPrice,
     FCronosSendContractTransactionDelegate Out) {
 
-    FString fromAddress = UUtlis::ToHex(GetAddress());
+    TArray<uint8> fromAddressTArray = GetAddress();
+    FString fromAddress = UUtlis::ToHex(fromAddressTArray);
+    std::array<uint8_t, 20> fromAddressArray =
+        UUtlis::ToArray(fromAddressTArray);
     // if no fromAddress, return
     if (fromAddress.IsEmpty())
         return;
     AsyncTask(
         ENamedThreads::AnyHiPriThreadNormalTask,
         [this, Out, contractAddress, fromAddress, toAddress, amount, gasLimit,
-         gasPrice]() {
+         gasPrice, fromAddressArray]() {
             FWalletSendTXEip155Result txresult;
             try {
                 if (NULL == _coreClient) {
@@ -1090,7 +1123,7 @@ void APlayCppSdkActor::Erc20TransferFrom(
                                         Erc20TransferFromAction(
                                             contractAddress, fromAddress,
                                             toAddress, amount),
-                                        common, fromAddress),
+                                        common, fromAddressArray),
                                     txresult.tx_hash);
                 }
 
@@ -1119,13 +1152,16 @@ void APlayCppSdkActor::Erc20Approve(
     FString gasLimit, FString gasPrice,
     FCronosSendContractTransactionDelegate Out) {
 
-    FString fromAddress = UUtlis::ToHex(GetAddress());
+    TArray<uint8> fromAddressTArray = GetAddress();
+    FString fromAddress = UUtlis::ToHex(fromAddressTArray);
+    std::array<uint8_t, 20> fromAddressArray =
+        UUtlis::ToArray(fromAddressTArray);
     // if no fromAddress, return
     if (fromAddress.IsEmpty())
         return;
     AsyncTask(ENamedThreads::AnyHiPriThreadNormalTask,
               [this, Out, contractAddress, fromAddress, approvedAddress, amount,
-               gasLimit, gasPrice]() {
+               gasLimit, gasPrice, fromAddressArray]() {
                   FWalletSendTXEip155Result txresult;
                   try {
                       if (NULL == _coreClient) {
@@ -1137,7 +1173,7 @@ void APlayCppSdkActor::Erc20Approve(
                               _coreClient->send_contract_transaction(
                                   Erc20ApprovalAction(contractAddress,
                                                       approvedAddress, amount),
-                                  common, fromAddress),
+                                  common, fromAddressArray),
                               txresult.tx_hash);
                       }
 
@@ -1153,9 +1189,9 @@ void APlayCppSdkActor::Erc20Approve(
               });
 }
 
-FString APlayCppSdkActor::Erc20TransferAction(FString contract_address,
-                                              FString to_address,
-                                              FString amount) {
+rust::string APlayCppSdkActor::Erc20TransferAction(FString contract_address,
+                                                   FString to_address,
+                                                   FString amount) {
     // Construct the JSON object
     TSharedPtr<FJsonObject> RootObject = MakeShareable(new FJsonObject);
     TSharedPtr<FJsonObject> FirstLevelObject = MakeShareable(new FJsonObject);
@@ -1170,13 +1206,13 @@ FString APlayCppSdkActor::Erc20TransferAction(FString contract_address,
     TSharedRef<TJsonWriter<>> Writer =
         TJsonWriterFactory<>::Create(&JsonString);
     FJsonSerializer::Serialize(RootObject.ToSharedRef(), Writer);
-    return JsonString;
+    return rust::string(TCHAR_TO_UTF8(*JsonString));
 }
 
-FString APlayCppSdkActor::Erc20TransferFromAction(FString contract_address,
-                                                  FString from_address,
-                                                  FString to_address,
-                                                  FString amount) {
+rust::string APlayCppSdkActor::Erc20TransferFromAction(FString contract_address,
+                                                       FString from_address,
+                                                       FString to_address,
+                                                       FString amount) {
     // Construct the JSON object
     TSharedPtr<FJsonObject> RootObject = MakeShareable(new FJsonObject);
     TSharedPtr<FJsonObject> FirstLevelObject = MakeShareable(new FJsonObject);
@@ -1192,13 +1228,12 @@ FString APlayCppSdkActor::Erc20TransferFromAction(FString contract_address,
     TSharedRef<TJsonWriter<>> Writer =
         TJsonWriterFactory<>::Create(&JsonString);
     FJsonSerializer::Serialize(RootObject.ToSharedRef(), Writer);
-    return JsonString;
+    return rust::string(TCHAR_TO_UTF8(*JsonString));
 }
 
-FString APlayCppSdkActor::Erc721TransferFromAction(FString contract_address,
-                                                   FString from_address,
-                                                   FString to_address,
-                                                   FString token_id) {
+rust::string APlayCppSdkActor::Erc721TransferFromAction(
+    FString contract_address, FString from_address, FString to_address,
+    FString token_id) {
     // Construct the JSON object
     TSharedPtr<FJsonObject> RootObject = MakeShareable(new FJsonObject);
     TSharedPtr<FJsonObject> FirstLevelObject = MakeShareable(new FJsonObject);
@@ -1214,13 +1249,12 @@ FString APlayCppSdkActor::Erc721TransferFromAction(FString contract_address,
     TSharedRef<TJsonWriter<>> Writer =
         TJsonWriterFactory<>::Create(&JsonString);
     FJsonSerializer::Serialize(RootObject.ToSharedRef(), Writer);
-    return JsonString;
+    return rust::string(TCHAR_TO_UTF8(*JsonString));
 }
 
-FString APlayCppSdkActor::Erc721SafeTransferFromAction(FString contract_address,
-                                                       FString from_address,
-                                                       FString to_address,
-                                                       FString token_id) {
+rust::string APlayCppSdkActor::Erc721SafeTransferFromAction(
+    FString contract_address, FString from_address, FString to_address,
+    FString token_id) {
     // Construct the JSON object
     TSharedPtr<FJsonObject> RootObject = MakeShareable(new FJsonObject);
     TSharedPtr<FJsonObject> FirstLevelObject = MakeShareable(new FJsonObject);
@@ -1237,10 +1271,10 @@ FString APlayCppSdkActor::Erc721SafeTransferFromAction(FString contract_address,
     TSharedRef<TJsonWriter<>> Writer =
         TJsonWriterFactory<>::Create(&JsonString);
     FJsonSerializer::Serialize(RootObject.ToSharedRef(), Writer);
-    return JsonString;
+    return rust::string(TCHAR_TO_UTF8(*JsonString));
 }
 
-FString APlayCppSdkActor::Erc721SafeTransferFromWithAdditionalDataAction(
+rust::string APlayCppSdkActor::Erc721SafeTransferFromWithAdditionalDataAction(
     FString contract_address, FString from_address, FString to_address,
     FString token_id, TArray<uint8> additional_data) {
     // Construct the JSON object
@@ -1253,18 +1287,19 @@ FString APlayCppSdkActor::Erc721SafeTransferFromWithAdditionalDataAction(
     SecondLevelObject->SetStringField("from_address", from_address);
     SecondLevelObject->SetStringField("to_address", to_address);
     SecondLevelObject->SetStringField("token_id", token_id);
-    SecondLevelObject->SetBinaryField(
-        "additional_data", additional_data.GetData(), additional_data.Num());
+    // TODO is the hex string correct?
+    SecondLevelObject->SetStringField("additional_data",
+                                      UUtlis::ToHex(additional_data));
     RootObject->SetObjectField("ContractTransfer", FirstLevelObject);
     // Convert the JSON object to a string
     FString JsonString;
     TSharedRef<TJsonWriter<>> Writer =
         TJsonWriterFactory<>::Create(&JsonString);
     FJsonSerializer::Serialize(RootObject.ToSharedRef(), Writer);
-    return JsonString;
+    return rust::string(TCHAR_TO_UTF8(*JsonString));
 }
 
-FString APlayCppSdkActor::Erc1155SafeTransferFromAction(
+rust::string APlayCppSdkActor::Erc1155SafeTransferFromAction(
     FString contract_address, FString from_address, FString to_address,
     FString token_id, FString amount, TArray<uint8> additional_data) {
     // Construct the JSON object
@@ -1278,20 +1313,21 @@ FString APlayCppSdkActor::Erc1155SafeTransferFromAction(
     SecondLevelObject->SetStringField("to_address", to_address);
     SecondLevelObject->SetStringField("token_id", token_id);
     SecondLevelObject->SetStringField("amount", amount);
-    SecondLevelObject->SetBinaryField(
-        "additional_data", additional_data.GetData(), additional_data.Num());
+    // TODO is the hex string correct?
+    SecondLevelObject->SetStringField("additional_data",
+                                      UUtlis::ToHex(additional_data));
     RootObject->SetObjectField("ContractTransfer", FirstLevelObject);
     // Convert the JSON object to a string
     FString JsonString;
     TSharedRef<TJsonWriter<>> Writer =
         TJsonWriterFactory<>::Create(&JsonString);
     FJsonSerializer::Serialize(RootObject.ToSharedRef(), Writer);
-    return JsonString;
+    return rust::string(TCHAR_TO_UTF8(*JsonString));
 }
 
-FString APlayCppSdkActor::Erc20ApprovalAction(FString contract_address,
-                                              FString approved_address,
-                                              FString amount) {
+rust::string APlayCppSdkActor::Erc20ApprovalAction(FString contract_address,
+                                                   FString approved_address,
+                                                   FString amount) {
     // Construct the JSON object
     TSharedPtr<FJsonObject> RootObject = MakeShareable(new FJsonObject);
     TSharedPtr<FJsonObject> FirstLevelObject = MakeShareable(new FJsonObject);
@@ -1306,19 +1342,19 @@ FString APlayCppSdkActor::Erc20ApprovalAction(FString contract_address,
     TSharedRef<TJsonWriter<>> Writer =
         TJsonWriterFactory<>::Create(&JsonString);
     FJsonSerializer::Serialize(RootObject.ToSharedRef(), Writer);
-    return JsonString;
+    return rust::string(TCHAR_TO_UTF8(*JsonString));
 }
 
-FString APlayCppSdkActor::Erc721ApprovalAction(FString contract_address,
-                                               FString approved_address,
-                                               FString token_id) {
+rust::string APlayCppSdkActor::Erc721ApprovalAction(FString contract_address,
+                                                    FString approved_address,
+                                                    FString token_id) {
     // Construct the JSON object
     TSharedPtr<FJsonObject> RootObject = MakeShareable(new FJsonObject);
     TSharedPtr<FJsonObject> FirstLevelObject = MakeShareable(new FJsonObject);
     TSharedPtr<FJsonObject> SecondLevelObject = MakeShareable(new FJsonObject);
     FirstLevelObject->SetObjectField("Erc721Approve", SecondLevelObject);
     SecondLevelObject->SetStringField("contract_address", contract_address);
-    SecondLevelObject->SetStringField("approved_address", to_address);
+    SecondLevelObject->SetStringField("approved_address", approved_address);
     SecondLevelObject->SetStringField("token_id", token_id);
     RootObject->SetObjectField("ContractApproval", FirstLevelObject);
     // Convert the JSON object to a string
@@ -1326,10 +1362,10 @@ FString APlayCppSdkActor::Erc721ApprovalAction(FString contract_address,
     TSharedRef<TJsonWriter<>> Writer =
         TJsonWriterFactory<>::Create(&JsonString);
     FJsonSerializer::Serialize(RootObject.ToSharedRef(), Writer);
-    return JsonString;
+    return rust::string(TCHAR_TO_UTF8(*JsonString));
 }
 
-FString APlayCppSdkActor::Erc721SetApprovalForAllAction(
+rust::string APlayCppSdkActor::Erc721SetApprovalForAllAction(
     FString contract_address, FString approved_address, bool approved) {
     // Construct the JSON object
     TSharedPtr<FJsonObject> RootObject = MakeShareable(new FJsonObject);
@@ -1338,33 +1374,33 @@ FString APlayCppSdkActor::Erc721SetApprovalForAllAction(
     FirstLevelObject->SetObjectField("Erc721SetApprovalForAll",
                                      SecondLevelObject);
     SecondLevelObject->SetStringField("contract_address", contract_address);
-    SecondLevelObject->SetStringField("approved_address", to_address);
-    SecondLevelObject->SetStringField("approved", token_id);
+    SecondLevelObject->SetStringField("approved_address", approved_address);
+    SecondLevelObject->SetBoolField("approved", approved);
     RootObject->SetObjectField("ContractApproval", FirstLevelObject);
     // Convert the JSON object to a string
     FString JsonString;
     TSharedRef<TJsonWriter<>> Writer =
         TJsonWriterFactory<>::Create(&JsonString);
     FJsonSerializer::Serialize(RootObject.ToSharedRef(), Writer);
-    return JsonString;
+    return rust::string(TCHAR_TO_UTF8(*JsonString));
 }
 
-FString APlayCppSdkActor::Erc1155ApprovalAction(FString contract_address,
-                                                FString approved_address,
-                                                bool approved) {
+rust::string APlayCppSdkActor::Erc1155ApprovalAction(FString contract_address,
+                                                     FString approved_address,
+                                                     bool approved) {
     // Construct the JSON object
     TSharedPtr<FJsonObject> RootObject = MakeShareable(new FJsonObject);
     TSharedPtr<FJsonObject> FirstLevelObject = MakeShareable(new FJsonObject);
     TSharedPtr<FJsonObject> SecondLevelObject = MakeShareable(new FJsonObject);
     FirstLevelObject->SetObjectField("Erc1155", SecondLevelObject);
     SecondLevelObject->SetStringField("contract_address", contract_address);
-    SecondLevelObject->SetStringField("approved_address", to_address);
-    SecondLevelObject->SetStringField("approved", token_id);
+    SecondLevelObject->SetStringField("approved_address", approved_address);
+    SecondLevelObject->SetBoolField("approved", approved);
     RootObject->SetObjectField("ContractApproval", FirstLevelObject);
     // Convert the JSON object to a string
     FString JsonString;
     TSharedRef<TJsonWriter<>> Writer =
         TJsonWriterFactory<>::Create(&JsonString);
     FJsonSerializer::Serialize(RootObject.ToSharedRef(), Writer);
-    return JsonString;
+    return rust::string(TCHAR_TO_UTF8(*JsonString));
 }

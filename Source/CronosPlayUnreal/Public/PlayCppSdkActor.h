@@ -702,38 +702,40 @@ class CRONOSPLAYUNREAL_API APlayCppSdkActor : public AActor {
                       FString amount, FString gasLimit, FString gasPrice,
                       FCronosSendContractTransactionDelegate Out);
 
-    FString Erc721TransferFromAction(FString contract_address,
-                                     FString from_address, FString to_address,
-                                     FString token_id);
-    FString Erc721SafeTransferFromAction(FString contract_address,
+    rust::string Erc721TransferFromAction(FString contract_address,
                                          FString from_address,
                                          FString to_address, FString token_id);
+    rust::string Erc721SafeTransferFromAction(FString contract_address,
+                                             FString from_address,
+                                             FString to_address,
+                                             FString token_id);
 
-    FString Erc721SafeTransferFromWithAdditionalDataAction(
+    rust::string Erc721SafeTransferFromWithAdditionalDataAction(
         FString contract_address, FString from_address, FString to_address,
         FString token_id, TArray<uint8> additional_data);
 
-    FString Erc1155SafeTransferFromAction(FString contract_address,
-                                          FString from_address,
-                                          FString to_address, FString token_id,
-                                          FString amount,
-                                          TArray<uint8> additional_data);
+    rust::string Erc1155SafeTransferFromAction(FString contract_address,
+                                              FString from_address,
+                                              FString to_address,
+                                              FString token_id, FString amount,
+                                              TArray<uint8> additional_data);
 
-    FString Erc20ApprovalAction(FString contract_address,
-                                FString approved_address, FString amount);
-    FString Erc721ApprovalAction(FString contract_address,
-                                 FString approved_address, FString token_id);
-    FString Erc721SetApprovalForAllAction(FString contract_address,
-                                          FString approved_address,
-                                          bool approved);
+    rust::string Erc20ApprovalAction(FString contract_address,
+                                    FString approved_address, FString amount);
+    rust::string Erc721ApprovalAction(FString contract_address,
+                                     FString approved_address,
+                                     FString token_id);
+    rust::string Erc721SetApprovalForAllAction(FString contract_address,
+                                              FString approved_address,
+                                              bool approved);
 
-    FString Erc1155ApprovalAction(FString contract_address,
-                                  FString approved_address, bool approved);
+    rust::string Erc1155ApprovalAction(FString contract_address,
+                                      FString approved_address, bool approved);
 
-    FString Erc20TransferAction(FString contract_address, FString to_address,
-                                FString amount);
+    rust::string Erc20TransferAction(FString contract_address,
+                                    FString to_address, FString amount);
 
-    FString Erc20TransferFromAction(FString contract_address,
-                                    FString from_address, FString to_address,
-                                    FString amount);
+    rust::string Erc20TransferFromAction(FString contract_address,
+                                        FString from_address,
+                                        FString to_address, FString amount);
 };
