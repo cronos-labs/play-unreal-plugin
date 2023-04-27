@@ -701,4 +701,36 @@ class CRONOSPLAYUNREAL_API APlayCppSdkActor : public AActor {
     void Erc20Approve(FString contractAddress, FString approvedAddress,
                       FString amount, FString gasLimit, FString gasPrice,
                       FCronosSendContractTransactionDelegate Out);
+
+    void Erc721TransferFromAction(FString contract_address,
+                                  FString from_address, FString to_address,
+                                  FString token_id);
+    void Erc721SafeTransferFromAction(FString contract_address,
+                                      FString from_address, FString to_address,
+                                      FString token_id);
+
+    void Erc721SafeTransferFromWithAdditionalDataAction(
+        FString contract_address, FString from_address, FString to_address,
+        FString token_id, TArray<uint8> additional_data);
+
+    void Erc1155SafeTransferFromAction(FString contract_address,
+                                       FString from_address, FString to_address,
+                                       FString token_id, FString amount,
+                                       TArray<uint8> additional_data);
+
+    void Erc20ApprovalAction(FString contract_address, FString approved_address,
+                             FString amount);
+    void Erc721ApprovalAction(FString contract_address,
+                              FString approved_address, FString token_id);
+    void Erc721SetApprovalForAllAction(FString contract_address,
+                                       FString approved_address, bool approved);
+
+    void Erc1155ApprovalAction(FString contract_address,
+                               FString approved_address, bool approved);
+
+    void Erc20TransferAction(FString contract_address, FString to_address,
+                             FString amount);
+
+    void Erc20TransferFromAction(FString contract_address, FString from_address,
+                                 FString to_address, FString amount)
 };
