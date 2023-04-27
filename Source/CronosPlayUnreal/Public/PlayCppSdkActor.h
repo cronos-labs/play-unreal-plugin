@@ -314,7 +314,7 @@ class CRONOSPLAYUNREAL_API APlayCppSdkActor : public AActor {
 
   public:
     void setCommon(com::crypto::game_sdk::WalletConnectTxCommon &common,
-                   FString fromaddress, FString gaslimit, FString gasprice);
+                   FString gaslimit, FString gasprice);
 
     // Called every frame
     virtual void Tick(float DeltaTime) override;

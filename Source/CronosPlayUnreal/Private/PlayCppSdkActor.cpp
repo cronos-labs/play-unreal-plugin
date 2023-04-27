@@ -774,7 +774,7 @@ void APlayCppSdkActor::Erc721TransferFrom(
             FWalletSendTXEip155Result txresult;
             try {
                 if (NULL == _coreClient) {
-                    result = TEXT("Invalid Walletconnect");
+                    txresult.result = TEXT("Invalid Walletconnect");
                 } else {
                     WalletConnectTxCommon common;
                     setCommon(common, gasLimit, gasPrice);
