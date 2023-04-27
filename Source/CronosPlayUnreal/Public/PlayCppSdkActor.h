@@ -566,7 +566,7 @@ class CRONOSPLAYUNREAL_API APlayCppSdkActor : public AActor {
      * @param Out FCronosSendContractTransactionDelegate callback
      */
     UFUNCTION(BlueprintCallable,
-              meta = (DisplayName = "Erc721TransferFrom",
+              meta = (DisplayName = "Erc721SafeTransferFromWithAdditionalData",
                       Keywords = "PlayCppSdk"),
               Category = "PlayCppSdk")
     void Erc721SafeTransferFromWithAdditionalData(
