@@ -732,5 +732,5 @@ class CRONOSPLAYUNREAL_API APlayCppSdkActor : public AActor {
                              FString amount);
 
     void Erc20TransferFromAction(FString contract_address, FString from_address,
-                                 FString to_address, FString amount)
+                                 FString to_address, FString amount);
 };
