@@ -1153,8 +1153,9 @@ void APlayCppSdkActor::Erc20Approve(
               });
 }
 
-void APlayCppSdkActor::Erc20TransferAction(FString contract_address,
-                                           FString to_address, FString amount) {
+FString APlayCppSdkActor::Erc20TransferAction(FString contract_address,
+                                              FString to_address,
+                                              FString amount) {
     // Construct the JSON object
     TSharedPtr<FJsonObject> RootObject = MakeShareable(new FJsonObject);
     TSharedPtr<FJsonObject> FirstLevelObject = MakeShareable(new FJsonObject);
@@ -1172,10 +1173,10 @@ void APlayCppSdkActor::Erc20TransferAction(FString contract_address,
     return JsonString;
 }
 
-void APlayCppSdkActor::Erc20TransferFromAction(FString contract_address,
-                                               FString from_address,
-                                               FString to_address,
-                                               FString amount) {
+FString APlayCppSdkActor::Erc20TransferFromAction(FString contract_address,
+                                                  FString from_address,
+                                                  FString to_address,
+                                                  FString amount) {
     // Construct the JSON object
     TSharedPtr<FJsonObject> RootObject = MakeShareable(new FJsonObject);
     TSharedPtr<FJsonObject> FirstLevelObject = MakeShareable(new FJsonObject);
@@ -1194,10 +1195,10 @@ void APlayCppSdkActor::Erc20TransferFromAction(FString contract_address,
     return JsonString;
 }
 
-void APlayCppSdkActor::Erc721TransferFromAction(FString contract_address,
-                                                FString from_address,
-                                                FString to_address,
-                                                FString token_id) {
+FString APlayCppSdkActor::Erc721TransferFromAction(FString contract_address,
+                                                   FString from_address,
+                                                   FString to_address,
+                                                   FString token_id) {
     // Construct the JSON object
     TSharedPtr<FJsonObject> RootObject = MakeShareable(new FJsonObject);
     TSharedPtr<FJsonObject> FirstLevelObject = MakeShareable(new FJsonObject);
@@ -1216,10 +1217,10 @@ void APlayCppSdkActor::Erc721TransferFromAction(FString contract_address,
     return JsonString;
 }
 
-void APlayCppSdkActor::Erc721SafeTransferFromAction(FString contract_address,
-                                                    FString from_address,
-                                                    FString to_address,
-                                                    FString token_id) {
+FString APlayCppSdkActor::Erc721SafeTransferFromAction(FString contract_address,
+                                                       FString from_address,
+                                                       FString to_address,
+                                                       FString token_id) {
     // Construct the JSON object
     TSharedPtr<FJsonObject> RootObject = MakeShareable(new FJsonObject);
     TSharedPtr<FJsonObject> FirstLevelObject = MakeShareable(new FJsonObject);
@@ -1239,7 +1240,7 @@ void APlayCppSdkActor::Erc721SafeTransferFromAction(FString contract_address,
     return JsonString;
 }
 
-void APlayCppSdkActor::Erc721SafeTransferFromWithAdditionalDataAction(
+FString APlayCppSdkActor::Erc721SafeTransferFromWithAdditionalDataAction(
     FString contract_address, FString from_address, FString to_address,
     FString token_id, TArray<uint8> additional_data) {
     // Construct the JSON object
@@ -1263,7 +1264,7 @@ void APlayCppSdkActor::Erc721SafeTransferFromWithAdditionalDataAction(
     return JsonString;
 }
 
-void APlayCppSdkActor::Erc1155SafeTransferFromAction(
+FString APlayCppSdkActor::Erc1155SafeTransferFromAction(
     FString contract_address, FString from_address, FString to_address,
     FString token_id, FString amount, TArray<uint8> additional_data) {
     // Construct the JSON object
@@ -1288,9 +1289,9 @@ void APlayCppSdkActor::Erc1155SafeTransferFromAction(
     return JsonString;
 }
 
-void APlayCppSdkActor::Erc20ApprovalAction(FString contract_address,
-                                           FString approved_address,
-                                           FString amount) {
+FString APlayCppSdkActor::Erc20ApprovalAction(FString contract_address,
+                                              FString approved_address,
+                                              FString amount) {
     // Construct the JSON object
     TSharedPtr<FJsonObject> RootObject = MakeShareable(new FJsonObject);
     TSharedPtr<FJsonObject> FirstLevelObject = MakeShareable(new FJsonObject);
@@ -1308,9 +1309,9 @@ void APlayCppSdkActor::Erc20ApprovalAction(FString contract_address,
     return JsonString;
 }
 
-void APlayCppSdkActor::Erc721ApprovalAction(FString contract_address,
-                                            FString approved_address,
-                                            FString token_id) {
+FString APlayCppSdkActor::Erc721ApprovalAction(FString contract_address,
+                                               FString approved_address,
+                                               FString token_id) {
     // Construct the JSON object
     TSharedPtr<FJsonObject> RootObject = MakeShareable(new FJsonObject);
     TSharedPtr<FJsonObject> FirstLevelObject = MakeShareable(new FJsonObject);
@@ -1328,9 +1329,8 @@ void APlayCppSdkActor::Erc721ApprovalAction(FString contract_address,
     return JsonString;
 }
 
-void APlayCppSdkActor::Erc721SetApprovalForAllAction(FString contract_address,
-                                                     FString approved_address,
-                                                     bool approved) {
+FString APlayCppSdkActor::Erc721SetApprovalForAllAction(
+    FString contract_address, FString approved_address, bool approved) {
     // Construct the JSON object
     TSharedPtr<FJsonObject> RootObject = MakeShareable(new FJsonObject);
     TSharedPtr<FJsonObject> FirstLevelObject = MakeShareable(new FJsonObject);
@@ -1349,9 +1349,9 @@ void APlayCppSdkActor::Erc721SetApprovalForAllAction(FString contract_address,
     return JsonString;
 }
 
-void APlayCppSdkActor::Erc1155ApprovalAction(FString contract_address,
-                                             FString approved_address,
-                                             bool approved) {
+FString APlayCppSdkActor::Erc1155ApprovalAction(FString contract_address,
+                                                FString approved_address,
+                                                bool approved) {
     // Construct the JSON object
     TSharedPtr<FJsonObject> RootObject = MakeShareable(new FJsonObject);
     TSharedPtr<FJsonObject> FirstLevelObject = MakeShareable(new FJsonObject);
