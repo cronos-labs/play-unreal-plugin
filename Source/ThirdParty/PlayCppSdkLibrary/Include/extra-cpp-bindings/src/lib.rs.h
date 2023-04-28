@@ -862,13 +862,6 @@ struct ImageUrl;
 struct WalletQrcode;
 struct WalletConnectTxCommon;
 struct WalletConnectTxEip155;
-struct WalletConnectErc20Transfer;
-struct WalletConnectErc721Transfer;
-struct WalletConnectErc1155Transfer;
-struct WalletConnectErc1155Batch;
-struct WalletConnectErc20Approve;
-struct WalletConnectErc721Approve;
-struct WalletConnectErc1155Approve;
 struct WalletConnectAddress;
 struct WalletConnectEnsureSessionResult;
 struct CryptoComPaymentResponse;
@@ -1005,105 +998,6 @@ struct WalletConnectTxEip155 final {
     using IsRelocatable = ::std::true_type;
 };
 #endif // CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectTxEip155
-
-#ifndef CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectErc20Transfer
-#define CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectErc20Transfer
-/// wallet connect cronos(eth) erc20-tx signing info
-///
-struct WalletConnectErc20Transfer final {
-    ::rust::String contract_address;
-    ::rust::String from_address;
-    ::rust::String to_address;
-    ::rust::String amount;
-    ::com::crypto::game_sdk::WalletConnectTxCommon common;
-
-    using IsRelocatable = ::std::true_type;
-};
-#endif // CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectErc20Transfer
-
-#ifndef CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectErc721Transfer
-#define CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectErc721Transfer
-/// wallet connect cronos(eth) erc721-tx signing info
-///
-struct WalletConnectErc721Transfer final {
-    ::rust::String contract_address;
-    ::rust::String from_address;
-    ::rust::String to_address;
-    ::rust::String token_id;
-    ::com::crypto::game_sdk::WalletConnectTxCommon common;
-
-    using IsRelocatable = ::std::true_type;
-};
-#endif // CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectErc721Transfer
-
-#ifndef CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectErc1155Transfer
-#define CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectErc1155Transfer
-struct WalletConnectErc1155Transfer final {
-    ::rust::String contract_address;
-    ::rust::String from_address;
-    ::rust::String to_address;
-    ::rust::String token_id;
-    ::rust::String amount;
-    ::rust::Vec<::std::uint8_t> additional_data;
-    ::com::crypto::game_sdk::WalletConnectTxCommon common;
-
-    using IsRelocatable = ::std::true_type;
-};
-#endif // CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectErc1155Transfer
-
-#ifndef CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectErc1155Batch
-#define CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectErc1155Batch
-struct WalletConnectErc1155Batch final {
-    ::rust::String contract_address;
-    ::rust::String from_address;
-    ::rust::String to_address;
-    ::rust::Vec<::rust::String> token_ids;
-    ::rust::Vec<::rust::String> amounts;
-    ::rust::Vec<::std::uint8_t> additional_data;
-    ::com::crypto::game_sdk::WalletConnectTxCommon common;
-
-    using IsRelocatable = ::std::true_type;
-};
-#endif // CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectErc1155Batch
-
-#ifndef CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectErc20Approve
-#define CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectErc20Approve
-struct WalletConnectErc20Approve final {
-    ::rust::String contract_address;
-    ::rust::String from_address;
-    ::rust::String approved_address;
-    ::rust::String amount;
-    ::com::crypto::game_sdk::WalletConnectTxCommon common;
-
-    using IsRelocatable = ::std::true_type;
-};
-#endif // CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectErc20Approve
-
-#ifndef CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectErc721Approve
-#define CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectErc721Approve
-struct WalletConnectErc721Approve final {
-    ::rust::String contract_address;
-    ::rust::String from_address;
-    ::rust::String approved_address;
-    ::rust::String token_id;
-    ::com::crypto::game_sdk::WalletConnectTxCommon common;
-
-    using IsRelocatable = ::std::true_type;
-};
-#endif // CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectErc721Approve
-
-#ifndef CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectErc1155Approve
-#define CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectErc1155Approve
-struct WalletConnectErc1155Approve final {
-    ::rust::String contract_address;
-    ::rust::String from_address;
-    ::rust::String approved_address;
-    bool approved;
-    ::com::crypto::game_sdk::WalletConnectTxCommon common;
-
-    using IsRelocatable = ::std::true_type;
-};
-#endif // CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectErc1155Approve
 
 #ifndef CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectAddress
 #define CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectAddress
@@ -1289,21 +1183,6 @@ struct WalletconnectClient final : public ::rust::Opaque {
     sign_personal_blocking(::rust::String message,
                            ::std::array<::std::uint8_t, 20> address);
 
-    ::rust::Vec<::std::uint8_t> erc20_transfer(
-        ::com::crypto::game_sdk::WalletConnectErc20Transfer const &info);
-    ::rust::Vec<::std::uint8_t> erc721_transfer(
-        ::com::crypto::game_sdk::WalletConnectErc721Transfer const &info);
-    ::rust::Vec<::std::uint8_t> erc1155_transfer(
-        ::com::crypto::game_sdk::WalletConnectErc1155Transfer const &info);
-    ::rust::Vec<::std::uint8_t> erc1155_transfer_batch(
-        ::com::crypto::game_sdk::WalletConnectErc1155Batch const &info);
-    ::rust::Vec<::std::uint8_t> erc20_approve(
-        ::com::crypto::game_sdk::WalletConnectErc20Approve const &info);
-    ::rust::Vec<::std::uint8_t> erc721_approve(
-        ::com::crypto::game_sdk::WalletConnectErc721Approve const &info);
-    ::rust::Vec<::std::uint8_t> erc1155_approve(
-        ::com::crypto::game_sdk::WalletConnectErc1155Approve const &info);
-
     /// build cronos(eth) eip155 transaction
     /// Supported Wallets: Trust Wallet, Crypto.com Desktop Defi Wallet
     ::rust::Vec<::std::uint8_t> sign_eip155_transaction_blocking(
@@ -1315,6 +1194,52 @@ struct WalletconnectClient final : public ::rust::Opaque {
     /// Wallet
     ::rust::Vec<::std::uint8_t> send_eip155_transaction_blocking(
         ::com::crypto::game_sdk::WalletConnectTxEip155 const &info,
+        ::std::array<::std::uint8_t, 20> address);
+
+    /// eip1559_transaction_request: json string of Eip1559TransactionRequest
+    /// return signed transaction bytes
+    ::rust::Vec<::std::uint8_t>
+    sign_transaction(::rust::String eip1559_transaction_request,
+                     ::std::array<::std::uint8_t, 20> address);
+
+    /// eip1559_transaction_request: json string of Eip1559TransactionRequest
+    /// return transaction hash bytes
+    ::rust::Vec<::std::uint8_t>
+    send_transaction(::rust::String eip1559_transaction_request,
+                     ::std::array<::std::uint8_t, 20> address);
+
+    /// sign a contract transaction
+    /// contract_action is a json string of `ContractAction` type, for example:
+    /// for example, transfer Erc20 token
+    /// {
+    ///     "ContractTransfer": {
+    ///         "Erc20Transfer": {
+    ///             "contract_address": "0xxxxx",
+    ///             "to_address": "0xxxxx",
+    ///             "amount": "1000000000000000000"
+    ///         }
+    ///     }
+    /// }
+    /// return signed transaction bytes
+    ::rust::Vec<::std::uint8_t> sign_contract_transaction(
+        ::rust::String contract_action,
+        ::com::crypto::game_sdk::WalletConnectTxCommon const &common,
+        ::std::array<::std::uint8_t, 20> address);
+
+    /// contract_action is a json string of `ContractAction` type
+    /// for example, transfer Erc20 token
+    /// {
+    ///     "ContractTransfer": {
+    ///         "Erc20Transfer": {
+    ///             "contract_address": "0xxxxx",
+    ///             "to_address": "0xxxxx",
+    ///             "amount": "1000000000000000000"
+    ///         }
+    ///     }
+    /// }
+    ::rust::Vec<::std::uint8_t> send_contract_transaction(
+        ::rust::String contract_action,
+        ::com::crypto::game_sdk::WalletConnectTxCommon const &common,
         ::std::array<::std::uint8_t, 20> address);
 
     ~WalletconnectClient() = delete;

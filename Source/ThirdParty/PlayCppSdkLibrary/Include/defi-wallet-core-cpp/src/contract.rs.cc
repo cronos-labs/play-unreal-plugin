@@ -679,7 +679,9 @@ template <typename T> std::size_t align_of() { return layout::align_of<T>(); }
 #ifndef CXXBRIDGE1_RELOCATABLE
 #define CXXBRIDGE1_RELOCATABLE
 namespace detail {
-template <typename... Ts> struct make_void { using type = void; };
+template <typename... Ts> struct make_void {
+    using type = void;
+};
 
 template <typename... Ts> using void_t = typename make_void<Ts...>::type;
 

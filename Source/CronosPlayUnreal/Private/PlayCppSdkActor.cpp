@@ -10,6 +10,8 @@
 #include "PlayCppSdkLibrary/Include/defi-wallet-core-cpp/src/lib.rs.h"
 #include "PlayCppSdkLibrary/Include/extra-cpp-bindings/src/lib.rs.h"
 #include "PlayCppSdkLibrary/Include/rust/cxx.h"
+#include "Serialization/JsonSerializer.h"
+#include "Dom/JsonObject.h"
 #include "Utlis.h"
 
 #include <iostream>
@@ -757,9 +759,13 @@ void StopWalletConnect() { APlayCppSdkActor::destroyCoreClient(); }
 
 void APlayCppSdkActor::Erc721TransferFrom(
     FString contractAddress, FString toAddress, FString tokenId,
-    FString gasLimit, FString gasPrice, FCronosSignedTransactionDelegate Out) {
+    FString gasLimit, FString gasPrice,
+    FCronosSendContractTransactionDelegate Out) {
 
-    FString fromAddress = UUtlis::ToHex(GetAddress());
+    TArray<uint8> fromAddressTArray = GetAddress();
+    FString fromAddress = UUtlis::ToHex(fromAddressTArray);
+    std::array<uint8_t, 20> fromAddressArray =
+        UUtlis::ToArray(fromAddressTArray);
     // if no fromAddress, return
     if (fromAddress.IsEmpty())
         return;
@@ -767,272 +773,634 @@ void APlayCppSdkActor::Erc721TransferFrom(
     AsyncTask(
         ENamedThreads::AnyHiPriThreadNormalTask,
         [this, Out, contractAddress, fromAddress, toAddress, tokenId, gasLimit,
-         gasPrice]() {
-            FString result;
-            FCronosSignedTransactionRaw txresult;
+         gasPrice, fromAddressArray]() {
+            FWalletSendTXEip155Result txresult;
             try {
                 if (NULL == _coreClient) {
-                    result = TEXT("Invalid Walletconnect");
+                    txresult.result = TEXT("Invalid Walletconnect");
                 } else {
-
-                    WalletConnectErc721Transfer info;
-                    info.contract_address = TCHAR_TO_UTF8(*contractAddress);
-                    info.from_address = TCHAR_TO_UTF8(*fromAddress);
-                    info.to_address = TCHAR_TO_UTF8(*toAddress);
-                    info.token_id = TCHAR_TO_UTF8(*tokenId);
-
-                    setCommon(info.common, fromAddress, gasLimit, gasPrice);
-
-                    Vec<uint8_t> rawtx = _coreClient->erc721_transfer(info);
-                    copyVecToTArray(rawtx, txresult.SignedTx);
+                    WalletConnectTxCommon common;
+                    setCommon(common, gasLimit, gasPrice);
+                    copyVecToTArray(_coreClient->send_contract_transaction(
+                                        Erc721TransferFromAction(
+                                            contractAddress, fromAddress,
+                                            toAddress, tokenId),
+                                        common, fromAddressArray),
+                                    txresult.tx_hash);
                 }
 
             } catch (const std::exception &e) {
-                result = FString::Printf(
+                txresult.result = FString::Printf(
                     TEXT("CronosPlayUnreal Erc721SafeTransferFrom Error: %s"),
                     UTF8_TO_TCHAR(e.what()));
             }
 
-            AsyncTask(ENamedThreads::GameThread, [Out, txresult, result]() {
-                Out.ExecuteIfBound(txresult, result);
-            });
+            AsyncTask(ENamedThreads::GameThread,
+                      [Out, txresult]() { Out.ExecuteIfBound(txresult); });
         });
 }
 
-void APlayCppSdkActor::Erc721Approve(FString contractAddress,
-                                     FString approvedAddress, FString tokenId,
-                                     FString gasLimit, FString gasPrice,
-                                     FCronosSignedTransactionDelegate Out) {
+void APlayCppSdkActor::Erc721SafeTransferFrom(
+    FString contractAddress, FString toAddress, FString tokenId,
+    FString gasLimit, FString gasPrice,
+    FCronosSendContractTransactionDelegate Out) {
 
-    FString fromAddress = UUtlis::ToHex(GetAddress());
+    TArray<uint8> fromAddressTArray = GetAddress();
+    FString fromAddress = UUtlis::ToHex(fromAddressTArray);
+    std::array<uint8_t, 20> fromAddressArray =
+        UUtlis::ToArray(fromAddressTArray);
+    // if no fromAddress, return
+    if (fromAddress.IsEmpty())
+        return;
+
+    AsyncTask(
+        ENamedThreads::AnyHiPriThreadNormalTask,
+        [this, Out, contractAddress, fromAddress, toAddress, tokenId, gasLimit,
+         gasPrice, fromAddressArray]() {
+            FWalletSendTXEip155Result txresult;
+            try {
+                if (NULL == _coreClient) {
+                    txresult.result = TEXT("Invalid Walletconnect");
+                } else {
+                    WalletConnectTxCommon common;
+                    setCommon(common, gasLimit, gasPrice);
+                    copyVecToTArray(_coreClient->send_contract_transaction(
+                                        Erc721SafeTransferFromAction(
+                                            contractAddress, fromAddress,
+                                            toAddress, tokenId),
+                                        common, fromAddressArray),
+                                    txresult.tx_hash);
+                }
+
+            } catch (const std::exception &e) {
+                txresult.result = FString::Printf(
+                    TEXT("CronosPlayUnreal Erc721SafeTransferFrom Error: %s"),
+                    UTF8_TO_TCHAR(e.what()));
+            }
+
+            AsyncTask(ENamedThreads::GameThread,
+                      [Out, txresult]() { Out.ExecuteIfBound(txresult); });
+        });
+}
+
+void APlayCppSdkActor::Erc721SafeTransferFromWithAdditionalData(
+    FString contractAddress, FString toAddress, FString tokenId,
+    TArray<uint8> additionalData, FString gasLimit, FString gasPrice,
+    FCronosSendContractTransactionDelegate Out) {
+
+    TArray<uint8> fromAddressTArray = GetAddress();
+    FString fromAddress = UUtlis::ToHex(fromAddressTArray);
+    std::array<uint8_t, 20> fromAddressArray =
+        UUtlis::ToArray(fromAddressTArray);
+    // if no fromAddress, return
+    if (fromAddress.IsEmpty())
+        return;
+
+    AsyncTask(
+        ENamedThreads::AnyHiPriThreadNormalTask,
+        [this, Out, contractAddress, fromAddress, toAddress, tokenId, gasLimit,
+         gasPrice, fromAddressArray, additionalData]() {
+            FWalletSendTXEip155Result txresult;
+            try {
+                if (NULL == _coreClient) {
+                    txresult.result = TEXT("Invalid Walletconnect");
+                } else {
+                    WalletConnectTxCommon common;
+                    setCommon(common, gasLimit, gasPrice);
+                    copyVecToTArray(
+                        _coreClient->send_contract_transaction(
+                            Erc721SafeTransferFromWithAdditionalDataAction(
+                                contractAddress, fromAddress, toAddress,
+                                tokenId, additionalData),
+                            common, fromAddressArray),
+                        txresult.tx_hash);
+                }
+
+            } catch (const std::exception &e) {
+                txresult.result = FString::Printf(
+                    TEXT("CronosPlayUnreal Erc721SafeTransferFrom Error: %s"),
+                    UTF8_TO_TCHAR(e.what()));
+            }
+
+            AsyncTask(ENamedThreads::GameThread,
+                      [Out, txresult]() { Out.ExecuteIfBound(txresult); });
+        });
+}
+
+void APlayCppSdkActor::Erc721Approve(
+    FString contractAddress, FString approvedAddress, FString tokenId,
+    FString gasLimit, FString gasPrice,
+    FCronosSendContractTransactionDelegate Out) {
+
+    TArray<uint8> fromAddressTArray = GetAddress();
+    FString fromAddress = UUtlis::ToHex(fromAddressTArray);
+    std::array<uint8_t, 20> fromAddressArray =
+        UUtlis::ToArray(fromAddressTArray);
     // if no fromAddress, return
     if (fromAddress.IsEmpty())
         return;
     AsyncTask(
         ENamedThreads::AnyHiPriThreadNormalTask,
         [this, Out, contractAddress, fromAddress, approvedAddress, tokenId,
-         gasLimit, gasPrice]() {
-            FString result;
-            FCronosSignedTransactionRaw txresult;
+         gasLimit, gasPrice, fromAddressArray]() {
+            FWalletSendTXEip155Result txresult;
             try {
                 if (NULL == _coreClient) {
-                    result = TEXT("Invalid Walletconnect");
+                    txresult.result = TEXT("Invalid Walletconnect");
                 } else {
-
-                    WalletConnectErc721Approve info;
-                    info.contract_address = TCHAR_TO_UTF8(*contractAddress);
-                    info.from_address = TCHAR_TO_UTF8(*fromAddress);
-                    info.approved_address = TCHAR_TO_UTF8(*approvedAddress);
-                    info.token_id = TCHAR_TO_UTF8(*tokenId);
-
-                    setCommon(info.common, fromAddress, gasLimit, gasPrice);
-
-                    copyVecToTArray(_coreClient->erc721_approve(info),
-                                    txresult.SignedTx);
+                    WalletConnectTxCommon common;
+                    setCommon(common, gasLimit, gasPrice);
+                    copyVecToTArray(
+                        _coreClient->send_contract_transaction(
+                            Erc721ApprovalAction(contractAddress,
+                                                 approvedAddress, tokenId),
+                            common, fromAddressArray),
+                        txresult.tx_hash);
                 }
 
             } catch (const std::exception &e) {
-                result = FString::Printf(
+                txresult.result = FString::Printf(
                     TEXT("CronosPlayUnreal Erc721SafeTransferFrom Error: %s"),
                     UTF8_TO_TCHAR(e.what()));
             }
 
-            AsyncTask(ENamedThreads::GameThread, [Out, txresult, result]() {
-                Out.ExecuteIfBound(txresult, result);
-            });
+            AsyncTask(ENamedThreads::GameThread,
+                      [Out, txresult]() { Out.ExecuteIfBound(txresult); });
         });
 }
 
+void APlayCppSdkActor::Erc721SetApprovalForAll(
+    FString contractAddress, FString approvedAddress, bool approved,
+    FString gasLimit, FString gasPrice,
+    FCronosSendContractTransactionDelegate Out) {
+
+    TArray<uint8> fromAddressTArray = GetAddress();
+    FString fromAddress = UUtlis::ToHex(fromAddressTArray);
+    std::array<uint8_t, 20> fromAddressArray =
+        UUtlis::ToArray(fromAddressTArray);
+    // if no fromAddress, return
+    if (fromAddress.IsEmpty())
+        return;
+    AsyncTask(
+        ENamedThreads::AnyHiPriThreadNormalTask,
+        [this, Out, contractAddress, fromAddress, approvedAddress, gasLimit,
+         gasPrice, fromAddressArray, approved]() {
+            FWalletSendTXEip155Result txresult;
+            try {
+                if (NULL == _coreClient) {
+                    txresult.result = TEXT("Invalid Walletconnect");
+                } else {
+                    WalletConnectTxCommon common;
+                    setCommon(common, gasLimit, gasPrice);
+                    copyVecToTArray(
+                        _coreClient->send_contract_transaction(
+                            Erc721SetApprovalForAllAction(
+                                contractAddress, approvedAddress, approved),
+                            common, fromAddressArray),
+                        txresult.tx_hash);
+                }
+
+            } catch (const std::exception &e) {
+                txresult.result = FString::Printf(
+                    TEXT("CronosPlayUnreal Erc721SafeTransferFrom Error: %s"),
+                    UTF8_TO_TCHAR(e.what()));
+            }
+
+            AsyncTask(ENamedThreads::GameThread,
+                      [Out, txresult]() { Out.ExecuteIfBound(txresult); });
+        });
+}
 void APlayCppSdkActor::Erc1155SafeTransferFrom(
     FString contractAddress, FString toAddress, FString tokenId, FString amount,
     TArray<uint8> additionalData, FString gasLimit, FString gasPrice,
-    FCronosSignedTransactionDelegate Out) {
-    FString fromAddress = UUtlis::ToHex(GetAddress());
+    FCronosSendContractTransactionDelegate Out) {
+    TArray<uint8> fromAddressTArray = GetAddress();
+    FString fromAddress = UUtlis::ToHex(fromAddressTArray);
+    std::array<uint8_t, 20> fromAddressArray =
+        UUtlis::ToArray(fromAddressTArray);
     // if no fromAddress, return
     if (fromAddress.IsEmpty())
         return;
     AsyncTask(
         ENamedThreads::AnyHiPriThreadNormalTask,
         [this, Out, contractAddress, fromAddress, toAddress, tokenId, amount,
-         gasLimit, gasPrice]() {
-            FString result;
-            FCronosSignedTransactionRaw txresult;
+         additionalData, gasLimit, gasPrice, fromAddressArray]() {
+            FWalletSendTXEip155Result txresult;
             try {
                 if (NULL == _coreClient) {
-                    result = TEXT("Invalid Walletconnect");
+                    txresult.result = TEXT("Invalid Walletconnect");
                 } else {
-
-                    WalletConnectErc1155Transfer info;
-                    info.contract_address = TCHAR_TO_UTF8(*contractAddress);
-                    info.from_address = TCHAR_TO_UTF8(*fromAddress);
-                    info.to_address = TCHAR_TO_UTF8(*toAddress);
-                    info.token_id = TCHAR_TO_UTF8(*tokenId);
-                    info.amount = TCHAR_TO_UTF8(*amount);
-
-                    setCommon(info.common, fromAddress, gasLimit, gasPrice);
-
-                    Vec<uint8_t> rawtx = _coreClient->erc1155_transfer(info);
-                    copyVecToTArray(rawtx, txresult.SignedTx);
+                    WalletConnectTxCommon common;
+                    setCommon(common, gasLimit, gasPrice);
+                    copyVecToTArray(
+                        _coreClient->send_contract_transaction(
+                            Erc1155SafeTransferFromAction(
+                                contractAddress, fromAddress, toAddress,
+                                tokenId, amount, additionalData),
+                            common, fromAddressArray),
+                        txresult.tx_hash);
                 }
 
             } catch (const std::exception &e) {
-                result = FString::Printf(
+                txresult.result = FString::Printf(
                     TEXT("CronosPlayUnreal Erc1155SafeTransferFrom Error: %s"),
                     UTF8_TO_TCHAR(e.what()));
             }
 
-            AsyncTask(ENamedThreads::GameThread, [Out, txresult, result]() {
-                Out.ExecuteIfBound(txresult, result);
-            });
+            AsyncTask(ENamedThreads::GameThread,
+                      [Out, txresult]() { Out.ExecuteIfBound(txresult); });
         });
 }
 
-void APlayCppSdkActor::Erc1155Approve(FString contractAddress,
-                                      FString approvedAddress, bool approved,
-                                      FString gasLimit, FString gasPrice,
-                                      FCronosSignedTransactionDelegate Out) {
-    FString fromAddress = UUtlis::ToHex(GetAddress());
+void APlayCppSdkActor::Erc1155Approve(
+    FString contractAddress, FString approvedAddress, bool approved,
+    FString gasLimit, FString gasPrice,
+    FCronosSendContractTransactionDelegate Out) {
+    TArray<uint8> fromAddressTArray = GetAddress();
+    FString fromAddress = UUtlis::ToHex(fromAddressTArray);
+    std::array<uint8_t, 20> fromAddressArray =
+        UUtlis::ToArray(fromAddressTArray);
     // if no fromAddress, return
     if (fromAddress.IsEmpty())
         return;
     AsyncTask(
         ENamedThreads::AnyHiPriThreadNormalTask,
         [this, Out, contractAddress, fromAddress, approvedAddress, approved,
-         gasLimit, gasPrice]() {
-            FString result;
-            FCronosSignedTransactionRaw txresult;
+         gasLimit, gasPrice, fromAddressArray]() {
+            FWalletSendTXEip155Result txresult;
             try {
                 if (NULL == _coreClient) {
-                    result = TEXT("Invalid Walletconnect");
+                    txresult.result = TEXT("Invalid Walletconnect");
                 } else {
-
-                    WalletConnectErc1155Approve info;
-                    info.contract_address = TCHAR_TO_UTF8(*contractAddress);
-                    info.from_address = TCHAR_TO_UTF8(*fromAddress);
-                    info.approved_address = TCHAR_TO_UTF8(*approvedAddress);
-                    info.approved = approved;
-
-                    setCommon(info.common, fromAddress, gasLimit, gasPrice);
-
-                    copyVecToTArray(_coreClient->erc1155_approve(info),
-                                    txresult.SignedTx);
+                    WalletConnectTxCommon common;
+                    setCommon(common, gasLimit, gasPrice);
+                    copyVecToTArray(
+                        _coreClient->send_contract_transaction(
+                            Erc1155ApprovalAction(contractAddress,
+                                                  approvedAddress, approved),
+                            common, fromAddressArray),
+                        txresult.tx_hash);
                 }
 
             } catch (const std::exception &e) {
-                result = FString::Printf(
+                txresult.result = FString::Printf(
                     TEXT("CronosPlayUnreal Erc1155Approve Error: %s"),
                     UTF8_TO_TCHAR(e.what()));
             }
 
-            AsyncTask(ENamedThreads::GameThread, [Out, txresult, result]() {
-                Out.ExecuteIfBound(txresult, result);
-            });
+            AsyncTask(ENamedThreads::GameThread,
+                      [Out, txresult]() { Out.ExecuteIfBound(txresult); });
         });
 }
 
-void APlayCppSdkActor::Erc20TransferFrom(FString contractAddress,
-                                         FString toAddress, FString amount,
-                                         FString gasLimit, FString gasPrice,
-                                         FCronosSignedTransactionDelegate Out) {
+void APlayCppSdkActor::Erc20Transfer(
+    FString contractAddress, FString toAddress, FString amount,
+    FString gasLimit, FString gasPrice,
+    FCronosSendContractTransactionDelegate Out) {
 
-    FString fromAddress = UUtlis::ToHex(GetAddress());
+    TArray<uint8> fromAddressTArray = GetAddress();
+    FString fromAddress = UUtlis::ToHex(fromAddressTArray);
+    std::array<uint8_t, 20> fromAddressArray =
+        UUtlis::ToArray(fromAddressTArray);
+    // if no fromAddress, return
+    if (fromAddress.IsEmpty())
+        return;
+    AsyncTask(
+        ENamedThreads::AnyHiPriThreadNormalTask,
+        [this, Out, contractAddress, fromAddressArray, toAddress, amount,
+         gasLimit, gasPrice]() {
+            FWalletSendTXEip155Result txresult;
+            try {
+                if (NULL == _coreClient) {
+                    txresult.result = TEXT("Invalid Walletconnect");
+                } else {
+
+                    WalletConnectTxCommon common;
+                    setCommon(common, gasLimit, gasPrice);
+                    copyVecToTArray(_coreClient->send_contract_transaction(
+                                        Erc20TransferAction(contractAddress,
+                                                            toAddress, amount),
+                                        common, fromAddressArray),
+                                    txresult.tx_hash);
+                }
+
+            } catch (const std::exception &e) {
+                txresult.result = FString::Printf(
+                    TEXT("CronosPlayUnreal Erc1155SafeTransferFrom Error: %s"),
+                    UTF8_TO_TCHAR(e.what()));
+            }
+
+            AsyncTask(ENamedThreads::GameThread,
+                      [Out, txresult]() { Out.ExecuteIfBound(txresult); });
+        });
+}
+
+void APlayCppSdkActor::Erc20TransferFrom(
+    FString contractAddress, FString toAddress, FString amount,
+    FString gasLimit, FString gasPrice,
+    FCronosSendContractTransactionDelegate Out) {
+
+    TArray<uint8> fromAddressTArray = GetAddress();
+    FString fromAddress = UUtlis::ToHex(fromAddressTArray);
+    std::array<uint8_t, 20> fromAddressArray =
+        UUtlis::ToArray(fromAddressTArray);
     // if no fromAddress, return
     if (fromAddress.IsEmpty())
         return;
     AsyncTask(
         ENamedThreads::AnyHiPriThreadNormalTask,
         [this, Out, contractAddress, fromAddress, toAddress, amount, gasLimit,
-         gasPrice]() {
-            FString result;
-            FCronosSignedTransactionRaw txresult;
+         gasPrice, fromAddressArray]() {
+            FWalletSendTXEip155Result txresult;
             try {
                 if (NULL == _coreClient) {
-                    result = TEXT("Invalid Walletconnect");
+                    txresult.result = TEXT("Invalid Walletconnect");
                 } else {
 
-                    std::string mycontractaddress =
-                        TCHAR_TO_UTF8(*contractAddress);
-                    WalletConnectErc20Transfer info;
-                    info.contract_address = mycontractaddress;
-                    info.from_address = TCHAR_TO_UTF8(*fromAddress);
-                    info.to_address = TCHAR_TO_UTF8(*toAddress);
-                    info.amount = TCHAR_TO_UTF8(*amount);
-
-                    setCommon(info.common, fromAddress, gasLimit, gasPrice);
-
-                    copyVecToTArray(_coreClient->erc20_transfer(info),
-                                    txresult.SignedTx);
+                    WalletConnectTxCommon common;
+                    setCommon(common, gasLimit, gasPrice);
+                    copyVecToTArray(_coreClient->send_contract_transaction(
+                                        Erc20TransferFromAction(
+                                            contractAddress, fromAddress,
+                                            toAddress, amount),
+                                        common, fromAddressArray),
+                                    txresult.tx_hash);
                 }
 
             } catch (const std::exception &e) {
-                result = FString::Printf(
+                txresult.result = FString::Printf(
                     TEXT("CronosPlayUnreal Erc1155SafeTransferFrom Error: %s"),
                     UTF8_TO_TCHAR(e.what()));
             }
 
-            AsyncTask(ENamedThreads::GameThread, [Out, txresult, result]() {
-                Out.ExecuteIfBound(txresult, result);
-            });
+            AsyncTask(ENamedThreads::GameThread,
+                      [Out, txresult]() { Out.ExecuteIfBound(txresult); });
         });
 }
 
 void APlayCppSdkActor::setCommon(WalletConnectTxCommon &common,
-                                 FString fromaddress, FString gaslimit,
-                                 FString gasprice) {
-    std::string mycronosrpc = TCHAR_TO_UTF8(*myCronosRpc);
-    std::string myfromaddress = TCHAR_TO_UTF8(*fromaddress);
-    // get nonce
-    std::string mynonce =
-        org::defi_wallet_core::get_eth_nonce(myfromaddress.c_str(), mycronosrpc)
-            .c_str();
-
-    common.web3api_url = mycronosrpc.c_str();
-    common.chainid = myCronosChainID;
+                                 FString gaslimit, FString gasprice) {
+    // std::string mycronosrpc = TCHAR_TO_UTF8(*myCronosRpc);
+    // common.web3api_url = mycronosrpc.c_str(); // uncessary
+    common.chainid = (uint64)GetChainId();
     common.gas_limit = TCHAR_TO_UTF8(*gaslimit);
     common.gas_price = TCHAR_TO_UTF8(*gasprice);
-    common.nonce = mynonce;
 }
 
-void APlayCppSdkActor::Erc20Approve(FString contractAddress,
-                                    FString approvedAddress, FString amount,
-                                    FString gasLimit, FString gasPrice,
-                                    FCronosSignedTransactionDelegate Out) {
+void APlayCppSdkActor::Erc20Approve(
+    FString contractAddress, FString approvedAddress, FString amount,
+    FString gasLimit, FString gasPrice,
+    FCronosSendContractTransactionDelegate Out) {
 
-    FString fromAddress = UUtlis::ToHex(GetAddress());
+    TArray<uint8> fromAddressTArray = GetAddress();
+    FString fromAddress = UUtlis::ToHex(fromAddressTArray);
+    std::array<uint8_t, 20> fromAddressArray =
+        UUtlis::ToArray(fromAddressTArray);
     // if no fromAddress, return
     if (fromAddress.IsEmpty())
         return;
-    AsyncTask(
-        ENamedThreads::AnyHiPriThreadNormalTask,
-        [this, Out, contractAddress, fromAddress, approvedAddress, amount,
-         gasLimit, gasPrice]() {
-            FString result;
-            FCronosSignedTransactionRaw txresult;
-            try {
-                if (NULL == _coreClient) {
-                    result = TEXT("Invalid Walletconnect");
-                } else {
+    AsyncTask(ENamedThreads::AnyHiPriThreadNormalTask,
+              [this, Out, contractAddress, fromAddress, approvedAddress, amount,
+               gasLimit, gasPrice, fromAddressArray]() {
+                  FWalletSendTXEip155Result txresult;
+                  try {
+                      if (NULL == _coreClient) {
+                          txresult.result = TEXT("Invalid Walletconnect");
+                      } else {
+                          WalletConnectTxCommon common;
+                          setCommon(common, gasLimit, gasPrice);
+                          copyVecToTArray(
+                              _coreClient->send_contract_transaction(
+                                  Erc20ApprovalAction(contractAddress,
+                                                      approvedAddress, amount),
+                                  common, fromAddressArray),
+                              txresult.tx_hash);
+                      }
 
-                    WalletConnectErc20Approve info;
-                    info.contract_address = TCHAR_TO_UTF8(*contractAddress);
-                    info.from_address = TCHAR_TO_UTF8(*fromAddress);
-                    info.approved_address = TCHAR_TO_UTF8(*approvedAddress);
-                    info.amount = TCHAR_TO_UTF8(*amount);
+                  } catch (const std::exception &e) {
+                      txresult.result = FString::Printf(
+                          TEXT("CronosPlayUnreal Erc1155Approve Error: %s"),
+                          UTF8_TO_TCHAR(e.what()));
+                  }
 
-                    setCommon(info.common, fromAddress, gasLimit, gasPrice);
+                  AsyncTask(ENamedThreads::GameThread, [Out, txresult]() {
+                      Out.ExecuteIfBound(txresult);
+                  });
+              });
+}
 
-                    copyVecToTArray(_coreClient->erc20_approve(info),
-                                    txresult.SignedTx);
-                }
+rust::string APlayCppSdkActor::Erc20TransferAction(FString contract_address,
+                                                   FString to_address,
+                                                   FString amount) {
+    // Construct the JSON object
+    TSharedPtr<FJsonObject> RootObject = MakeShareable(new FJsonObject);
+    TSharedPtr<FJsonObject> FirstLevelObject = MakeShareable(new FJsonObject);
+    TSharedPtr<FJsonObject> SecondLevelObject = MakeShareable(new FJsonObject);
+    FirstLevelObject->SetObjectField("Erc20Transfer", SecondLevelObject);
+    SecondLevelObject->SetStringField("contract_address", contract_address);
+    SecondLevelObject->SetStringField("to_address", to_address);
+    SecondLevelObject->SetStringField("amount", amount);
+    RootObject->SetObjectField("ContractTransfer", FirstLevelObject);
+    // Convert the JSON object to a string
+    FString JsonString;
+    TSharedRef<TJsonWriter<>> Writer =
+        TJsonWriterFactory<>::Create(&JsonString);
+    FJsonSerializer::Serialize(RootObject.ToSharedRef(), Writer);
+    return rust::string(TCHAR_TO_UTF8(*JsonString));
+}
 
-            } catch (const std::exception &e) {
-                result = FString::Printf(
-                    TEXT("CronosPlayUnreal Erc1155Approve Error: %s"),
-                    UTF8_TO_TCHAR(e.what()));
-            }
+rust::string APlayCppSdkActor::Erc20TransferFromAction(FString contract_address,
+                                                       FString from_address,
+                                                       FString to_address,
+                                                       FString amount) {
+    // Construct the JSON object
+    TSharedPtr<FJsonObject> RootObject = MakeShareable(new FJsonObject);
+    TSharedPtr<FJsonObject> FirstLevelObject = MakeShareable(new FJsonObject);
+    TSharedPtr<FJsonObject> SecondLevelObject = MakeShareable(new FJsonObject);
+    FirstLevelObject->SetObjectField("Erc20TransferFrom", SecondLevelObject);
+    SecondLevelObject->SetStringField("contract_address", contract_address);
+    SecondLevelObject->SetStringField("from_address", from_address);
+    SecondLevelObject->SetStringField("to_address", to_address);
+    SecondLevelObject->SetStringField("amount", amount);
+    RootObject->SetObjectField("ContractTransfer", FirstLevelObject);
+    // Convert the JSON object to a string
+    FString JsonString;
+    TSharedRef<TJsonWriter<>> Writer =
+        TJsonWriterFactory<>::Create(&JsonString);
+    FJsonSerializer::Serialize(RootObject.ToSharedRef(), Writer);
+    return rust::string(TCHAR_TO_UTF8(*JsonString));
+}
 
-            AsyncTask(ENamedThreads::GameThread, [Out, txresult, result]() {
-                Out.ExecuteIfBound(txresult, result);
-            });
-        });
+rust::string APlayCppSdkActor::Erc721TransferFromAction(
+    FString contract_address, FString from_address, FString to_address,
+    FString token_id) {
+    // Construct the JSON object
+    TSharedPtr<FJsonObject> RootObject = MakeShareable(new FJsonObject);
+    TSharedPtr<FJsonObject> FirstLevelObject = MakeShareable(new FJsonObject);
+    TSharedPtr<FJsonObject> SecondLevelObject = MakeShareable(new FJsonObject);
+    FirstLevelObject->SetObjectField("Erc721TransferFrom", SecondLevelObject);
+    SecondLevelObject->SetStringField("contract_address", contract_address);
+    SecondLevelObject->SetStringField("from_address", from_address);
+    SecondLevelObject->SetStringField("to_address", to_address);
+    SecondLevelObject->SetStringField("token_id", token_id);
+    RootObject->SetObjectField("ContractTransfer", FirstLevelObject);
+    // Convert the JSON object to a string
+    FString JsonString;
+    TSharedRef<TJsonWriter<>> Writer =
+        TJsonWriterFactory<>::Create(&JsonString);
+    FJsonSerializer::Serialize(RootObject.ToSharedRef(), Writer);
+    return rust::string(TCHAR_TO_UTF8(*JsonString));
+}
+
+rust::string APlayCppSdkActor::Erc721SafeTransferFromAction(
+    FString contract_address, FString from_address, FString to_address,
+    FString token_id) {
+    // Construct the JSON object
+    TSharedPtr<FJsonObject> RootObject = MakeShareable(new FJsonObject);
+    TSharedPtr<FJsonObject> FirstLevelObject = MakeShareable(new FJsonObject);
+    TSharedPtr<FJsonObject> SecondLevelObject = MakeShareable(new FJsonObject);
+    FirstLevelObject->SetObjectField("Erc721SafeTransferFrom",
+                                     SecondLevelObject);
+    SecondLevelObject->SetStringField("contract_address", contract_address);
+    SecondLevelObject->SetStringField("from_address", from_address);
+    SecondLevelObject->SetStringField("to_address", to_address);
+    SecondLevelObject->SetStringField("token_id", token_id);
+    RootObject->SetObjectField("ContractTransfer", FirstLevelObject);
+    // Convert the JSON object to a string
+    FString JsonString;
+    TSharedRef<TJsonWriter<>> Writer =
+        TJsonWriterFactory<>::Create(&JsonString);
+    FJsonSerializer::Serialize(RootObject.ToSharedRef(), Writer);
+    return rust::string(TCHAR_TO_UTF8(*JsonString));
+}
+
+rust::string APlayCppSdkActor::Erc721SafeTransferFromWithAdditionalDataAction(
+    FString contract_address, FString from_address, FString to_address,
+    FString token_id, TArray<uint8> additional_data) {
+    // Construct the JSON object
+    TSharedPtr<FJsonObject> RootObject = MakeShareable(new FJsonObject);
+    TSharedPtr<FJsonObject> FirstLevelObject = MakeShareable(new FJsonObject);
+    TSharedPtr<FJsonObject> SecondLevelObject = MakeShareable(new FJsonObject);
+    FirstLevelObject->SetObjectField("Erc721SafeTransferFromWithAdditionalData",
+                                     SecondLevelObject);
+    SecondLevelObject->SetStringField("contract_address", contract_address);
+    SecondLevelObject->SetStringField("from_address", from_address);
+    SecondLevelObject->SetStringField("to_address", to_address);
+    SecondLevelObject->SetStringField("token_id", token_id);
+    // TODO is the hex string correct?
+    SecondLevelObject->SetStringField("additional_data",
+                                      UUtlis::ToHex(additional_data));
+    RootObject->SetObjectField("ContractTransfer", FirstLevelObject);
+    // Convert the JSON object to a string
+    FString JsonString;
+    TSharedRef<TJsonWriter<>> Writer =
+        TJsonWriterFactory<>::Create(&JsonString);
+    FJsonSerializer::Serialize(RootObject.ToSharedRef(), Writer);
+    return rust::string(TCHAR_TO_UTF8(*JsonString));
+}
+
+rust::string APlayCppSdkActor::Erc1155SafeTransferFromAction(
+    FString contract_address, FString from_address, FString to_address,
+    FString token_id, FString amount, TArray<uint8> additional_data) {
+    // Construct the JSON object
+    TSharedPtr<FJsonObject> RootObject = MakeShareable(new FJsonObject);
+    TSharedPtr<FJsonObject> FirstLevelObject = MakeShareable(new FJsonObject);
+    TSharedPtr<FJsonObject> SecondLevelObject = MakeShareable(new FJsonObject);
+    FirstLevelObject->SetObjectField("Erc1155SafeTransferFrom",
+                                     SecondLevelObject);
+    SecondLevelObject->SetStringField("contract_address", contract_address);
+    SecondLevelObject->SetStringField("from_address", from_address);
+    SecondLevelObject->SetStringField("to_address", to_address);
+    SecondLevelObject->SetStringField("token_id", token_id);
+    SecondLevelObject->SetStringField("amount", amount);
+    // TODO is the hex string correct?
+    SecondLevelObject->SetStringField("additional_data",
+                                      UUtlis::ToHex(additional_data));
+    RootObject->SetObjectField("ContractTransfer", FirstLevelObject);
+    // Convert the JSON object to a string
+    FString JsonString;
+    TSharedRef<TJsonWriter<>> Writer =
+        TJsonWriterFactory<>::Create(&JsonString);
+    FJsonSerializer::Serialize(RootObject.ToSharedRef(), Writer);
+    return rust::string(TCHAR_TO_UTF8(*JsonString));
+}
+
+rust::string APlayCppSdkActor::Erc20ApprovalAction(FString contract_address,
+                                                   FString approved_address,
+                                                   FString amount) {
+    // Construct the JSON object
+    TSharedPtr<FJsonObject> RootObject = MakeShareable(new FJsonObject);
+    TSharedPtr<FJsonObject> FirstLevelObject = MakeShareable(new FJsonObject);
+    TSharedPtr<FJsonObject> SecondLevelObject = MakeShareable(new FJsonObject);
+    FirstLevelObject->SetObjectField("Erc20", SecondLevelObject);
+    SecondLevelObject->SetStringField("contract_address", contract_address);
+    SecondLevelObject->SetStringField("approved_address", approved_address);
+    SecondLevelObject->SetStringField("amount", amount);
+    RootObject->SetObjectField("ContractApproval", FirstLevelObject);
+    // Convert the JSON object to a string
+    FString JsonString;
+    TSharedRef<TJsonWriter<>> Writer =
+        TJsonWriterFactory<>::Create(&JsonString);
+    FJsonSerializer::Serialize(RootObject.ToSharedRef(), Writer);
+    return rust::string(TCHAR_TO_UTF8(*JsonString));
+}
+
+rust::string APlayCppSdkActor::Erc721ApprovalAction(FString contract_address,
+                                                    FString approved_address,
+                                                    FString token_id) {
+    // Construct the JSON object
+    TSharedPtr<FJsonObject> RootObject = MakeShareable(new FJsonObject);
+    TSharedPtr<FJsonObject> FirstLevelObject = MakeShareable(new FJsonObject);
+    TSharedPtr<FJsonObject> SecondLevelObject = MakeShareable(new FJsonObject);
+    FirstLevelObject->SetObjectField("Erc721Approve", SecondLevelObject);
+    SecondLevelObject->SetStringField("contract_address", contract_address);
+    SecondLevelObject->SetStringField("approved_address", approved_address);
+    SecondLevelObject->SetStringField("token_id", token_id);
+    RootObject->SetObjectField("ContractApproval", FirstLevelObject);
+    // Convert the JSON object to a string
+    FString JsonString;
+    TSharedRef<TJsonWriter<>> Writer =
+        TJsonWriterFactory<>::Create(&JsonString);
+    FJsonSerializer::Serialize(RootObject.ToSharedRef(), Writer);
+    return rust::string(TCHAR_TO_UTF8(*JsonString));
+}
+
+rust::string APlayCppSdkActor::Erc721SetApprovalForAllAction(
+    FString contract_address, FString approved_address, bool approved) {
+    // Construct the JSON object
+    TSharedPtr<FJsonObject> RootObject = MakeShareable(new FJsonObject);
+    TSharedPtr<FJsonObject> FirstLevelObject = MakeShareable(new FJsonObject);
+    TSharedPtr<FJsonObject> SecondLevelObject = MakeShareable(new FJsonObject);
+    FirstLevelObject->SetObjectField("Erc721SetApprovalForAll",
+                                     SecondLevelObject);
+    SecondLevelObject->SetStringField("contract_address", contract_address);
+    SecondLevelObject->SetStringField("approved_address", approved_address);
+    SecondLevelObject->SetBoolField("approved", approved);
+    RootObject->SetObjectField("ContractApproval", FirstLevelObject);
+    // Convert the JSON object to a string
+    FString JsonString;
+    TSharedRef<TJsonWriter<>> Writer =
+        TJsonWriterFactory<>::Create(&JsonString);
+    FJsonSerializer::Serialize(RootObject.ToSharedRef(), Writer);
+    return rust::string(TCHAR_TO_UTF8(*JsonString));
+}
+
+rust::string APlayCppSdkActor::Erc1155ApprovalAction(FString contract_address,
+                                                     FString approved_address,
+                                                     bool approved) {
+    // Construct the JSON object
+    TSharedPtr<FJsonObject> RootObject = MakeShareable(new FJsonObject);
+    TSharedPtr<FJsonObject> FirstLevelObject = MakeShareable(new FJsonObject);
+    TSharedPtr<FJsonObject> SecondLevelObject = MakeShareable(new FJsonObject);
+    FirstLevelObject->SetObjectField("Erc1155", SecondLevelObject);
+    SecondLevelObject->SetStringField("contract_address", contract_address);
+    SecondLevelObject->SetStringField("approved_address", approved_address);
+    SecondLevelObject->SetBoolField("approved", approved);
+    RootObject->SetObjectField("ContractApproval", FirstLevelObject);
+    // Convert the JSON object to a string
+    FString JsonString;
+    TSharedRef<TJsonWriter<>> Writer =
+        TJsonWriterFactory<>::Create(&JsonString);
+    FJsonSerializer::Serialize(RootObject.ToSharedRef(), Writer);
+    return rust::string(TCHAR_TO_UTF8(*JsonString));
 }
