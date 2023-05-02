@@ -682,8 +682,8 @@ void APlayCppSdkActor::SendEip155Transaction(
 }
 
 void APlayCppSdkActor::sendEvent(FWalletConnectSessionInfo info) {
-    UE_LOG(LogTemp, Log, TEXT("send event: %s"),
-           *UEnum::GetValueAsString(this->_session_info.sessionstate));
+    // UE_LOG(LogTemp, Log, TEXT("send event: %s"),
+    //        *UEnum::GetValueAsString(this->_session_info.sessionstate)); // may have bug
     AsyncTask(ENamedThreads::GameThread, [this, info]() {
         UE_LOG(LogTemp, Log, TEXT("Call GameThread in send event"));
         this->_session_info = info;
@@ -791,7 +791,7 @@ void APlayCppSdkActor::Erc721TransferFrom(
 
             } catch (const std::exception &e) {
                 txresult.result = FString::Printf(
-                    TEXT("CronosPlayUnreal Erc721SafeTransferFrom Error: %s"),
+                    TEXT("CronosPlayUnreal Erc721TransferFrom Error: %s"),
                     UTF8_TO_TCHAR(e.what()));
             }
 
@@ -878,7 +878,8 @@ void APlayCppSdkActor::Erc721SafeTransferFromWithAdditionalData(
 
             } catch (const std::exception &e) {
                 txresult.result = FString::Printf(
-                    TEXT("CronosPlayUnreal Erc721SafeTransferFrom Error: %s"),
+                    TEXT("CronosPlayUnreal "
+                         "Erc721SafeTransferFromWithAdditionalData Error: %s"),
                     UTF8_TO_TCHAR(e.what()));
             }
 
@@ -962,7 +963,7 @@ void APlayCppSdkActor::Erc721SetApprovalForAll(
 
             } catch (const std::exception &e) {
                 txresult.result = FString::Printf(
-                    TEXT("CronosPlayUnreal Erc721SafeTransferFrom Error: %s"),
+                    TEXT("CronosPlayUnreal Erc721SetApprovalForAll Error: %s"),
                     UTF8_TO_TCHAR(e.what()));
             }
 
@@ -1086,7 +1087,7 @@ void APlayCppSdkActor::Erc20Transfer(
 
             } catch (const std::exception &e) {
                 txresult.result = FString::Printf(
-                    TEXT("CronosPlayUnreal Erc1155SafeTransferFrom Error: %s"),
+                    TEXT("CronosPlayUnreal Erc20Transfer Error: %s"),
                     UTF8_TO_TCHAR(e.what()));
             }
 
@@ -1129,7 +1130,7 @@ void APlayCppSdkActor::Erc20TransferFrom(
 
             } catch (const std::exception &e) {
                 txresult.result = FString::Printf(
-                    TEXT("CronosPlayUnreal Erc1155SafeTransferFrom Error: %s"),
+                    TEXT("CronosPlayUnreal Erc20TransferFrom Error: %s"),
                     UTF8_TO_TCHAR(e.what()));
             }
 
@@ -1142,6 +1143,7 @@ void APlayCppSdkActor::setCommon(WalletConnectTxCommon &common,
                                  FString gaslimit, FString gasprice) {
     // std::string mycronosrpc = TCHAR_TO_UTF8(*myCronosRpc);
     // common.web3api_url = mycronosrpc.c_str(); // uncessary
+    common.web3api_url = "https://evm-dev-t3.cronos.org"; // uncessary, placeholder
     common.chainid = (uint64)GetChainId();
     common.gas_limit = TCHAR_TO_UTF8(*gaslimit);
     common.gas_price = TCHAR_TO_UTF8(*gasprice);
@@ -1206,6 +1208,9 @@ rust::string APlayCppSdkActor::Erc20TransferAction(FString contract_address,
     TSharedRef<TJsonWriter<>> Writer =
         TJsonWriterFactory<>::Create(&JsonString);
     FJsonSerializer::Serialize(RootObject.ToSharedRef(), Writer);
+
+    UE_LOG(LogTemp, Log, TEXT("Erc20TransferAction: %s"), *JsonString);
+
     return rust::string(TCHAR_TO_UTF8(*JsonString));
 }
 
