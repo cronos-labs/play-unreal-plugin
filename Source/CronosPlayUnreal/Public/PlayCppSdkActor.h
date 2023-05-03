@@ -218,8 +218,6 @@ class CRONOSPLAYUNREAL_API APlayCppSdkActor : public AActor {
   private:
     static ::com::crypto::game_sdk::WalletconnectClient *_coreClient;
 
-    static APlayCppSdkActor *_sdk;
-
     // Internal session info, it will be updated every time walletconnect status
     // changes
     FWalletConnectSessionInfo _session_info;
@@ -262,13 +260,11 @@ class CRONOSPLAYUNREAL_API APlayCppSdkActor : public AActor {
     EConnectionType _connection_type = EConnectionType::URI_STRING;
 
     /**
-     * SetupCallback delegate, called after calling `SetupCallback`
+     * SetupCallback delegate, called after calling `SetupCallback` internally, it does not expose to blueprint
      */
     FWalletconnectSessionInfoDelegate OnSetupCallbackDelegate;
 
   public:
-    static APlayCppSdkActor *getInstance();
-
     // Sets default values for this actor's properties
     APlayCppSdkActor();
 
@@ -306,6 +302,10 @@ class CRONOSPLAYUNREAL_API APlayCppSdkActor : public AActor {
     FWalletConnectSessionInfo GetWalletConnectSessionInfo() {
         return _session_info;
     }
+
+    FWalletConnectSessionInfo SetWalletConnectSessionInfo(
+        com::crypto::game_sdk::WalletConnectSessionInfo src,
+        EWalletconnectSessionState sessionstate);
 
   protected:
     // Called when the game starts or when spawned
@@ -514,11 +514,6 @@ class CRONOSPLAYUNREAL_API APlayCppSdkActor : public AActor {
               Category = "PlayCppSdk")
     void SendEip155Transaction(FWalletConnectTxEip155 info,
                                FWalletconnectSendEip155TransactionDelegate Out);
-
-    /**
-     * send wallet-connect information to unreal game thread
-     */
-    void sendEvent(FWalletConnectSessionInfo);
 
     static void destroyCoreClient();
 
