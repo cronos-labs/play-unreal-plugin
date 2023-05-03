@@ -24,10 +24,6 @@ using namespace com::crypto::game_sdk;
 ::com::crypto::game_sdk::WalletconnectClient *APlayCppSdkActor::_coreClient =
     NULL;
 
-FWalletConnectSessionInfo
-convertSession(::com::crypto::game_sdk::WalletConnectSessionInfo src,
-               EWalletconnectSessionState sessionstate);
-
 class UserWalletConnectCallback : public WalletConnectCallback {
   private:
     APlayCppSdkActor *PlayCppSdkPtr;
@@ -518,7 +514,7 @@ void APlayCppSdkActor::SetupCallback(
         OnReceiveWalletconnectSessionInfoDelegate = sessioninfodelegate;
 
         // TODO, unsafe, pass the PlayCppSdk pointer from game thread to tokio
-        // thread It could raise
+        // thread It could race
         WalletConnectCallback *usercallbackraw =
             new UserWalletConnectCallback(this);
         std::unique_ptr<WalletConnectCallback> usercallback(usercallbackraw);
@@ -785,7 +781,7 @@ void APlayCppSdkActor::destroyCoreClient() {
 
         // restored back, close tokio-runtime
         // ue4 editor gracefully closed
-        // TODO crashed here
+        // TODO crashed here? Likely to be fixed, but need to be careful
         Box<WalletconnectClient> tmpwallet =
             Box<WalletconnectClient>::from_raw(_coreClient);
         _coreClient = NULL;
