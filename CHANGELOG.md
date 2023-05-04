@@ -1,7 +1,12 @@
 # Changelog
 
 ## [Unreleased]
-
+## [v0.0.12-alpha] - 2023-5-04
+- Support sending transactions using Metamask and Crypto.com Defi Wallet
+- Use play-cpp-sdk v0.0.19-alpha
+- Replace rust::cxxbridge1::Error with std::exception
+- Merge CI workflows
+- Fix varies crashes issues
 
 ## [v0.0.11-alpha] - 2023-3-07
 - Add SecureStorageOption for Wallets for desktop, mobile
@@ -25,10 +30,10 @@
 - Save session to a sessioninfo.json file under project dir
 - Restore session info sessioninfo.json file
 - Consolidate Engine Version, Platform Name, and Plugin Version Name into user agent
-- Add support of walletconnect and erc-721, erc-1155, erc-20 
+- Add support of walletconnect and erc-721, erc-1155, erc-20
 - Add IOS support
 - Add chain_id to function: SignEip155Transaction
-- Rename 
+- Rename
   - `FInitializeWalletConnectBlockingDelegate` to `FInitializeWalletConnectDelegate`
   - Rename `EnsureSessionBlocking` to `EnsureSession`
   - Add GetCryptoWalletUrl
