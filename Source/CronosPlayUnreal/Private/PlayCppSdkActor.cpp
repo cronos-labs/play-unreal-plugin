@@ -23,17 +23,112 @@ using namespace com::crypto::game_sdk;
 
 ::com::crypto::game_sdk::WalletconnectClient *APlayCppSdkActor::_coreClient =
     NULL;
-APlayCppSdkActor *APlayCppSdkActor::_sdk = NULL;
 
 class UserWalletConnectCallback : public WalletConnectCallback {
+  private:
+    APlayCppSdkActor *PlayCppSdkPtr;
   public:
+    UserWalletConnectCallback(APlayCppSdkActor *PlayCppSdkPtr);
     void onConnected(const WalletConnectSessionInfo &sessioninfo) const;
     void onDisconnected(const WalletConnectSessionInfo &sessioninfo) const;
     void onConnecting(const WalletConnectSessionInfo &sessioninfo) const;
     void onUpdated(const WalletConnectSessionInfo &sessioninfo) const;
 };
 
-APlayCppSdkActor *APlayCppSdkActor::getInstance() { return _sdk; }
+UserWalletConnectCallback::UserWalletConnectCallback(
+    APlayCppSdkActor *PlayCppSdk)
+    : PlayCppSdkPtr(PlayCppSdk) {}
+
+void UserWalletConnectCallback::onConnected( // NOLINT : flase positive, virtual
+                                             // function cannot be static
+    const WalletConnectSessionInfo &sessioninfo) const {
+    UE_LOG(LogTemp, Log, TEXT("user c++ onConnected"));
+    if (PlayCppSdkPtr) {
+        APlayCppSdkActor *PlayCppSdk =
+            PlayCppSdkPtr; // we need it to create a new varialbe for lambda
+        // We could not Call PlayCppSdkPtr's function direclty, bcause it is not
+        // in game thread. Instead, we can create AsyncTask and pass the
+        // PlayCppSdkPtr and sessioninfo into it, then call the function in game
+        // thread.
+        AsyncTask(ENamedThreads::GameThread, [PlayCppSdk, sessioninfo]() {
+            UE_LOG(LogTemp, Log, TEXT("Call GameThread in send event"));
+            PlayCppSdk->OnReceiveWalletconnectSessionInfoDelegate
+                .ExecuteIfBound(PlayCppSdk->SetWalletConnectSessionInfo(
+                    sessioninfo, EWalletconnectSessionState::StateConnected));
+        });
+    } else {
+        UE_LOG(LogTemp, Error, TEXT("Can not find PlayCppSdkActor onConnected"));
+    }
+}
+void UserWalletConnectCallback::onDisconnected( // NOLINT : flase positive,
+                                                // virtual function cannot be
+                                                // static
+    const WalletConnectSessionInfo &sessioninfo) const {
+    UE_LOG(LogTemp, Log, TEXT("user c++ onDisconnected"));
+    if (PlayCppSdkPtr) {
+        APlayCppSdkActor *PlayCppSdk =
+            PlayCppSdkPtr; // we need it to create a new varialbe for lambda
+        // We could not Call PlayCppSdkPtr's function direclty, bcause it is not
+        // in game thread. Instead, we can create AsyncTask and pass the
+        // PlayCppSdkPtr and sessioninfo into it, then call the function in game
+        // thread.
+        AsyncTask(ENamedThreads::GameThread, [PlayCppSdk, sessioninfo]() {
+            UE_LOG(LogTemp, Log, TEXT("Call GameThread in send event"));
+            PlayCppSdk->OnReceiveWalletconnectSessionInfoDelegate
+                .ExecuteIfBound(PlayCppSdk->SetWalletConnectSessionInfo(
+                    sessioninfo,
+                    EWalletconnectSessionState::StateDisconnected));
+        });
+    } else {
+        UE_LOG(LogTemp, Error,
+               TEXT("Can not find PlayCppSdkActor durig onDisconnected"));
+    }
+}
+void UserWalletConnectCallback::
+    onConnecting( // NOLINT : flase positive, virtual function cannot be static
+        const WalletConnectSessionInfo &sessioninfo) const {
+    UE_LOG(LogTemp, Log, TEXT("user c++ onConnecting"));
+    if (PlayCppSdkPtr) {
+        APlayCppSdkActor *PlayCppSdk =
+            PlayCppSdkPtr; // we need it to create a new varialbe for lambda
+        // We could not Call PlayCppSdkPtr's function direclty, bcause it is not
+        // in game thread. Instead, we can create AsyncTask and pass the
+        // PlayCppSdkPtr and sessioninfo into it, then call the function in game
+        // thread.
+        AsyncTask(ENamedThreads::GameThread, [PlayCppSdk, sessioninfo]() {
+            UE_LOG(LogTemp, Log, TEXT("Call GameThread in send event"));
+            PlayCppSdk->OnReceiveWalletconnectSessionInfoDelegate
+                .ExecuteIfBound(PlayCppSdk->SetWalletConnectSessionInfo(
+                    sessioninfo, EWalletconnectSessionState::StateConnecting));
+        });
+    } else {
+        UE_LOG(LogTemp, Error,
+               TEXT("Can not find PlayCppSdkActor durig onConnecting"));
+    }
+}
+void UserWalletConnectCallback::onUpdated( // NOLINT : flase positive, virtual
+                                           // function cannot be static
+    const WalletConnectSessionInfo &sessioninfo) const {
+    UE_LOG(LogTemp, Log, TEXT("user c++ onUpdated"));
+    if (PlayCppSdkPtr) {
+        APlayCppSdkActor *PlayCppSdk =
+            PlayCppSdkPtr; // we need it to create a new varialbe for lambda
+        // We could not Call PlayCppSdkPtr's function direclty, bcause it is not
+        // in game thread. Instead, we can create AsyncTask and pass the
+        // PlayCppSdkPtr and sessioninfo into it, then call the function in game
+        // thread.
+        AsyncTask(ENamedThreads::GameThread, [PlayCppSdk, sessioninfo]() {
+            UE_LOG(LogTemp, Log, TEXT("Call GameThread in send event"));
+            PlayCppSdk->OnReceiveWalletconnectSessionInfoDelegate
+                .ExecuteIfBound(PlayCppSdk->SetWalletConnectSessionInfo(
+                    sessioninfo, EWalletconnectSessionState::StateUpdated));
+        });
+    } else {
+        UE_LOG(LogTemp, Error,
+               TEXT("Can not find PlayCppSdkActor durig onUpdated"));
+    }
+}
+
 
 // Sets default values
 APlayCppSdkActor::APlayCppSdkActor() {
@@ -41,18 +136,15 @@ APlayCppSdkActor::APlayCppSdkActor() {
     // improve performance if you don't need it.
     PrimaryActorTick.bCanEverTick = false;
     _coreClient = NULL;
-    _sdk = this;
 }
 
 // Called when the game starts or when spawned
 void APlayCppSdkActor::BeginPlay() { Super::BeginPlay(); }
 
-auto convertSession(::com::crypto::game_sdk::WalletConnectSessionInfo src,
-                    EWalletconnectSessionState sessionstate)
-    -> FWalletConnectSessionInfo {
-    FWalletConnectSessionInfo dst =  // NOLINT
-        FWalletConnectSessionInfo(); // NOLINT : by unreal engine macro, can be
-                                     // ignored
+FWalletConnectSessionInfo APlayCppSdkActor::SetWalletConnectSessionInfo(
+    ::com::crypto::game_sdk::WalletConnectSessionInfo src,
+    EWalletconnectSessionState sessionstate) {
+    FWalletConnectSessionInfo dst = FWalletConnectSessionInfo();
     dst.sessionstate = sessionstate;
     dst.connected = src.connected;
     dst.accounts.Empty();
@@ -69,6 +161,7 @@ auto convertSession(::com::crypto::game_sdk::WalletConnectSessionInfo src,
     dst.peer_id = UTF8_TO_TCHAR(src.peer_id.c_str());
     dst.peer_meta = UTF8_TO_TCHAR(src.peer_meta.c_str());
     dst.handshake_topic = UTF8_TO_TCHAR(src.handshake_topic.c_str());
+    _session_info = dst; // set the internal session info
     return dst;
 }
 // Called every frame
@@ -82,9 +175,7 @@ void APlayCppSdkActor::Destroyed() {
     UE_LOG(LogTemp, Log, TEXT("PlayCppActor Destroyed"));
     DestroyClient();
 
-    _sdk = NULL;
     assert(NULL == _coreClient);
-    assert(NULL == _sdk);
 }
 
 void APlayCppSdkActor::ConnectWalletConnect(FString description, FString url,
@@ -422,8 +513,10 @@ void APlayCppSdkActor::SetupCallback(
         // connect dynamic multicast delegate
         OnReceiveWalletconnectSessionInfoDelegate = sessioninfodelegate;
 
+        // TODO, unsafe, pass the PlayCppSdk pointer from game thread to tokio
+        // thread It could race
         WalletConnectCallback *usercallbackraw =
-            new UserWalletConnectCallback();
+            new UserWalletConnectCallback(this);
         std::unique_ptr<WalletConnectCallback> usercallback(usercallbackraw);
         _coreClient->setup_callback_blocking(std::move(usercallback));
 
@@ -681,67 +774,6 @@ void APlayCppSdkActor::SendEip155Transaction(
     });
 }
 
-void APlayCppSdkActor::sendEvent(FWalletConnectSessionInfo info) {
-    // UE_LOG(LogTemp, Log, TEXT("send event: %s"),
-    //        *UEnum::GetValueAsString(this->_session_info.sessionstate)); // may have bug
-    AsyncTask(ENamedThreads::GameThread, [this, info]() {
-        UE_LOG(LogTemp, Log, TEXT("Call GameThread in send event"));
-        this->_session_info = info;
-        this->OnReceiveWalletconnectSessionInfoDelegate.ExecuteIfBound(info);
-    });
-}
-
-void UserWalletConnectCallback::onConnected( // NOLINT : flase positive, virtual
-                                             // function cannot be static
-    const WalletConnectSessionInfo &sessioninfo) const {
-    UE_LOG(LogTemp, Log, TEXT("user c++ onConnected"));
-    if (APlayCppSdkActor::getInstance()) {
-        FWalletConnectSessionInfo
-            output = // NOLINT : by unreal engine macro, can be ignored
-            convertSession(sessioninfo,
-                           EWalletconnectSessionState::StateConnected);
-        APlayCppSdkActor::getInstance()->sendEvent(output);
-    }
-}
-void UserWalletConnectCallback::onDisconnected( // NOLINT : flase positive,
-                                                // virtual function cannot be
-                                                // static
-    const WalletConnectSessionInfo &sessioninfo) const {
-    UE_LOG(LogTemp, Log, TEXT("user c++ onDisconnected"));
-    if (APlayCppSdkActor::getInstance()) {
-        FWalletConnectSessionInfo output = // NOLINT
-            convertSession( // NOLINT : by unreal engine macro, can be ignored
-                sessioninfo, EWalletconnectSessionState::StateDisconnected);
-
-        APlayCppSdkActor::getInstance()->sendEvent(output);
-    }
-}
-void UserWalletConnectCallback::
-    onConnecting( // NOLINT : flase positive, virtual function cannot be static
-        const WalletConnectSessionInfo &sessioninfo) const {
-    UE_LOG(LogTemp, Log, TEXT("user c++ onConnecting"));
-    if (APlayCppSdkActor::getInstance()) {
-        FWalletConnectSessionInfo output = // NOLINT
-            convertSession( // NOLINT : by unreal engine macro, can be ignored
-                sessioninfo, EWalletconnectSessionState::StateConnecting);
-
-        APlayCppSdkActor::getInstance()->sendEvent(output);
-    }
-}
-void UserWalletConnectCallback::onUpdated( // NOLINT : flase positive, virtual
-                                           // function cannot be static
-    const WalletConnectSessionInfo &sessioninfo) const {
-
-    UE_LOG(LogTemp, Log, TEXT("user c++ onUpdated"));
-    if (APlayCppSdkActor::getInstance()) {
-        FWalletConnectSessionInfo
-            output = // NOLINT : by unreal engine macro, can be ignored
-            convertSession(sessioninfo,
-                           EWalletconnectSessionState::StateUpdated);
-
-        APlayCppSdkActor::getInstance()->sendEvent(output);
-    }
-}
 
 void APlayCppSdkActor::destroyCoreClient() {
     if (_coreClient != NULL) {
@@ -749,6 +781,7 @@ void APlayCppSdkActor::destroyCoreClient() {
 
         // restored back, close tokio-runtime
         // ue4 editor gracefully closed
+        // TODO crashed here? Likely to be fixed, but need to be careful
         Box<WalletconnectClient> tmpwallet =
             Box<WalletconnectClient>::from_raw(_coreClient);
         _coreClient = NULL;
