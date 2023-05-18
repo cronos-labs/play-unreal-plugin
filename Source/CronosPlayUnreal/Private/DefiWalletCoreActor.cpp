@@ -15,6 +15,7 @@
 #include "PlayCppSdkLibrary/Include/defi-wallet-core-cpp/src/lib.rs.h"
 #include "PlayCppSdkLibrary/Include/rust/cxx.h"
 #include "TxBuilder.h"
+#include "Utlis.h"
 
 #define SECURE_STORAGE_CLASS "com/cronos/play/SecureStorage"
 
@@ -2179,4 +2180,63 @@ void zeroize_buffer(char *dst, char value, int length) {
     for (int i = 0; i < length; i++) {
         dst[i] = value; // NOLINT
     }
+}
+
+void ADefiWalletCoreActor::GetEthTransactionReceipt(
+    TArray<uint8> txHash, FTransactionReceiptDelegate Out) {
+
+    AsyncTask(ENamedThreads::AnyHiPriThreadNormalTask, [this, Out, txHash]() {
+        FString tx_receipt;
+        FString result;
+        try {
+            if (NULL == _coreWallet) {
+                result = TEXT("Invalid Wallet");
+            } else {
+                std::string mycronosrpc = TCHAR_TO_UTF8(*myCronosRpc);
+                rust::Vec<uint8_t> dst_tx_hash;
+                UUtlis::copyTArrayToVec(txHash, dst_tx_hash);
+                tx_receipt = UTF8_TO_TCHAR(get_eth_transaction_receipt_blocking(
+                                               dst_tx_hash, mycronosrpc)
+                                               .c_str());
+            }
+        } catch (const std::exception &e) {
+            result = FString::Printf(
+                TEXT("CronosPlayUnreal WaitForTransactionReceipt Error: %s"),
+                UTF8_TO_TCHAR(e.what()));
+        }
+
+        AsyncTask(ENamedThreads::GameThread, [Out, tx_receipt, result]() {
+            Out.ExecuteIfBound(tx_receipt, result);
+        });
+    });
+}
+
+void ADefiWalletCoreActor::WaitForTransactionReceipt(
+    TArray<uint8> txHash, FTransactionReceiptDelegate Out) {
+
+    AsyncTask(ENamedThreads::AnyHiPriThreadNormalTask, [this, Out, txHash]() {
+        FString tx_receipt;
+        FString result;
+        try {
+            if (NULL == _coreWallet) {
+                result = TEXT("Invalid Wallet");
+            } else {
+                std::string mycronosrpc = TCHAR_TO_UTF8(*myCronosRpc);
+                rust::Vec<uint8_t> dst_tx_hash;
+                UUtlis::copyTArrayToVec(txHash, dst_tx_hash);
+                tx_receipt =
+                    UTF8_TO_TCHAR(wait_for_transaction_receipt_blocking(
+                                      dst_tx_hash, mycronosrpc)
+                                      .c_str());
+            }
+        } catch (const std::exception &e) {
+            result = FString::Printf(
+                TEXT("CronosPlayUnreal WaitForTransactionReceipt Error: %s"),
+                UTF8_TO_TCHAR(e.what()));
+        }
+
+        AsyncTask(ENamedThreads::GameThread, [Out, tx_receipt, result]() {
+            Out.ExecuteIfBound(tx_receipt, result);
+        });
+    });
 }

@@ -65,6 +65,10 @@ DECLARE_DYNAMIC_DELEGATE_TwoParams(FErc20ApproveDelegate,
                                    FCronosTransactionReceiptRaw, TxResult,
                                    FString, Result);
 
+DECLARE_DYNAMIC_DELEGATE_TwoParams(FTransactionReceiptDelegate,
+                                   FString, TxReceipt,
+                                   FString, Result);
+
 /**
  Cosmos NFT Denom
  */
@@ -1025,6 +1029,31 @@ class CRONOSPLAYUNREAL_API ADefiWalletCoreActor : public AActor {
     CreateDynamicSigningContract(FString contractaddress, FString abijson,
                                  int32 walletindex, bool &success,
                                  FString &output_message);
+
+    /**
+     * Get eth transaction receipt
+     * @param txHash transaction hash
+     * @param Out event delegate which is triggered after getting eth transaction receipt
+     */
+    UFUNCTION(BlueprintCallable,
+              meta = (DisplayName = "GetEthTransactionReceipt",
+                      Keywords = "Wallet"),
+              Category = "CronosPlayUnreal")
+    void GetEthTransactionReceipt(TArray<uint8> txHash,
+                                  FTransactionReceiptDelegate Out);
+
+    /**
+     * Wait for transaction receipt
+     * @param txHash transaction hash
+     * @param Out event delegate which is triggered after waiting eth
+     * transaction receipt
+     */
+    UFUNCTION(BlueprintCallable,
+              meta = (DisplayName = "WaitForTransactionReceipt",
+                      Keywords = "Wallet"),
+              Category = "CronosPlayUnreal")
+    void WaitForTransactionReceipt(TArray<uint8> txHash,
+                                   FTransactionReceiptDelegate Out);
 
     /**
      * Grpc address

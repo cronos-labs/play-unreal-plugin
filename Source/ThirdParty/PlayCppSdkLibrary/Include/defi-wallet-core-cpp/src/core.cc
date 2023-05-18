@@ -52,8 +52,8 @@ class String final {
     static String lossy(const char16_t *) noexcept;
     static String lossy(const char16_t *, std::size_t) noexcept;
 
-    String &operator=(const String &) &noexcept;
-    String &operator=(String &&) &noexcept;
+    String &operator=(const String &) & noexcept;
+    String &operator=(String &&) & noexcept;
 
     explicit operator std::string() const;
 
@@ -108,7 +108,7 @@ class Str final {
     Str(const char *);
     Str(const char *, std::size_t);
 
-    Str &operator=(const Str &) &noexcept = default;
+    Str &operator=(const Str &) & noexcept = default;
 
     explicit operator std::string() const;
 
@@ -154,8 +154,8 @@ template <> struct copy_assignable_if<false> {
     copy_assignable_if() noexcept = default;
     copy_assignable_if(const copy_assignable_if &) noexcept = default;
     copy_assignable_if &
-    operator=(const copy_assignable_if &) &noexcept = delete;
-    copy_assignable_if &operator=(copy_assignable_if &&) &noexcept = default;
+    operator=(const copy_assignable_if &) & noexcept = delete;
+    copy_assignable_if &operator=(copy_assignable_if &&) & noexcept = default;
 };
 } // namespace detail
 
@@ -168,8 +168,8 @@ class Slice final
     Slice() noexcept;
     Slice(T *, std::size_t count) noexcept;
 
-    Slice &operator=(const Slice<T> &) &noexcept = default;
-    Slice &operator=(Slice<T> &&) &noexcept = default;
+    Slice &operator=(const Slice<T> &) & noexcept = default;
+    Slice &operator=(Slice<T> &&) & noexcept = default;
 
     T *data() const noexcept;
     std::size_t size() const noexcept;
@@ -438,7 +438,7 @@ template <typename T> class Box final {
     explicit Box(const T &);
     explicit Box(T &&);
 
-    Box &operator=(Box &&) &noexcept;
+    Box &operator=(Box &&) & noexcept;
 
     const T *operator->() const noexcept;
     const T &operator*() const noexcept;
@@ -506,7 +506,7 @@ template <typename T> Box<T>::~Box() noexcept {
     }
 }
 
-template <typename T> Box<T> &Box<T>::operator=(Box &&other) &noexcept {
+template <typename T> Box<T> &Box<T>::operator=(Box &&other) & noexcept {
     if (this->ptr) {
         this->drop();
     }
@@ -576,7 +576,7 @@ template <typename T> class Vec final {
     Vec(Vec &&) noexcept;
     ~Vec() noexcept;
 
-    Vec &operator=(Vec &&) &noexcept;
+    Vec &operator=(Vec &&) & noexcept;
     Vec &operator=(const Vec &) &;
 
     std::size_t size() const noexcept;
@@ -642,7 +642,7 @@ template <typename T> Vec<T>::Vec(Vec &&other) noexcept : repr(other.repr) {
 
 template <typename T> Vec<T>::~Vec() noexcept { this->drop(); }
 
-template <typename T> Vec<T> &Vec<T>::operator=(Vec &&other) &noexcept {
+template <typename T> Vec<T> &Vec<T>::operator=(Vec &&other) & noexcept {
     this->drop();
     this->repr = other.repr;
     new (&other) Vec();
@@ -783,7 +783,7 @@ class Error final : public std::exception {
     ~Error() noexcept override;
 
     Error &operator=(const Error &) &;
-    Error &operator=(Error &&) &noexcept;
+    Error &operator=(Error &&) & noexcept;
 
     const char *what() const noexcept override;
 
@@ -1421,6 +1421,29 @@ void org$defi_wallet_core$cxxbridge1$new_eth_tx_info(
 ::rust::repr::PtrLen org$defi_wallet_core$cxxbridge1$get_eth_nonce(
     ::rust::Str address, ::rust::Str api_url, ::rust::String *return$) noexcept;
 
+::rust::repr::PtrLen org$defi_wallet_core$cxxbridge1$get_block_number_blocking(
+    ::rust::String *api_url, ::rust::String *return$) noexcept;
+
+::rust::repr::PtrLen
+org$defi_wallet_core$cxxbridge1$get_eth_transaction_receipt_by_vec_blocking(
+    ::rust::Vec<::std::uint8_t> *tx_hash, ::rust::String *api_url,
+    ::rust::String *return$) noexcept;
+
+::rust::repr::PtrLen
+org$defi_wallet_core$cxxbridge1$get_eth_transaction_receipt_by_string_blocking(
+    ::rust::String *tx_hash, ::rust::String *api_url,
+    ::rust::String *return$) noexcept;
+
+::rust::repr::PtrLen
+org$defi_wallet_core$cxxbridge1$wait_for_transaction_receipt_by_vec_blocking(
+    ::rust::Vec<::std::uint8_t> *tx_hash, ::rust::String *api_url,
+    ::rust::String *return$) noexcept;
+
+::rust::repr::PtrLen
+org$defi_wallet_core$cxxbridge1$wait_for_transaction_receipt_by_string_blocking(
+    ::rust::String *tx_hash, ::rust::String *api_url,
+    ::rust::String *return$) noexcept;
+
 ::rust::repr::PtrLen
 org$defi_wallet_core$cxxbridge1$broadcast_eth_signed_raw_tx(
     ::rust::Vec<::std::uint8_t> *raw_tx, ::rust::Str web3api_url,
@@ -1978,6 +2001,71 @@ build_eth_signed_tx(::org::defi_wallet_core::EthTxInfoRaw tx_info,
     ::rust::MaybeUninit<::rust::String> return$;
     ::rust::repr::PtrLen error$ = org$defi_wallet_core$cxxbridge1$get_eth_nonce(
         address, api_url, &return$.value);
+    if (error$.ptr) {
+        throw ::rust::impl<::rust::Error>::error(error$);
+    }
+    return ::std::move(return$.value);
+}
+
+::rust::String get_block_number_blocking(::rust::String api_url) {
+    ::rust::MaybeUninit<::rust::String> return$;
+    ::rust::repr::PtrLen error$ =
+        org$defi_wallet_core$cxxbridge1$get_block_number_blocking(
+            &api_url, &return$.value);
+    if (error$.ptr) {
+        throw ::rust::impl<::rust::Error>::error(error$);
+    }
+    return ::std::move(return$.value);
+}
+
+::rust::String
+get_eth_transaction_receipt_blocking(::rust::Vec<::std::uint8_t> tx_hash,
+                                     ::rust::String api_url) {
+    ::rust::ManuallyDrop<::rust::Vec<::std::uint8_t>> tx_hash$(
+        ::std::move(tx_hash));
+    ::rust::MaybeUninit<::rust::String> return$;
+    ::rust::repr::PtrLen error$ =
+        org$defi_wallet_core$cxxbridge1$get_eth_transaction_receipt_by_vec_blocking(
+            &tx_hash$.value, &api_url, &return$.value);
+    if (error$.ptr) {
+        throw ::rust::impl<::rust::Error>::error(error$);
+    }
+    return ::std::move(return$.value);
+}
+
+::rust::String get_eth_transaction_receipt_blocking(::rust::String tx_hash,
+                                                    ::rust::String api_url) {
+    ::rust::MaybeUninit<::rust::String> return$;
+    ::rust::repr::PtrLen error$ =
+        org$defi_wallet_core$cxxbridge1$get_eth_transaction_receipt_by_string_blocking(
+            &tx_hash, &api_url, &return$.value);
+    if (error$.ptr) {
+        throw ::rust::impl<::rust::Error>::error(error$);
+    }
+    return ::std::move(return$.value);
+}
+
+::rust::String
+wait_for_transaction_receipt_blocking(::rust::Vec<::std::uint8_t> tx_hash,
+                                      ::rust::String api_url) {
+    ::rust::ManuallyDrop<::rust::Vec<::std::uint8_t>> tx_hash$(
+        ::std::move(tx_hash));
+    ::rust::MaybeUninit<::rust::String> return$;
+    ::rust::repr::PtrLen error$ =
+        org$defi_wallet_core$cxxbridge1$wait_for_transaction_receipt_by_vec_blocking(
+            &tx_hash$.value, &api_url, &return$.value);
+    if (error$.ptr) {
+        throw ::rust::impl<::rust::Error>::error(error$);
+    }
+    return ::std::move(return$.value);
+}
+
+::rust::String wait_for_transaction_receipt_blocking(::rust::String tx_hash,
+                                                     ::rust::String api_url) {
+    ::rust::MaybeUninit<::rust::String> return$;
+    ::rust::repr::PtrLen error$ =
+        org$defi_wallet_core$cxxbridge1$wait_for_transaction_receipt_by_string_blocking(
+            &tx_hash, &api_url, &return$.value);
     if (error$.ptr) {
         throw ::rust::impl<::rust::Error>::error(error$);
     }

@@ -3,6 +3,8 @@
 #include "Utlis.h"
 #include "Containers/UnrealString.h"
 
+using namespace rust;
+
 FString UUtlis::ToHex(TArray<uint8> address) {
     return BytesToHex(address.GetData(), address.Num());
 }
@@ -16,4 +18,20 @@ std::array<std::uint8_t, 20> UUtlis::ToArray(TArray<uint8> address) {
         std_array.fill(0);
     }
     return std_array;
+}
+
+void UUtlis::copyTArrayToVec(const TArray<uint8> &src, rust::Vec<uint8_t> &dst) {
+    dst.clear();
+    for (int i = 0; i < src.Num(); i++) {
+        dst.push_back(src[i]);
+    }
+    assert(dst.size() == src.Num());
+}
+void UUtlis::copyVecToTArray(const rust::Vec<uint8_t> &src,
+                             TArray<uint8> &dst) {
+    dst.Empty();
+    for (int i = 0; i < src.size(); i++) {
+        dst.Add(src[i]);
+    }
+    assert(dst.Num() == src.size());
 }

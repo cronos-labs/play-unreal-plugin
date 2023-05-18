@@ -53,8 +53,8 @@ class String final {
     static String lossy(const char16_t *) noexcept;
     static String lossy(const char16_t *, std::size_t) noexcept;
 
-    String &operator=(const String &) &noexcept;
-    String &operator=(String &&) &noexcept;
+    String &operator=(const String &) & noexcept;
+    String &operator=(String &&) & noexcept;
 
     explicit operator std::string() const;
 
@@ -108,8 +108,8 @@ template <> struct copy_assignable_if<false> {
     copy_assignable_if() noexcept = default;
     copy_assignable_if(const copy_assignable_if &) noexcept = default;
     copy_assignable_if &
-    operator=(const copy_assignable_if &) &noexcept = delete;
-    copy_assignable_if &operator=(copy_assignable_if &&) &noexcept = default;
+    operator=(const copy_assignable_if &) & noexcept = delete;
+    copy_assignable_if &operator=(copy_assignable_if &&) & noexcept = default;
 };
 } // namespace detail
 
@@ -122,8 +122,8 @@ class Slice final
     Slice() noexcept;
     Slice(T *, std::size_t count) noexcept;
 
-    Slice &operator=(const Slice<T> &) &noexcept = default;
-    Slice &operator=(Slice<T> &&) &noexcept = default;
+    Slice &operator=(const Slice<T> &) & noexcept = default;
+    Slice &operator=(Slice<T> &&) & noexcept = default;
 
     T *data() const noexcept;
     std::size_t size() const noexcept;
@@ -395,7 +395,7 @@ template <typename T> class Vec final {
     Vec(Vec &&) noexcept;
     ~Vec() noexcept;
 
-    Vec &operator=(Vec &&) &noexcept;
+    Vec &operator=(Vec &&) & noexcept;
     Vec &operator=(const Vec &) &;
 
     std::size_t size() const noexcept;
@@ -461,7 +461,7 @@ template <typename T> Vec<T>::Vec(Vec &&other) noexcept : repr(other.repr) {
 
 template <typename T> Vec<T>::~Vec() noexcept { this->drop(); }
 
-template <typename T> Vec<T> &Vec<T>::operator=(Vec &&other) &noexcept {
+template <typename T> Vec<T> &Vec<T>::operator=(Vec &&other) & noexcept {
     this->drop();
     this->repr = other.repr;
     new (&other) Vec();

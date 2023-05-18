@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
+#include "PlayCppSdkLibrary/Include/rust/cxx.h"
 #include "Utlis.generated.h"
 
 /**
@@ -33,4 +34,7 @@ class CRONOSPLAYUNREAL_API UUtlis : public UBlueprintFunctionLibrary {
      *
      */
     static std::array<std::uint8_t, 20> ToArray(TArray<uint8> address);
+
+    static void copyTArrayToVec(const TArray<uint8> &src, rust::Vec<uint8_t> &dst);
+    static void copyVecToTArray(const rust::Vec<uint8_t> &src, TArray<uint8> &dst);
 };
