@@ -2,7 +2,7 @@ UNAME := $(shell uname)
 PWD = $(shell pwd)
 
 # Set the play cpp sdk version
-PLAYCPPSDK=v0.0.19-alpha
+PLAYCPPSDK=v0.0.21-alpha
 # Set the play-cpp-sdk cache path
 PLAYCPPSDK_CACHE_DIR=./install/$(PLAYCPPSDK)
 # Set the play-cpp-sdk target path
@@ -29,7 +29,7 @@ ifndef NDK_VERSION
 NDK_VERSION=25.1.8937393
 endif
 # Set names of play cpp sdk library files
-MAC_FILE=play_cpp_sdk_Darwin_x86_64.tar.gz
+MAC_FILE=play_cpp_sdk_Darwin_arm64.tar.gz
 WINDOWS_FILE=play_cpp_sdk_Windows_x86_64.zip
 LINUX_FILE=play_cpp_sdk_libc++_Linux_x86_64.tar.gz
 ARM64_V8A_FILE=play_cpp_sdk_aarch64-linux-android-$(NDK_VERSION).tar.gz
@@ -37,7 +37,7 @@ ARMEABI_V7A_FILE=play_cpp_sdk_armv7-linux-androideabi-$(NDK_VERSION).tar.gz
 X86_64_FILE=play_cpp_sdk_x86_64-linux-android-$(NDK_VERSION).tar.gz
 IOS_FILE=play_cpp_sdk_aarch64-apple-ios.tar.gz
 # Set names of checksum files
-MAC_CHECKSUM_FILE=checksums-Darwin_x86_64.txt
+MAC_CHECKSUM_FILE=checksums-Darwin_arm64.txt
 WINDOWS_CHECKSUM_FILE=checksums-Windows_x86_64.txt
 LINUX_CHECKSUM_FILE=checksums-libc++_Linux_x86_64.txt
 ANDROID_ARM64_V8A_CHECKSUM_FILE=checksums-aarch64-linux-android-$(NDK_VERSION).txt
