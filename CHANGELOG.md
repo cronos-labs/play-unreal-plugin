@@ -1,6 +1,10 @@
 # Changelog
 
 ## [Unreleased]
+
+## [v0.0.13-alpha] - 2023-6-12
+- Support apple arm64
+- Support Unreal Engine 5.2.0
 ## [v0.0.12-alpha] - 2023-5-04
 - Support sending transactions using Metamask and Crypto.com Defi Wallet
 - Use play-cpp-sdk v0.0.19-alpha
