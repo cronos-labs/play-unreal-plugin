@@ -27,6 +27,7 @@ using namespace com::crypto::game_sdk;
 class UserWalletConnectCallback : public WalletConnectCallback {
   private:
     APlayCppSdkActor *PlayCppSdkPtr;
+
   public:
     UserWalletConnectCallback(APlayCppSdkActor *PlayCppSdkPtr);
     void onConnected(const WalletConnectSessionInfo &sessioninfo) const;
@@ -57,7 +58,8 @@ void UserWalletConnectCallback::onConnected( // NOLINT : flase positive, virtual
                     sessioninfo, EWalletconnectSessionState::StateConnected));
         });
     } else {
-        UE_LOG(LogTemp, Error, TEXT("Can not find PlayCppSdkActor onConnected"));
+        UE_LOG(LogTemp, Error,
+               TEXT("Can not find PlayCppSdkActor onConnected"));
     }
 }
 void UserWalletConnectCallback::onDisconnected( // NOLINT : flase positive,
@@ -128,7 +130,6 @@ void UserWalletConnectCallback::onUpdated( // NOLINT : flase positive, virtual
                TEXT("Can not find PlayCppSdkActor durig onUpdated"));
     }
 }
-
 
 // Sets default values
 APlayCppSdkActor::APlayCppSdkActor() {
@@ -774,7 +775,6 @@ void APlayCppSdkActor::SendEip155Transaction(
     });
 }
 
-
 void APlayCppSdkActor::destroyCoreClient() {
     if (_coreClient != NULL) {
         UE_LOG(LogTemp, Log, TEXT("PlayCppSdkActor destroyCoreClient"));
@@ -803,34 +803,35 @@ void APlayCppSdkActor::Erc721TransferFrom(
     if (fromAddress.IsEmpty())
         return;
 
-    AsyncTask(
-        ENamedThreads::AnyHiPriThreadNormalTask,
-        [this, Out, contractAddress, fromAddress, toAddress, tokenId, gasLimit,
-         gasPrice, fromAddressArray]() {
-            FWalletSendTXEip155Result txresult;
-            try {
-                if (NULL == _coreClient) {
-                    txresult.result = TEXT("Invalid Walletconnect");
-                } else {
-                    WalletConnectTxCommon common;
-                    setCommon(common, gasLimit, gasPrice);
-                    copyVecToTArray(_coreClient->send_contract_transaction(
-                                        Erc721TransferFromAction(
-                                            contractAddress, fromAddress,
-                                            toAddress, tokenId),
-                                        common, fromAddressArray),
-                                    txresult.tx_hash);
-                }
+    AsyncTask(ENamedThreads::AnyHiPriThreadNormalTask,
+              [this, Out, contractAddress, fromAddress, toAddress, tokenId,
+               gasLimit, gasPrice, fromAddressArray]() {
+                  FWalletSendTXEip155Result txresult;
+                  try {
+                      if (NULL == _coreClient) {
+                          txresult.result = TEXT("Invalid Walletconnect");
+                      } else {
+                          WalletConnectTxCommon common;
+                          setCommon(common, gasLimit, gasPrice);
+                          copyVecToTArray(
+                              _coreClient->send_contract_transaction(
+                                  Erc721TransferFromAction(contractAddress,
+                                                           fromAddress,
+                                                           toAddress, tokenId),
+                                  common, fromAddressArray),
+                              txresult.tx_hash);
+                      }
 
-            } catch (const std::exception &e) {
-                txresult.result = FString::Printf(
-                    TEXT("CronosPlayUnreal Erc721TransferFrom Error: %s"),
-                    UTF8_TO_TCHAR(e.what()));
-            }
+                  } catch (const std::exception &e) {
+                      txresult.result = FString::Printf(
+                          TEXT("CronosPlayUnreal Erc721TransferFrom Error: %s"),
+                          UTF8_TO_TCHAR(e.what()));
+                  }
 
-            AsyncTask(ENamedThreads::GameThread,
-                      [Out, txresult]() { Out.ExecuteIfBound(txresult); });
-        });
+                  AsyncTask(ENamedThreads::GameThread, [Out, txresult]() {
+                      Out.ExecuteIfBound(txresult);
+                  });
+              });
 }
 
 void APlayCppSdkActor::Erc721SafeTransferFrom(
@@ -1141,42 +1142,44 @@ void APlayCppSdkActor::Erc20TransferFrom(
     // if no fromAddress, return
     if (fromAddress.IsEmpty())
         return;
-    AsyncTask(
-        ENamedThreads::AnyHiPriThreadNormalTask,
-        [this, Out, contractAddress, fromAddress, toAddress, amount, gasLimit,
-         gasPrice, fromAddressArray]() {
-            FWalletSendTXEip155Result txresult;
-            try {
-                if (NULL == _coreClient) {
-                    txresult.result = TEXT("Invalid Walletconnect");
-                } else {
+    AsyncTask(ENamedThreads::AnyHiPriThreadNormalTask,
+              [this, Out, contractAddress, fromAddress, toAddress, amount,
+               gasLimit, gasPrice, fromAddressArray]() {
+                  FWalletSendTXEip155Result txresult;
+                  try {
+                      if (NULL == _coreClient) {
+                          txresult.result = TEXT("Invalid Walletconnect");
+                      } else {
 
-                    WalletConnectTxCommon common;
-                    setCommon(common, gasLimit, gasPrice);
-                    copyVecToTArray(_coreClient->send_contract_transaction(
-                                        Erc20TransferFromAction(
-                                            contractAddress, fromAddress,
-                                            toAddress, amount),
-                                        common, fromAddressArray),
-                                    txresult.tx_hash);
-                }
+                          WalletConnectTxCommon common;
+                          setCommon(common, gasLimit, gasPrice);
+                          copyVecToTArray(
+                              _coreClient->send_contract_transaction(
+                                  Erc20TransferFromAction(contractAddress,
+                                                          fromAddress,
+                                                          toAddress, amount),
+                                  common, fromAddressArray),
+                              txresult.tx_hash);
+                      }
 
-            } catch (const std::exception &e) {
-                txresult.result = FString::Printf(
-                    TEXT("CronosPlayUnreal Erc20TransferFrom Error: %s"),
-                    UTF8_TO_TCHAR(e.what()));
-            }
+                  } catch (const std::exception &e) {
+                      txresult.result = FString::Printf(
+                          TEXT("CronosPlayUnreal Erc20TransferFrom Error: %s"),
+                          UTF8_TO_TCHAR(e.what()));
+                  }
 
-            AsyncTask(ENamedThreads::GameThread,
-                      [Out, txresult]() { Out.ExecuteIfBound(txresult); });
-        });
+                  AsyncTask(ENamedThreads::GameThread, [Out, txresult]() {
+                      Out.ExecuteIfBound(txresult);
+                  });
+              });
 }
 
 void APlayCppSdkActor::setCommon(WalletConnectTxCommon &common,
                                  FString gaslimit, FString gasprice) {
     // std::string mycronosrpc = TCHAR_TO_UTF8(*myCronosRpc);
     // common.web3api_url = mycronosrpc.c_str(); // uncessary
-    common.web3api_url = "https://evm-dev-t3.cronos.org"; // uncessary, placeholder
+    common.web3api_url =
+        "https://evm-dev-t3.cronos.org"; // uncessary, placeholder
     common.chainid = (uint64)GetChainId();
     common.gas_limit = TCHAR_TO_UTF8(*gaslimit);
     common.gas_price = TCHAR_TO_UTF8(*gasprice);
