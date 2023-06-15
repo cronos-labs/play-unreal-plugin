@@ -950,12 +950,16 @@ struct WalletConnectTxCommon;
 struct WalletConnectTxEip155;
 struct WalletConnectAddress;
 struct WalletConnectEnsureSessionResult;
+struct WalletConnect2Eip155Accounts;
+struct WalletConnect2Eip155;
+struct WalletConnect2EnsureSessionResult;
 struct CryptoComPaymentResponse;
 struct RawTxDetail;
 struct RawTokenResult;
 struct TokenHolderDetail;
 enum class QueryOption : ::std::uint8_t;
 struct WalletconnectClient;
+struct Walletconnect2Client;
 using OptionalArguments = ::com::crypto::game_sdk::OptionalArguments;
 } // namespace game_sdk
 } // namespace crypto
@@ -1107,6 +1111,36 @@ struct WalletConnectEnsureSessionResult final {
     using IsRelocatable = ::std::true_type;
 };
 #endif // CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectEnsureSessionResult
+
+#ifndef CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnect2Eip155Accounts
+#define CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnect2Eip155Accounts
+struct WalletConnect2Eip155Accounts final {
+    ::com::crypto::game_sdk::WalletConnectAddress address;
+    ::std::uint64_t chain_id;
+
+    using IsRelocatable = ::std::true_type;
+};
+#endif // CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnect2Eip155Accounts
+
+#ifndef CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnect2Eip155
+#define CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnect2Eip155
+struct WalletConnect2Eip155 final {
+    ::rust::Vec<::com::crypto::game_sdk::WalletConnect2Eip155Accounts> accounts;
+    ::rust::Vec<::rust::String> methods;
+    ::rust::Vec<::rust::String> events;
+
+    using IsRelocatable = ::std::true_type;
+};
+#endif // CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnect2Eip155
+
+#ifndef CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnect2EnsureSessionResult
+#define CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnect2EnsureSessionResult
+struct WalletConnect2EnsureSessionResult final {
+    ::com::crypto::game_sdk::WalletConnect2Eip155 eip155;
+
+    using IsRelocatable = ::std::true_type;
+};
+#endif // CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnect2EnsureSessionResult
 
 #ifndef CXXBRIDGE1_STRUCT_com$crypto$game_sdk$CryptoComPaymentResponse
 #define CXXBRIDGE1_STRUCT_com$crypto$game_sdk$CryptoComPaymentResponse
@@ -1339,6 +1373,50 @@ struct WalletconnectClient final : public ::rust::Opaque {
 };
 #endif // CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletconnectClient
 
+#ifndef CXXBRIDGE1_STRUCT_com$crypto$game_sdk$Walletconnect2Client
+#define CXXBRIDGE1_STRUCT_com$crypto$game_sdk$Walletconnect2Client
+struct Walletconnect2Client final : public ::rust::Opaque {
+    ::com::crypto::game_sdk::WalletConnect2EnsureSessionResult
+    ensure_session_blocking(::std::uint64_t waitmillis);
+    ::rust::String poll_events_blocking(::std::uint64_t waitmillis);
+    ::rust::String get_connection_string();
+    ::rust::String save_client();
+    ::rust::String print_uri();
+    ::rust::Vec<::std::uint8_t>
+    sign_personal_blocking(::rust::String message,
+                           ::std::array<::std::uint8_t, 20> address);
+    ::rust::String ping_blocking(::std::uint64_t waitmillis);
+    ::rust::Vec<::std::uint8_t> sign_eip155_transaction_blocking(
+        ::com::crypto::game_sdk::WalletConnectTxEip155 const &info,
+        ::std::array<::std::uint8_t, 20> address);
+    ::rust::Vec<::std::uint8_t> send_eip155_transaction_blocking(
+        ::com::crypto::game_sdk::WalletConnectTxEip155 const &info,
+        ::std::array<::std::uint8_t, 20> address);
+    ::rust::Vec<::std::uint8_t>
+    sign_transaction(::rust::String eip1559_transaction_request,
+                     ::std::array<::std::uint8_t, 20> address);
+    ::rust::Vec<::std::uint8_t>
+    send_transaction(::rust::String eip1559_transaction_request,
+                     ::std::array<::std::uint8_t, 20> address);
+    ::rust::Vec<::std::uint8_t> sign_contract_transaction(
+        ::rust::String contract_action,
+        ::com::crypto::game_sdk::WalletConnectTxCommon const &common,
+        ::std::array<::std::uint8_t, 20> address);
+    ::rust::Vec<::std::uint8_t> send_contract_transaction(
+        ::rust::String contract_action,
+        ::com::crypto::game_sdk::WalletConnectTxCommon const &common,
+        ::std::array<::std::uint8_t, 20> address);
+    ~Walletconnect2Client() = delete;
+
+  private:
+    friend ::rust::layout;
+    struct layout {
+        static ::std::size_t size() noexcept;
+        static ::std::size_t align() noexcept;
+    };
+};
+#endif // CXXBRIDGE1_STRUCT_com$crypto$game_sdk$Walletconnect2Client
+
 extern "C" {
 void com$crypto$game_sdk$cxxbridge1$WalletConnectCallback$onConnected(
     ::com::crypto::game_sdk::WalletConnectCallback const &self,
@@ -1511,6 +1589,10 @@ bool com$crypto$game_sdk$cxxbridge1$TokenHolderDetail$operator$eq(
 com$crypto$game_sdk$cxxbridge1$WalletconnectClient$operator$sizeof() noexcept;
 ::std::size_t
 com$crypto$game_sdk$cxxbridge1$WalletconnectClient$operator$alignof() noexcept;
+::std::size_t
+com$crypto$game_sdk$cxxbridge1$Walletconnect2Client$operator$sizeof() noexcept;
+::std::size_t
+com$crypto$game_sdk$cxxbridge1$Walletconnect2Client$operator$alignof() noexcept;
 
 ::rust::repr::PtrLen
 com$crypto$game_sdk$cxxbridge1$walletconnect_restore_client(
@@ -1518,11 +1600,23 @@ com$crypto$game_sdk$cxxbridge1$walletconnect_restore_client(
     ::rust::Box<::com::crypto::game_sdk::WalletconnectClient>
         *return$) noexcept;
 
+::rust::repr::PtrLen
+com$crypto$game_sdk$cxxbridge1$walletconnect2_restore_client(
+    ::rust::String *session_info,
+    ::rust::Box<::com::crypto::game_sdk::Walletconnect2Client>
+        *return$) noexcept;
+
 ::rust::repr::PtrLen com$crypto$game_sdk$cxxbridge1$walletconnect_new_client(
     ::rust::String *description, ::rust::String *url,
     ::rust::Vec<::rust::String> *icon_urls, ::rust::String *name,
     ::std::uint64_t chain_id,
     ::rust::Box<::com::crypto::game_sdk::WalletconnectClient>
+        *return$) noexcept;
+
+::rust::repr::PtrLen com$crypto$game_sdk$cxxbridge1$walletconnect2_client_new(
+    ::rust::String *relayserver, ::rust::String *project_id,
+    ::rust::String *required_namespaces, ::rust::String *client_meta,
+    ::rust::Box<::com::crypto::game_sdk::Walletconnect2Client>
         *return$) noexcept;
 
 ::rust::repr::PtrLen
@@ -1537,8 +1631,25 @@ com$crypto$game_sdk$cxxbridge1$WalletconnectClient$ensure_session_blocking(
         *return$) noexcept;
 
 ::rust::repr::PtrLen
+com$crypto$game_sdk$cxxbridge1$Walletconnect2Client$ensure_session_blocking(
+    ::com::crypto::game_sdk::Walletconnect2Client &self,
+    ::std::uint64_t waitmillis,
+    ::com::crypto::game_sdk::WalletConnect2EnsureSessionResult
+        *return$) noexcept;
+
+::rust::repr::PtrLen
+com$crypto$game_sdk$cxxbridge1$Walletconnect2Client$poll_events_blocking(
+    ::com::crypto::game_sdk::Walletconnect2Client &self,
+    ::std::uint64_t waitmillis, ::rust::String *return$) noexcept;
+
+::rust::repr::PtrLen
 com$crypto$game_sdk$cxxbridge1$WalletconnectClient$get_connection_string(
     ::com::crypto::game_sdk::WalletconnectClient &self,
+    ::rust::String *return$) noexcept;
+
+::rust::repr::PtrLen
+com$crypto$game_sdk$cxxbridge1$Walletconnect2Client$get_connection_string(
+    ::com::crypto::game_sdk::Walletconnect2Client &self,
     ::rust::String *return$) noexcept;
 
 ::rust::repr::PtrLen
@@ -1547,8 +1658,18 @@ com$crypto$game_sdk$cxxbridge1$WalletconnectClient$save_client(
     ::rust::String *return$) noexcept;
 
 ::rust::repr::PtrLen
+com$crypto$game_sdk$cxxbridge1$Walletconnect2Client$save_client(
+    ::com::crypto::game_sdk::Walletconnect2Client &self,
+    ::rust::String *return$) noexcept;
+
+::rust::repr::PtrLen
 com$crypto$game_sdk$cxxbridge1$WalletconnectClient$print_uri(
     ::com::crypto::game_sdk::WalletconnectClient &self,
+    ::rust::String *return$) noexcept;
+
+::rust::repr::PtrLen
+com$crypto$game_sdk$cxxbridge1$Walletconnect2Client$print_uri(
+    ::com::crypto::game_sdk::Walletconnect2Client &self,
     ::rust::String *return$) noexcept;
 
 ::rust::repr::PtrLen
@@ -1558,8 +1679,26 @@ com$crypto$game_sdk$cxxbridge1$WalletconnectClient$sign_personal_blocking(
     ::rust::Vec<::std::uint8_t> *return$) noexcept;
 
 ::rust::repr::PtrLen
+com$crypto$game_sdk$cxxbridge1$Walletconnect2Client$sign_personal_blocking(
+    ::com::crypto::game_sdk::Walletconnect2Client &self,
+    ::rust::String *message, ::std::array<::std::uint8_t, 20> *address,
+    ::rust::Vec<::std::uint8_t> *return$) noexcept;
+
+::rust::repr::PtrLen
+com$crypto$game_sdk$cxxbridge1$Walletconnect2Client$ping_blocking(
+    ::com::crypto::game_sdk::Walletconnect2Client &self,
+    ::std::uint64_t waitmillis, ::rust::String *return$) noexcept;
+
+::rust::repr::PtrLen
 com$crypto$game_sdk$cxxbridge1$WalletconnectClient$sign_eip155_transaction_blocking(
     ::com::crypto::game_sdk::WalletconnectClient &self,
+    ::com::crypto::game_sdk::WalletConnectTxEip155 const &info,
+    ::std::array<::std::uint8_t, 20> *address,
+    ::rust::Vec<::std::uint8_t> *return$) noexcept;
+
+::rust::repr::PtrLen
+com$crypto$game_sdk$cxxbridge1$Walletconnect2Client$sign_eip155_transaction_blocking(
+    ::com::crypto::game_sdk::Walletconnect2Client &self,
     ::com::crypto::game_sdk::WalletConnectTxEip155 const &info,
     ::std::array<::std::uint8_t, 20> *address,
     ::rust::Vec<::std::uint8_t> *return$) noexcept;
@@ -1572,6 +1711,13 @@ com$crypto$game_sdk$cxxbridge1$WalletconnectClient$send_eip155_transaction_block
     ::rust::Vec<::std::uint8_t> *return$) noexcept;
 
 ::rust::repr::PtrLen
+com$crypto$game_sdk$cxxbridge1$Walletconnect2Client$send_eip155_transaction_blocking(
+    ::com::crypto::game_sdk::Walletconnect2Client &self,
+    ::com::crypto::game_sdk::WalletConnectTxEip155 const &info,
+    ::std::array<::std::uint8_t, 20> *address,
+    ::rust::Vec<::std::uint8_t> *return$) noexcept;
+
+::rust::repr::PtrLen
 com$crypto$game_sdk$cxxbridge1$WalletconnectClient$sign_transaction(
     ::com::crypto::game_sdk::WalletconnectClient &self,
     ::rust::String *eip1559_transaction_request,
@@ -1579,8 +1725,22 @@ com$crypto$game_sdk$cxxbridge1$WalletconnectClient$sign_transaction(
     ::rust::Vec<::std::uint8_t> *return$) noexcept;
 
 ::rust::repr::PtrLen
+com$crypto$game_sdk$cxxbridge1$Walletconnect2Client$sign_transaction(
+    ::com::crypto::game_sdk::Walletconnect2Client &self,
+    ::rust::String *eip1559_transaction_request,
+    ::std::array<::std::uint8_t, 20> *address,
+    ::rust::Vec<::std::uint8_t> *return$) noexcept;
+
+::rust::repr::PtrLen
 com$crypto$game_sdk$cxxbridge1$WalletconnectClient$send_transaction(
     ::com::crypto::game_sdk::WalletconnectClient &self,
+    ::rust::String *eip1559_transaction_request,
+    ::std::array<::std::uint8_t, 20> *address,
+    ::rust::Vec<::std::uint8_t> *return$) noexcept;
+
+::rust::repr::PtrLen
+com$crypto$game_sdk$cxxbridge1$Walletconnect2Client$send_transaction(
+    ::com::crypto::game_sdk::Walletconnect2Client &self,
     ::rust::String *eip1559_transaction_request,
     ::std::array<::std::uint8_t, 20> *address,
     ::rust::Vec<::std::uint8_t> *return$) noexcept;
@@ -1594,8 +1754,24 @@ com$crypto$game_sdk$cxxbridge1$WalletconnectClient$sign_contract_transaction(
     ::rust::Vec<::std::uint8_t> *return$) noexcept;
 
 ::rust::repr::PtrLen
+com$crypto$game_sdk$cxxbridge1$Walletconnect2Client$sign_contract_transaction(
+    ::com::crypto::game_sdk::Walletconnect2Client &self,
+    ::rust::String *contract_action,
+    ::com::crypto::game_sdk::WalletConnectTxCommon const &common,
+    ::std::array<::std::uint8_t, 20> *address,
+    ::rust::Vec<::std::uint8_t> *return$) noexcept;
+
+::rust::repr::PtrLen
 com$crypto$game_sdk$cxxbridge1$WalletconnectClient$send_contract_transaction(
     ::com::crypto::game_sdk::WalletconnectClient &self,
+    ::rust::String *contract_action,
+    ::com::crypto::game_sdk::WalletConnectTxCommon const &common,
+    ::std::array<::std::uint8_t, 20> *address,
+    ::rust::Vec<::std::uint8_t> *return$) noexcept;
+
+::rust::repr::PtrLen
+com$crypto$game_sdk$cxxbridge1$Walletconnect2Client$send_contract_transaction(
+    ::com::crypto::game_sdk::Walletconnect2Client &self,
     ::rust::String *contract_action,
     ::com::crypto::game_sdk::WalletConnectTxCommon const &common,
     ::std::array<::std::uint8_t, 20> *address,
@@ -1821,6 +1997,14 @@ generate_qrcode(::rust::String qrcodestring) {
     return com$crypto$game_sdk$cxxbridge1$WalletconnectClient$operator$alignof();
 }
 
+::std::size_t Walletconnect2Client::layout::size() noexcept {
+    return com$crypto$game_sdk$cxxbridge1$Walletconnect2Client$operator$sizeof();
+}
+
+::std::size_t Walletconnect2Client::layout::align() noexcept {
+    return com$crypto$game_sdk$cxxbridge1$Walletconnect2Client$operator$alignof();
+}
+
 /// restore walletconnect-session from string
 ///
 ::rust::Box<::com::crypto::game_sdk::WalletconnectClient>
@@ -1830,6 +2014,20 @@ walletconnect_restore_client(::rust::String session_info) {
         return$;
     ::rust::repr::PtrLen error$ =
         com$crypto$game_sdk$cxxbridge1$walletconnect_restore_client(
+            &session_info, &return$.value);
+    if (error$.ptr) {
+        throw ::rust::impl<::rust::Error>::error(error$);
+    }
+    return ::std::move(return$.value);
+}
+
+::rust::Box<::com::crypto::game_sdk::Walletconnect2Client>
+walletconnect2_restore_client(::rust::String session_info) {
+    ::rust::MaybeUninit<
+        ::rust::Box<::com::crypto::game_sdk::Walletconnect2Client>>
+        return$;
+    ::rust::repr::PtrLen error$ =
+        com$crypto$game_sdk$cxxbridge1$walletconnect2_restore_client(
             &session_info, &return$.value);
     if (error$.ptr) {
         throw ::rust::impl<::rust::Error>::error(error$);
@@ -1852,6 +2050,23 @@ walletconnect_new_client(::rust::String description, ::rust::String url,
     ::rust::repr::PtrLen error$ =
         com$crypto$game_sdk$cxxbridge1$walletconnect_new_client(
             &description, &url, &icon_urls$.value, &name, chain_id,
+            &return$.value);
+    if (error$.ptr) {
+        throw ::rust::impl<::rust::Error>::error(error$);
+    }
+    return ::std::move(return$.value);
+}
+
+::rust::Box<::com::crypto::game_sdk::Walletconnect2Client>
+walletconnect2_client_new(::rust::String relayserver, ::rust::String project_id,
+                          ::rust::String required_namespaces,
+                          ::rust::String client_meta) {
+    ::rust::MaybeUninit<
+        ::rust::Box<::com::crypto::game_sdk::Walletconnect2Client>>
+        return$;
+    ::rust::repr::PtrLen error$ =
+        com$crypto$game_sdk$cxxbridge1$walletconnect2_client_new(
+            &relayserver, &project_id, &required_namespaces, &client_meta,
             &return$.value);
     if (error$.ptr) {
         throw ::rust::impl<::rust::Error>::error(error$);
@@ -1884,10 +2099,47 @@ WalletconnectClient::ensure_session_blocking() {
     return ::std::move(return$.value);
 }
 
+::com::crypto::game_sdk::WalletConnect2EnsureSessionResult
+Walletconnect2Client::ensure_session_blocking(::std::uint64_t waitmillis) {
+    ::rust::MaybeUninit<
+        ::com::crypto::game_sdk::WalletConnect2EnsureSessionResult>
+        return$;
+    ::rust::repr::PtrLen error$ =
+        com$crypto$game_sdk$cxxbridge1$Walletconnect2Client$ensure_session_blocking(
+            *this, waitmillis, &return$.value);
+    if (error$.ptr) {
+        throw ::rust::impl<::rust::Error>::error(error$);
+    }
+    return ::std::move(return$.value);
+}
+
+::rust::String
+Walletconnect2Client::poll_events_blocking(::std::uint64_t waitmillis) {
+    ::rust::MaybeUninit<::rust::String> return$;
+    ::rust::repr::PtrLen error$ =
+        com$crypto$game_sdk$cxxbridge1$Walletconnect2Client$poll_events_blocking(
+            *this, waitmillis, &return$.value);
+    if (error$.ptr) {
+        throw ::rust::impl<::rust::Error>::error(error$);
+    }
+    return ::std::move(return$.value);
+}
+
 ::rust::String WalletconnectClient::get_connection_string() {
     ::rust::MaybeUninit<::rust::String> return$;
     ::rust::repr::PtrLen error$ =
         com$crypto$game_sdk$cxxbridge1$WalletconnectClient$get_connection_string(
+            *this, &return$.value);
+    if (error$.ptr) {
+        throw ::rust::impl<::rust::Error>::error(error$);
+    }
+    return ::std::move(return$.value);
+}
+
+::rust::String Walletconnect2Client::get_connection_string() {
+    ::rust::MaybeUninit<::rust::String> return$;
+    ::rust::repr::PtrLen error$ =
+        com$crypto$game_sdk$cxxbridge1$Walletconnect2Client$get_connection_string(
             *this, &return$.value);
     if (error$.ptr) {
         throw ::rust::impl<::rust::Error>::error(error$);
@@ -1906,10 +2158,32 @@ WalletconnectClient::ensure_session_blocking() {
     return ::std::move(return$.value);
 }
 
+::rust::String Walletconnect2Client::save_client() {
+    ::rust::MaybeUninit<::rust::String> return$;
+    ::rust::repr::PtrLen error$ =
+        com$crypto$game_sdk$cxxbridge1$Walletconnect2Client$save_client(
+            *this, &return$.value);
+    if (error$.ptr) {
+        throw ::rust::impl<::rust::Error>::error(error$);
+    }
+    return ::std::move(return$.value);
+}
+
 ::rust::String WalletconnectClient::print_uri() {
     ::rust::MaybeUninit<::rust::String> return$;
     ::rust::repr::PtrLen error$ =
         com$crypto$game_sdk$cxxbridge1$WalletconnectClient$print_uri(
+            *this, &return$.value);
+    if (error$.ptr) {
+        throw ::rust::impl<::rust::Error>::error(error$);
+    }
+    return ::std::move(return$.value);
+}
+
+::rust::String Walletconnect2Client::print_uri() {
+    ::rust::MaybeUninit<::rust::String> return$;
+    ::rust::repr::PtrLen error$ =
+        com$crypto$game_sdk$cxxbridge1$Walletconnect2Client$print_uri(
             *this, &return$.value);
     if (error$.ptr) {
         throw ::rust::impl<::rust::Error>::error(error$);
@@ -1925,6 +2199,31 @@ WalletconnectClient::ensure_session_blocking() {
     ::rust::repr::PtrLen error$ =
         com$crypto$game_sdk$cxxbridge1$WalletconnectClient$sign_personal_blocking(
             *this, &message, &address$.value, &return$.value);
+    if (error$.ptr) {
+        throw ::rust::impl<::rust::Error>::error(error$);
+    }
+    return ::std::move(return$.value);
+}
+
+::rust::Vec<::std::uint8_t> Walletconnect2Client::sign_personal_blocking(
+    ::rust::String message, ::std::array<::std::uint8_t, 20> address) {
+    ::rust::ManuallyDrop<::std::array<::std::uint8_t, 20>> address$(
+        ::std::move(address));
+    ::rust::MaybeUninit<::rust::Vec<::std::uint8_t>> return$;
+    ::rust::repr::PtrLen error$ =
+        com$crypto$game_sdk$cxxbridge1$Walletconnect2Client$sign_personal_blocking(
+            *this, &message, &address$.value, &return$.value);
+    if (error$.ptr) {
+        throw ::rust::impl<::rust::Error>::error(error$);
+    }
+    return ::std::move(return$.value);
+}
+
+::rust::String Walletconnect2Client::ping_blocking(::std::uint64_t waitmillis) {
+    ::rust::MaybeUninit<::rust::String> return$;
+    ::rust::repr::PtrLen error$ =
+        com$crypto$game_sdk$cxxbridge1$Walletconnect2Client$ping_blocking(
+            *this, waitmillis, &return$.value);
     if (error$.ptr) {
         throw ::rust::impl<::rust::Error>::error(error$);
     }
@@ -1948,6 +2247,22 @@ WalletconnectClient::sign_eip155_transaction_blocking(
 }
 
 ::rust::Vec<::std::uint8_t>
+Walletconnect2Client::sign_eip155_transaction_blocking(
+    ::com::crypto::game_sdk::WalletConnectTxEip155 const &info,
+    ::std::array<::std::uint8_t, 20> address) {
+    ::rust::ManuallyDrop<::std::array<::std::uint8_t, 20>> address$(
+        ::std::move(address));
+    ::rust::MaybeUninit<::rust::Vec<::std::uint8_t>> return$;
+    ::rust::repr::PtrLen error$ =
+        com$crypto$game_sdk$cxxbridge1$Walletconnect2Client$sign_eip155_transaction_blocking(
+            *this, info, &address$.value, &return$.value);
+    if (error$.ptr) {
+        throw ::rust::impl<::rust::Error>::error(error$);
+    }
+    return ::std::move(return$.value);
+}
+
+::rust::Vec<::std::uint8_t>
 WalletconnectClient::send_eip155_transaction_blocking(
     ::com::crypto::game_sdk::WalletConnectTxEip155 const &info,
     ::std::array<::std::uint8_t, 20> address) {
@@ -1963,6 +2278,22 @@ WalletconnectClient::send_eip155_transaction_blocking(
     return ::std::move(return$.value);
 }
 
+::rust::Vec<::std::uint8_t>
+Walletconnect2Client::send_eip155_transaction_blocking(
+    ::com::crypto::game_sdk::WalletConnectTxEip155 const &info,
+    ::std::array<::std::uint8_t, 20> address) {
+    ::rust::ManuallyDrop<::std::array<::std::uint8_t, 20>> address$(
+        ::std::move(address));
+    ::rust::MaybeUninit<::rust::Vec<::std::uint8_t>> return$;
+    ::rust::repr::PtrLen error$ =
+        com$crypto$game_sdk$cxxbridge1$Walletconnect2Client$send_eip155_transaction_blocking(
+            *this, info, &address$.value, &return$.value);
+    if (error$.ptr) {
+        throw ::rust::impl<::rust::Error>::error(error$);
+    }
+    return ::std::move(return$.value);
+}
+
 ::rust::Vec<::std::uint8_t> WalletconnectClient::sign_transaction(
     ::rust::String eip1559_transaction_request,
     ::std::array<::std::uint8_t, 20> address) {
@@ -1971,6 +2302,22 @@ WalletconnectClient::send_eip155_transaction_blocking(
     ::rust::MaybeUninit<::rust::Vec<::std::uint8_t>> return$;
     ::rust::repr::PtrLen error$ =
         com$crypto$game_sdk$cxxbridge1$WalletconnectClient$sign_transaction(
+            *this, &eip1559_transaction_request, &address$.value,
+            &return$.value);
+    if (error$.ptr) {
+        throw ::rust::impl<::rust::Error>::error(error$);
+    }
+    return ::std::move(return$.value);
+}
+
+::rust::Vec<::std::uint8_t> Walletconnect2Client::sign_transaction(
+    ::rust::String eip1559_transaction_request,
+    ::std::array<::std::uint8_t, 20> address) {
+    ::rust::ManuallyDrop<::std::array<::std::uint8_t, 20>> address$(
+        ::std::move(address));
+    ::rust::MaybeUninit<::rust::Vec<::std::uint8_t>> return$;
+    ::rust::repr::PtrLen error$ =
+        com$crypto$game_sdk$cxxbridge1$Walletconnect2Client$sign_transaction(
             *this, &eip1559_transaction_request, &address$.value,
             &return$.value);
     if (error$.ptr) {
@@ -1995,6 +2342,22 @@ WalletconnectClient::send_eip155_transaction_blocking(
     return ::std::move(return$.value);
 }
 
+::rust::Vec<::std::uint8_t> Walletconnect2Client::send_transaction(
+    ::rust::String eip1559_transaction_request,
+    ::std::array<::std::uint8_t, 20> address) {
+    ::rust::ManuallyDrop<::std::array<::std::uint8_t, 20>> address$(
+        ::std::move(address));
+    ::rust::MaybeUninit<::rust::Vec<::std::uint8_t>> return$;
+    ::rust::repr::PtrLen error$ =
+        com$crypto$game_sdk$cxxbridge1$Walletconnect2Client$send_transaction(
+            *this, &eip1559_transaction_request, &address$.value,
+            &return$.value);
+    if (error$.ptr) {
+        throw ::rust::impl<::rust::Error>::error(error$);
+    }
+    return ::std::move(return$.value);
+}
+
 ::rust::Vec<::std::uint8_t> WalletconnectClient::sign_contract_transaction(
     ::rust::String contract_action,
     ::com::crypto::game_sdk::WalletConnectTxCommon const &common,
@@ -2011,6 +2374,22 @@ WalletconnectClient::send_eip155_transaction_blocking(
     return ::std::move(return$.value);
 }
 
+::rust::Vec<::std::uint8_t> Walletconnect2Client::sign_contract_transaction(
+    ::rust::String contract_action,
+    ::com::crypto::game_sdk::WalletConnectTxCommon const &common,
+    ::std::array<::std::uint8_t, 20> address) {
+    ::rust::ManuallyDrop<::std::array<::std::uint8_t, 20>> address$(
+        ::std::move(address));
+    ::rust::MaybeUninit<::rust::Vec<::std::uint8_t>> return$;
+    ::rust::repr::PtrLen error$ =
+        com$crypto$game_sdk$cxxbridge1$Walletconnect2Client$sign_contract_transaction(
+            *this, &contract_action, common, &address$.value, &return$.value);
+    if (error$.ptr) {
+        throw ::rust::impl<::rust::Error>::error(error$);
+    }
+    return ::std::move(return$.value);
+}
+
 ::rust::Vec<::std::uint8_t> WalletconnectClient::send_contract_transaction(
     ::rust::String contract_action,
     ::com::crypto::game_sdk::WalletConnectTxCommon const &common,
@@ -2020,6 +2399,22 @@ WalletconnectClient::send_eip155_transaction_blocking(
     ::rust::MaybeUninit<::rust::Vec<::std::uint8_t>> return$;
     ::rust::repr::PtrLen error$ =
         com$crypto$game_sdk$cxxbridge1$WalletconnectClient$send_contract_transaction(
+            *this, &contract_action, common, &address$.value, &return$.value);
+    if (error$.ptr) {
+        throw ::rust::impl<::rust::Error>::error(error$);
+    }
+    return ::std::move(return$.value);
+}
+
+::rust::Vec<::std::uint8_t> Walletconnect2Client::send_contract_transaction(
+    ::rust::String contract_action,
+    ::com::crypto::game_sdk::WalletConnectTxCommon const &common,
+    ::std::array<::std::uint8_t, 20> address) {
+    ::rust::ManuallyDrop<::std::array<::std::uint8_t, 20>> address$(
+        ::std::move(address));
+    ::rust::MaybeUninit<::rust::Vec<::std::uint8_t>> return$;
+    ::rust::repr::PtrLen error$ =
+        com$crypto$game_sdk$cxxbridge1$Walletconnect2Client$send_contract_transaction(
             *this, &contract_action, common, &address$.value, &return$.value);
     if (error$.ptr) {
         throw ::rust::impl<::rust::Error>::error(error$);
@@ -2264,6 +2659,34 @@ void cxxbridge1$rust_vec$com$crypto$game_sdk$WalletConnectAddress$truncate(
     ::rust::Vec<::com::crypto::game_sdk::WalletConnectAddress> *ptr,
     ::std::size_t len) noexcept;
 
+void cxxbridge1$rust_vec$com$crypto$game_sdk$WalletConnect2Eip155Accounts$new(
+    ::rust::Vec<::com::crypto::game_sdk::WalletConnect2Eip155Accounts> const
+        *ptr) noexcept;
+void cxxbridge1$rust_vec$com$crypto$game_sdk$WalletConnect2Eip155Accounts$drop(
+    ::rust::Vec<::com::crypto::game_sdk::WalletConnect2Eip155Accounts>
+        *ptr) noexcept;
+::std::size_t
+cxxbridge1$rust_vec$com$crypto$game_sdk$WalletConnect2Eip155Accounts$len(
+    ::rust::Vec<::com::crypto::game_sdk::WalletConnect2Eip155Accounts> const
+        *ptr) noexcept;
+::std::size_t
+cxxbridge1$rust_vec$com$crypto$game_sdk$WalletConnect2Eip155Accounts$capacity(
+    ::rust::Vec<::com::crypto::game_sdk::WalletConnect2Eip155Accounts> const
+        *ptr) noexcept;
+::com::crypto::game_sdk::WalletConnect2Eip155Accounts const *
+cxxbridge1$rust_vec$com$crypto$game_sdk$WalletConnect2Eip155Accounts$data(
+    ::rust::Vec<::com::crypto::game_sdk::WalletConnect2Eip155Accounts> const
+        *ptr) noexcept;
+void cxxbridge1$rust_vec$com$crypto$game_sdk$WalletConnect2Eip155Accounts$reserve_total(
+    ::rust::Vec<::com::crypto::game_sdk::WalletConnect2Eip155Accounts> *ptr,
+    ::std::size_t new_cap) noexcept;
+void cxxbridge1$rust_vec$com$crypto$game_sdk$WalletConnect2Eip155Accounts$set_len(
+    ::rust::Vec<::com::crypto::game_sdk::WalletConnect2Eip155Accounts> *ptr,
+    ::std::size_t len) noexcept;
+void cxxbridge1$rust_vec$com$crypto$game_sdk$WalletConnect2Eip155Accounts$truncate(
+    ::rust::Vec<::com::crypto::game_sdk::WalletConnect2Eip155Accounts> *ptr,
+    ::std::size_t len) noexcept;
+
 void cxxbridge1$rust_vec$com$crypto$game_sdk$WalletEntry$new(
     ::rust::Vec<::com::crypto::game_sdk::WalletEntry> const *ptr) noexcept;
 void cxxbridge1$rust_vec$com$crypto$game_sdk$WalletEntry$drop(
@@ -2291,6 +2714,13 @@ void cxxbridge1$box$com$crypto$game_sdk$WalletconnectClient$dealloc(
     ::com::crypto::game_sdk::WalletconnectClient *) noexcept;
 void cxxbridge1$box$com$crypto$game_sdk$WalletconnectClient$drop(
     ::rust::Box<::com::crypto::game_sdk::WalletconnectClient> *ptr) noexcept;
+
+::com::crypto::game_sdk::Walletconnect2Client *
+cxxbridge1$box$com$crypto$game_sdk$Walletconnect2Client$alloc() noexcept;
+void cxxbridge1$box$com$crypto$game_sdk$Walletconnect2Client$dealloc(
+    ::com::crypto::game_sdk::Walletconnect2Client *) noexcept;
+void cxxbridge1$box$com$crypto$game_sdk$Walletconnect2Client$drop(
+    ::rust::Box<::com::crypto::game_sdk::Walletconnect2Client> *ptr) noexcept;
 
 static_assert(::rust::detail::is_complete<
                   ::com::crypto::game_sdk::WalletConnectCallback>::value,
@@ -2450,6 +2880,55 @@ void Vec<::com::crypto::game_sdk::WalletConnectAddress>::truncate(
     return cxxbridge1$rust_vec$com$crypto$game_sdk$WalletConnectAddress$truncate(
         this, len);
 }
+template <>
+Vec<::com::crypto::game_sdk::WalletConnect2Eip155Accounts>::Vec() noexcept {
+    cxxbridge1$rust_vec$com$crypto$game_sdk$WalletConnect2Eip155Accounts$new(
+        this);
+}
+template <>
+void Vec<
+    ::com::crypto::game_sdk::WalletConnect2Eip155Accounts>::drop() noexcept {
+    return cxxbridge1$rust_vec$com$crypto$game_sdk$WalletConnect2Eip155Accounts$drop(
+        this);
+}
+template <>
+::std::size_t Vec<::com::crypto::game_sdk::WalletConnect2Eip155Accounts>::size()
+    const noexcept {
+    return cxxbridge1$rust_vec$com$crypto$game_sdk$WalletConnect2Eip155Accounts$len(
+        this);
+}
+template <>
+::std::size_t
+Vec<::com::crypto::game_sdk::WalletConnect2Eip155Accounts>::capacity()
+    const noexcept {
+    return cxxbridge1$rust_vec$com$crypto$game_sdk$WalletConnect2Eip155Accounts$capacity(
+        this);
+}
+template <>
+::com::crypto::game_sdk::WalletConnect2Eip155Accounts const *
+Vec<::com::crypto::game_sdk::WalletConnect2Eip155Accounts>::data()
+    const noexcept {
+    return cxxbridge1$rust_vec$com$crypto$game_sdk$WalletConnect2Eip155Accounts$data(
+        this);
+}
+template <>
+void Vec<::com::crypto::game_sdk::WalletConnect2Eip155Accounts>::reserve_total(
+    ::std::size_t new_cap) noexcept {
+    return cxxbridge1$rust_vec$com$crypto$game_sdk$WalletConnect2Eip155Accounts$reserve_total(
+        this, new_cap);
+}
+template <>
+void Vec<::com::crypto::game_sdk::WalletConnect2Eip155Accounts>::set_len(
+    ::std::size_t len) noexcept {
+    return cxxbridge1$rust_vec$com$crypto$game_sdk$WalletConnect2Eip155Accounts$set_len(
+        this, len);
+}
+template <>
+void Vec<::com::crypto::game_sdk::WalletConnect2Eip155Accounts>::truncate(
+    ::std::size_t len) {
+    return cxxbridge1$rust_vec$com$crypto$game_sdk$WalletConnect2Eip155Accounts$truncate(
+        this, len);
+}
 template <> Vec<::com::crypto::game_sdk::WalletEntry>::Vec() noexcept {
     cxxbridge1$rust_vec$com$crypto$game_sdk$WalletEntry$new(this);
 }
@@ -2501,6 +2980,21 @@ void Box<::com::crypto::game_sdk::WalletconnectClient>::allocation::dealloc(
 template <>
 void Box<::com::crypto::game_sdk::WalletconnectClient>::drop() noexcept {
     cxxbridge1$box$com$crypto$game_sdk$WalletconnectClient$drop(this);
+}
+template <>
+::com::crypto::game_sdk::Walletconnect2Client *
+Box<::com::crypto::game_sdk::Walletconnect2Client>::allocation::
+    alloc() noexcept {
+    return cxxbridge1$box$com$crypto$game_sdk$Walletconnect2Client$alloc();
+}
+template <>
+void Box<::com::crypto::game_sdk::Walletconnect2Client>::allocation::dealloc(
+    ::com::crypto::game_sdk::Walletconnect2Client *ptr) noexcept {
+    cxxbridge1$box$com$crypto$game_sdk$Walletconnect2Client$dealloc(ptr);
+}
+template <>
+void Box<::com::crypto::game_sdk::Walletconnect2Client>::drop() noexcept {
+    cxxbridge1$box$com$crypto$game_sdk$Walletconnect2Client$drop(this);
 }
 template <> Vec<::com::crypto::game_sdk::RawTxDetail>::Vec() noexcept {
     cxxbridge1$rust_vec$com$crypto$game_sdk$RawTxDetail$new(this);

@@ -1289,6 +1289,22 @@ build_eth_signed_tx(::org::defi_wallet_core::EthTxInfoRaw tx_info,
 /// sent from it.
 ::rust::String get_eth_nonce(::rust::Str address, ::rust::Str api_url);
 
+::rust::String get_block_number_blocking(::rust::String api_url);
+
+::rust::String
+get_eth_transaction_receipt_blocking(::rust::Vec<::std::uint8_t> tx_hash,
+                                     ::rust::String api_url);
+
+::rust::String get_eth_transaction_receipt_blocking(::rust::String tx_hash,
+                                                    ::rust::String api_url);
+
+::rust::String
+wait_for_transaction_receipt_blocking(::rust::Vec<::std::uint8_t> tx_hash,
+                                      ::rust::String api_url);
+
+::rust::String wait_for_transaction_receipt_blocking(::rust::String tx_hash,
+                                                     ::rust::String api_url);
+
 /// broadcast signed cronos tx
 ///
 ::org::defi_wallet_core::CronosTransactionReceiptRaw
