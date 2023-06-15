@@ -868,9 +868,7 @@ template <typename T> std::size_t align_of() { return layout::align_of<T>(); }
 #ifndef CXXBRIDGE1_RELOCATABLE
 #define CXXBRIDGE1_RELOCATABLE
 namespace detail {
-template <typename... Ts> struct make_void {
-    using type = void;
-};
+template <typename... Ts> struct make_void { using type = void; };
 
 template <typename... Ts> using void_t = typename make_void<Ts...>::type;
 
@@ -1420,6 +1418,29 @@ void org$defi_wallet_core$cxxbridge1$new_eth_tx_info(
 
 ::rust::repr::PtrLen org$defi_wallet_core$cxxbridge1$get_eth_nonce(
     ::rust::Str address, ::rust::Str api_url, ::rust::String *return$) noexcept;
+
+::rust::repr::PtrLen org$defi_wallet_core$cxxbridge1$get_block_number_blocking(
+    ::rust::String *api_url, ::rust::String *return$) noexcept;
+
+::rust::repr::PtrLen
+org$defi_wallet_core$cxxbridge1$get_eth_transaction_receipt_by_vec_blocking(
+    ::rust::Vec<::std::uint8_t> *tx_hash, ::rust::String *api_url,
+    ::rust::String *return$) noexcept;
+
+::rust::repr::PtrLen
+org$defi_wallet_core$cxxbridge1$get_eth_transaction_receipt_by_string_blocking(
+    ::rust::String *tx_hash, ::rust::String *api_url,
+    ::rust::String *return$) noexcept;
+
+::rust::repr::PtrLen
+org$defi_wallet_core$cxxbridge1$wait_for_transaction_receipt_by_vec_blocking(
+    ::rust::Vec<::std::uint8_t> *tx_hash, ::rust::String *api_url,
+    ::rust::String *return$) noexcept;
+
+::rust::repr::PtrLen
+org$defi_wallet_core$cxxbridge1$wait_for_transaction_receipt_by_string_blocking(
+    ::rust::String *tx_hash, ::rust::String *api_url,
+    ::rust::String *return$) noexcept;
 
 ::rust::repr::PtrLen
 org$defi_wallet_core$cxxbridge1$broadcast_eth_signed_raw_tx(
@@ -1978,6 +1999,71 @@ build_eth_signed_tx(::org::defi_wallet_core::EthTxInfoRaw tx_info,
     ::rust::MaybeUninit<::rust::String> return$;
     ::rust::repr::PtrLen error$ = org$defi_wallet_core$cxxbridge1$get_eth_nonce(
         address, api_url, &return$.value);
+    if (error$.ptr) {
+        throw ::rust::impl<::rust::Error>::error(error$);
+    }
+    return ::std::move(return$.value);
+}
+
+::rust::String get_block_number_blocking(::rust::String api_url) {
+    ::rust::MaybeUninit<::rust::String> return$;
+    ::rust::repr::PtrLen error$ =
+        org$defi_wallet_core$cxxbridge1$get_block_number_blocking(
+            &api_url, &return$.value);
+    if (error$.ptr) {
+        throw ::rust::impl<::rust::Error>::error(error$);
+    }
+    return ::std::move(return$.value);
+}
+
+::rust::String
+get_eth_transaction_receipt_blocking(::rust::Vec<::std::uint8_t> tx_hash,
+                                     ::rust::String api_url) {
+    ::rust::ManuallyDrop<::rust::Vec<::std::uint8_t>> tx_hash$(
+        ::std::move(tx_hash));
+    ::rust::MaybeUninit<::rust::String> return$;
+    ::rust::repr::PtrLen error$ =
+        org$defi_wallet_core$cxxbridge1$get_eth_transaction_receipt_by_vec_blocking(
+            &tx_hash$.value, &api_url, &return$.value);
+    if (error$.ptr) {
+        throw ::rust::impl<::rust::Error>::error(error$);
+    }
+    return ::std::move(return$.value);
+}
+
+::rust::String get_eth_transaction_receipt_blocking(::rust::String tx_hash,
+                                                    ::rust::String api_url) {
+    ::rust::MaybeUninit<::rust::String> return$;
+    ::rust::repr::PtrLen error$ =
+        org$defi_wallet_core$cxxbridge1$get_eth_transaction_receipt_by_string_blocking(
+            &tx_hash, &api_url, &return$.value);
+    if (error$.ptr) {
+        throw ::rust::impl<::rust::Error>::error(error$);
+    }
+    return ::std::move(return$.value);
+}
+
+::rust::String
+wait_for_transaction_receipt_blocking(::rust::Vec<::std::uint8_t> tx_hash,
+                                      ::rust::String api_url) {
+    ::rust::ManuallyDrop<::rust::Vec<::std::uint8_t>> tx_hash$(
+        ::std::move(tx_hash));
+    ::rust::MaybeUninit<::rust::String> return$;
+    ::rust::repr::PtrLen error$ =
+        org$defi_wallet_core$cxxbridge1$wait_for_transaction_receipt_by_vec_blocking(
+            &tx_hash$.value, &api_url, &return$.value);
+    if (error$.ptr) {
+        throw ::rust::impl<::rust::Error>::error(error$);
+    }
+    return ::std::move(return$.value);
+}
+
+::rust::String wait_for_transaction_receipt_blocking(::rust::String tx_hash,
+                                                     ::rust::String api_url) {
+    ::rust::MaybeUninit<::rust::String> return$;
+    ::rust::repr::PtrLen error$ =
+        org$defi_wallet_core$cxxbridge1$wait_for_transaction_receipt_by_string_blocking(
+            &tx_hash, &api_url, &return$.value);
     if (error$.ptr) {
         throw ::rust::impl<::rust::Error>::error(error$);
     }

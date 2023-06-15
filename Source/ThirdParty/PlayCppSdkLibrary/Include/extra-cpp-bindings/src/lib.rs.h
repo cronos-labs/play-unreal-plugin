@@ -864,12 +864,16 @@ struct WalletConnectTxCommon;
 struct WalletConnectTxEip155;
 struct WalletConnectAddress;
 struct WalletConnectEnsureSessionResult;
+struct WalletConnect2Eip155Accounts;
+struct WalletConnect2Eip155;
+struct WalletConnect2EnsureSessionResult;
 struct CryptoComPaymentResponse;
 struct RawTxDetail;
 struct RawTokenResult;
 struct TokenHolderDetail;
 enum class QueryOption : ::std::uint8_t;
 struct WalletconnectClient;
+struct Walletconnect2Client;
 using OptionalArguments = ::com::crypto::game_sdk::OptionalArguments;
 } // namespace game_sdk
 } // namespace crypto
@@ -1021,6 +1025,36 @@ struct WalletConnectEnsureSessionResult final {
     using IsRelocatable = ::std::true_type;
 };
 #endif // CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnectEnsureSessionResult
+
+#ifndef CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnect2Eip155Accounts
+#define CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnect2Eip155Accounts
+struct WalletConnect2Eip155Accounts final {
+    ::com::crypto::game_sdk::WalletConnectAddress address;
+    ::std::uint64_t chain_id;
+
+    using IsRelocatable = ::std::true_type;
+};
+#endif // CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnect2Eip155Accounts
+
+#ifndef CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnect2Eip155
+#define CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnect2Eip155
+struct WalletConnect2Eip155 final {
+    ::rust::Vec<::com::crypto::game_sdk::WalletConnect2Eip155Accounts> accounts;
+    ::rust::Vec<::rust::String> methods;
+    ::rust::Vec<::rust::String> events;
+
+    using IsRelocatable = ::std::true_type;
+};
+#endif // CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnect2Eip155
+
+#ifndef CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnect2EnsureSessionResult
+#define CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnect2EnsureSessionResult
+struct WalletConnect2EnsureSessionResult final {
+    ::com::crypto::game_sdk::WalletConnect2Eip155 eip155;
+
+    using IsRelocatable = ::std::true_type;
+};
+#endif // CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletConnect2EnsureSessionResult
 
 #ifndef CXXBRIDGE1_STRUCT_com$crypto$game_sdk$CryptoComPaymentResponse
 #define CXXBRIDGE1_STRUCT_com$crypto$game_sdk$CryptoComPaymentResponse
@@ -1253,6 +1287,50 @@ struct WalletconnectClient final : public ::rust::Opaque {
 };
 #endif // CXXBRIDGE1_STRUCT_com$crypto$game_sdk$WalletconnectClient
 
+#ifndef CXXBRIDGE1_STRUCT_com$crypto$game_sdk$Walletconnect2Client
+#define CXXBRIDGE1_STRUCT_com$crypto$game_sdk$Walletconnect2Client
+struct Walletconnect2Client final : public ::rust::Opaque {
+    ::com::crypto::game_sdk::WalletConnect2EnsureSessionResult
+    ensure_session_blocking(::std::uint64_t waitmillis);
+    ::rust::String poll_events_blocking(::std::uint64_t waitmillis);
+    ::rust::String get_connection_string();
+    ::rust::String save_client();
+    ::rust::String print_uri();
+    ::rust::Vec<::std::uint8_t>
+    sign_personal_blocking(::rust::String message,
+                           ::std::array<::std::uint8_t, 20> address);
+    ::rust::String ping_blocking(::std::uint64_t waitmillis);
+    ::rust::Vec<::std::uint8_t> sign_eip155_transaction_blocking(
+        ::com::crypto::game_sdk::WalletConnectTxEip155 const &info,
+        ::std::array<::std::uint8_t, 20> address);
+    ::rust::Vec<::std::uint8_t> send_eip155_transaction_blocking(
+        ::com::crypto::game_sdk::WalletConnectTxEip155 const &info,
+        ::std::array<::std::uint8_t, 20> address);
+    ::rust::Vec<::std::uint8_t>
+    sign_transaction(::rust::String eip1559_transaction_request,
+                     ::std::array<::std::uint8_t, 20> address);
+    ::rust::Vec<::std::uint8_t>
+    send_transaction(::rust::String eip1559_transaction_request,
+                     ::std::array<::std::uint8_t, 20> address);
+    ::rust::Vec<::std::uint8_t> sign_contract_transaction(
+        ::rust::String contract_action,
+        ::com::crypto::game_sdk::WalletConnectTxCommon const &common,
+        ::std::array<::std::uint8_t, 20> address);
+    ::rust::Vec<::std::uint8_t> send_contract_transaction(
+        ::rust::String contract_action,
+        ::com::crypto::game_sdk::WalletConnectTxCommon const &common,
+        ::std::array<::std::uint8_t, 20> address);
+    ~Walletconnect2Client() = delete;
+
+  private:
+    friend ::rust::layout;
+    struct layout {
+        static ::std::size_t size() noexcept;
+        static ::std::size_t align() noexcept;
+    };
+};
+#endif // CXXBRIDGE1_STRUCT_com$crypto$game_sdk$Walletconnect2Client
+
 /// filter wallets by platform
 /// (`registry_local_path` can be empty string if it is not needed to store the
 /// `cached` registry result)
@@ -1289,6 +1367,9 @@ generate_qrcode(::rust::String qrcodestring);
 ::rust::Box<::com::crypto::game_sdk::WalletconnectClient>
 walletconnect_restore_client(::rust::String session_info);
 
+::rust::Box<::com::crypto::game_sdk::Walletconnect2Client>
+walletconnect2_restore_client(::rust::String session_info);
+
 /// create walletconnect-session
 /// the chain id (if 0, retrived and decided by wallet, if > 0, decided by the
 /// client)
@@ -1296,6 +1377,11 @@ walletconnect_restore_client(::rust::String session_info);
 walletconnect_new_client(::rust::String description, ::rust::String url,
                          ::rust::Vec<::rust::String> icon_urls,
                          ::rust::String name, ::std::uint64_t chain_id);
+
+::rust::Box<::com::crypto::game_sdk::Walletconnect2Client>
+walletconnect2_client_new(::rust::String relayserver, ::rust::String project_id,
+                          ::rust::String required_namespaces,
+                          ::rust::String client_meta);
 
 /// returns the transactions of a given address.
 /// The API key can be obtained from https://cronoscan.com
