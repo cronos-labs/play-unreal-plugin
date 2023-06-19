@@ -2,16 +2,7 @@
 
 /**
  * wallet-connect apis
- * how callback works for c++ events
-  dynamic delegate is used for blueprint callback.
-  (delegate, multicast delegate, event is for c++ only)
-  when c++ callback is called, it calls sendEvent to trigger the delegate.
-  ue4 async task is used for calling delegation.
-
-  DECLARE_DYNAMIC_DELEGATE_OneParam(FWalletconnectSessionInfoDelegate, <-
-  delegation name FWalletConnectSessionInfo, <- 1st parameter type SessionInfo);
-  <- 1st parameter name
-
+ *
  */
 
 #pragma once
@@ -89,9 +80,9 @@ struct FWalletConnectSessionInfo {
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayCppSdk")
     FString handshake_topic;
 };
-/// wallet connect callback
-DECLARE_DYNAMIC_DELEGATE_OneParam(FWalletconnectSessionInfoDelegate,
-                                  FWalletConnectSessionInfo, SessionInfo);
+
+DECLARE_DYNAMIC_DELEGATE_TwoParams(FWalletconnectPollingDelegate, FString,
+                                   jsonevent, FString, result);
 
 /// wallet connect address, 20 bytes
 USTRUCT(BlueprintType)
@@ -215,8 +206,11 @@ UCLASS()
 class CRONOSPLAYUNREAL_API APlayCppSdkActor : public AActor {
     GENERATED_BODY()
 
-  private:
-    static ::com::crypto::game_sdk::WalletconnectClient *_coreClient;
+  public:
+    bool _pollingEvents;
+    bool _removeClient;
+
+    ::com::crypto::game_sdk::Walletconnect2Client *_coreClient;
 
     // Internal session info, it will be updated every time walletconnect status
     // changes
@@ -252,24 +246,18 @@ class CRONOSPLAYUNREAL_API APlayCppSdkActor : public AActor {
     /**
      * Used for `ConnectWalletConnect`
      */
-    FString _description;
-    FString _url;
-    TArray<FString> _icon_urls;
-    FString _name;
-    int64 _chain_id;
-    EConnectionType _connection_type = EConnectionType::URI_STRING;
+    FString _relayserver;
+    FString _projectid;
+    FString _walletnamespace;
+    FString _clientmeta;
 
-    /**
-     * SetupCallback delegate, called after calling `SetupCallback` internally,
-     * it does not expose to blueprint
-     */
-    FWalletconnectSessionInfoDelegate OnSetupCallbackDelegate;
+    EConnectionType _connection_type = EConnectionType::URI_STRING;
 
   public:
     // Sets default values for this actor's properties
     APlayCppSdkActor();
 
-    ::com::crypto::game_sdk::WalletconnectClient *GetClient() const {
+    ::com::crypto::game_sdk::Walletconnect2Client *GetClient() const {
         return _coreClient;
     };
 
@@ -342,9 +330,12 @@ class CRONOSPLAYUNREAL_API APlayCppSdkActor : public AActor {
               meta = (DisplayName = "ConnectWalletConnect",
                       Keywords = "PlayCppSdk"),
               Category = "PlayCppSdk")
-    void ConnectWalletConnect(FString description, FString url,
-                              TArray<FString> icon_urls, FString name,
-                              int64 chain_id, EConnectionType connection_type);
+    void ConnectWalletConnect(
+
+        FString relayserver, FString projectid, FString walletnamespace,
+        FString clientmeta,
+
+        EConnectionType connection_type);
 
     /**
      * intialize wallet-connect client
@@ -358,9 +349,9 @@ class CRONOSPLAYUNREAL_API APlayCppSdkActor : public AActor {
               meta = (DisplayName = "InitializeWalletConnect",
                       Keywords = "PlayCppSdk"),
               Category = "PlayCppSdk")
-    void InitializeWalletConnect(FString description, FString url,
-                                 TArray<FString> icon_urls, FString name,
-                                 int64 chain_id,
+    void InitializeWalletConnect(FString relayserver, FString projectid,
+                                 FString walletnamespace, FString clientmeta,
+
                                  FInitializeWalletConnectDelegate Out);
 
     UFUNCTION()
@@ -378,6 +369,10 @@ class CRONOSPLAYUNREAL_API APlayCppSdkActor : public AActor {
     UFUNCTION()
     void OnNewSession(FWalletConnectEnsureSessionResult SessionResult,
                       FString Result);
+
+    UFUNCTION()
+    void OnReceiveWalletconnectPolling(FString jsonevent, FString result);
+
     /**
      * On NewSessionReady delegate, called if session is created
      */
@@ -394,6 +389,33 @@ class CRONOSPLAYUNREAL_API APlayCppSdkActor : public AActor {
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayCppSdk")
     FOnRestoreSessionReady OnRestoreSessionReady;
 
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayCppSdk")
+    FWalletconnectPollingDelegate OnReceiveWalletconnectPollingDelegate;
+
+    /**
+     * Enable polling events
+     */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayCppSdk")
+    bool PollingEventsEnabled;
+
+    /**
+     * Include chainid in signing,sending tx
+     *
+     */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayCppSdk")
+    bool EnableEipTx155Tx; // include chainid in tx
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayCppSdk")
+    int64
+        EnsureSessionTimeoutMilliSeconds; // in milli seconds, 1 seconds = 1000
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayCppSdk")
+    int64 PollingEventsIntervalInMilliseconds; // in milli seconds, 1 seconds =
+                                               // 1000
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayCppSdk")
+    float DestroyClientWaitSeconds; // in seconds
+
     /**
      * Clear Session
      * @param success whether clearing session succeed or not
@@ -404,25 +426,13 @@ class CRONOSPLAYUNREAL_API APlayCppSdkActor : public AActor {
     void ClearSession(bool &success);
 
     /**
-     * setup callback to receive event
-     * @param sessioninfodelegate callback to receive session info
-     * @param success succeed or fail
-     * @output_message  error message
+     * Begin polling
+     * @param sessioninfodelegate   session info delegate
      */
     UFUNCTION(BlueprintCallable,
-              meta = (DisplayName = "SetupCallback", Keywords = "PlayCppSdk"),
+              meta = (DisplayName = "BeginPolling", Keywords = "PlayCppSdk"),
               Category = "PlayCppSdk")
-    void
-    SetupCallback(const FWalletconnectSessionInfoDelegate &sessioninfodelegate,
-                  bool &success, FString &output_message);
-
-    /**
-     * WalletConnect Session Information delegate, called after walletconnect
-     * callback onConnected, onDisconnected, onConnecting, or onUpdated is
-     * called.
-     */
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayCppSdk")
-    FWalletconnectSessionInfoDelegate OnReceiveWalletconnectSessionInfoDelegate;
+    bool BeginPolling(const FWalletconnectPollingDelegate &sessioninfodelegate);
 
     /**
      * On QR Ready delegate, called after QR is ready
@@ -516,7 +526,7 @@ class CRONOSPLAYUNREAL_API APlayCppSdkActor : public AActor {
     void SendEip155Transaction(FWalletConnectTxEip155 info,
                                FWalletconnectSendEip155TransactionDelegate Out);
 
-    static void destroyCoreClient();
+    void destroyCoreClient();
 
     /**
      * Transfers `token_id` token from `from_address` to `to_address`.
