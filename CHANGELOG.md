@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+## [v0.0.14-alpha] - 2023-7-26
+- only one build for mac
+- fix Array bug in abi json
+
 ## [v0.0.13-alpha] - 2023-6-15
 - Support apple arm64
 - Support Unreal Engine 5.2.0
