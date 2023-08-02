@@ -24,7 +24,6 @@ jobs:
 
       - name: Prepare PlayCppSdk
         run: |
-          mv ./Source/ThirdParty/PlayCppSdkLibrary/PlayCppSdkLibrary.Build.cs.legacy ./Source/ThirdParty/PlayCppSdkLibrary/PlayCppSdkLibrary.Build.cs
           TARGET=4.27 make
           python change_version.py 4.27.0
           
@@ -49,40 +48,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  Unreal_Release_5_0:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          submodules: recursive
-
-      - name: Prepare PlayCppSdk
-        run: |
-          mv ./Source/ThirdParty/PlayCppSdkLibrary/PlayCppSdkLibrary.Build.cs.legacy ./Source/ThirdParty/PlayCppSdkLibrary/PlayCppSdkLibrary.Build.cs
-          TARGET=5.0 make
-          python change_version.py 5.0.0
-          
-
-      - name: Package For Windows,Mac
-        run: |
-          FILENAME="CronosPlayForUnrealEngine5.0.zip"
-          zip -r ${FILENAME} Source Resources CronosPlayUnreal.uplugin
-          sha256sum ${FILENAME} > "checksums.txt"
-          echo "release_file=${FILENAME}" >> $GITHUB_ENV
-          echo "checksum_file=checksums.txt" >> $GITHUB_ENV
-
-
-      - name: Upload binaries and bindings to Release
-        uses: softprops/action-gh-release@v1
-        if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
-        with:
-          draft: true
-          files: |
-            ${{ env.release_file }}
-            ${{ env.checksum_file }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   Unreal_Release_5_1:
     runs-on: ubuntu-latest
@@ -94,7 +59,6 @@ jobs:
 
       - name: Prepare PlayCppSdk
         run: |
-          mv ./Source/ThirdParty/PlayCppSdkLibrary/PlayCppSdkLibrary.Build.cs.legacy ./Source/ThirdParty/PlayCppSdkLibrary/PlayCppSdkLibrary.Build.cs
           TARGET=5.1 make
           python change_version.py 5.1.0
           
@@ -121,6 +85,8 @@ jobs:
 
   Unreal_Release_5_2:
     runs-on: ubuntu-latest
+    env:
+          USE_ARM64: true
     steps:
       - uses: actions/checkout@v2
         with:
@@ -129,7 +95,6 @@ jobs:
 
       - name: Prepare PlayCppSdk
         run: |
-          rm ./Source/ThirdParty/PlayCppSdkLibrary/PlayCppSdkLibrary.Build.cs.legacy
           TARGET=5.2 make
           python change_version.py 5.2.0
           

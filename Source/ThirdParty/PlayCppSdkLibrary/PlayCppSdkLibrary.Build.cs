@@ -40,15 +40,8 @@ public class PlayCppSdkLibrary : ModuleRules {
             PublicAdditionalLibraries.Add("ws2_32.lib");
 
         } else if (Target.Platform == UnrealTargetPlatform.Mac) {
-            if (Target.Architecture == UnrealArch.X64)
-                PublicAdditionalLibraries.Add(Path.Combine(
-                    LibrariesPath, "Mac/x86_64", "libplay_cpp_sdk.a"));
-            else if (Target.Architecture == UnrealArch.Arm64)
-                PublicAdditionalLibraries.Add(Path.Combine(
-                    LibrariesPath, "Mac/arm64", "libplay_cpp_sdk.a"));
-            else {
-                throw new System.Exception("Unsupported architecture");
-            }
+            PublicAdditionalLibraries.Add(Path.Combine(
+                    LibrariesPath, "Mac", "libplay_cpp_sdk.a"));
         } else if (Target.Platform == UnrealTargetPlatform.Linux) {
             PublicAdditionalLibraries.Add(
                 Path.Combine(LibrariesPath, "Linux", "libplay_cpp_sdk.a"));
@@ -61,7 +54,7 @@ public class PlayCppSdkLibrary : ModuleRules {
                 LibrariesPath, "Android", "x86_64", "libplay_cpp_sdk.a"));
         } else if (Target.Platform == UnrealTargetPlatform.IOS) {
             PublicAdditionalLibraries.Add(Path.Combine(
-                LibrariesPath, "iOS", "arm64", "libplay_cpp_sdk.a"));
+                LibrariesPath, "iOS", "libplay_cpp_sdk.a"));
         }
     }
 }

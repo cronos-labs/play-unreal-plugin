@@ -1,6 +1,7 @@
 # Changelog
 
 ## [Unreleased]
+use one binary for mac
 
 ## [v0.0.13-alpha] - 2023-6-15
 - Support apple arm64

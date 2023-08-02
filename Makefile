@@ -127,24 +127,26 @@ else
 endif
 
 prepare:
-	mkdir -p $(PLAYCPPSDK_TARGET_DIR)/Mac/x86_64
-	mkdir -p $(PLAYCPPSDK_TARGET_DIR)/Mac/arm64
+	mkdir -p $(PLAYCPPSDK_TARGET_DIR)/Mac
 	mkdir -p $(PLAYCPPSDK_TARGET_DIR)/Win64
 	mkdir -p $(PLAYCPPSDK_TARGET_DIR)/Linux
 	mkdir -p $(PLAYCPPSDK_TARGET_DIR)/Android/arm64-v8a
 	mkdir -p $(PLAYCPPSDK_TARGET_DIR)/Android/armeabi-v7a
 	mkdir -p $(PLAYCPPSDK_TARGET_DIR)/Android/x86_64
-	mkdir -p $(PLAYCPPSDK_TARGET_DIR)/iOS/arm64
+	mkdir -p $(PLAYCPPSDK_TARGET_DIR)/iOS
 
 uncompress: prepare
-	tar xvf $(PLAYCPPSDK_CACHE_DIR)/Mac/x86_64/$(MAC_FILE) -C $(PLAYCPPSDK_TARGET_DIR)/Mac/x86_64 --strip-components=2 sdk/lib/libplay_cpp_sdk.a
-	tar xvf $(PLAYCPPSDK_CACHE_DIR)/Mac/arm64/$(MACARM64_FILE) -C $(PLAYCPPSDK_TARGET_DIR)/Mac/arm64 --strip-components=2 sdk/lib/libplay_cpp_sdk.a
+ifeq ($(USE_ARM64), true)
+	tar xvf $(PLAYCPPSDK_CACHE_DIR)/Mac/arm64/$(MACARM64_FILE) -C $(PLAYCPPSDK_TARGET_DIR)/Mac --strip-components=2 sdk/lib/libplay_cpp_sdk.a
+else
+	tar xvf $(PLAYCPPSDK_CACHE_DIR)/Mac/x86_64/$(MAC_FILE) -C $(PLAYCPPSDK_TARGET_DIR)/Mac --strip-components=2 sdk/lib/libplay_cpp_sdk.a
+endif
 	unzip -j $(PLAYCPPSDK_CACHE_DIR)/Win64/$(WINDOWS_FILE) sdk/lib/play_cpp_sdk.lib -d $(PLAYCPPSDK_TARGET_DIR)/Win64
 	tar xvf $(PLAYCPPSDK_CACHE_DIR)/Linux/$(LINUX_FILE) -C $(PLAYCPPSDK_TARGET_DIR)/Linux --strip-components=2 sdk/lib/libplay_cpp_sdk.a
 	tar xvf $(PLAYCPPSDK_CACHE_DIR)/Android/arm64-v8a/$(ARM64_V8A_FILE) -C $(PLAYCPPSDK_TARGET_DIR)/Android/arm64-v8a --strip-components=2 sdk/lib/libplay_cpp_sdk.a
 	tar xvf $(PLAYCPPSDK_CACHE_DIR)/Android/armeabi-v7a/$(ARMEABI_V7A_FILE) -C $(PLAYCPPSDK_TARGET_DIR)/Android/armeabi-v7a --strip-components=2 sdk/lib/libplay_cpp_sdk.a
 	tar xvf $(PLAYCPPSDK_CACHE_DIR)/Android/x86_64/$(X86_64_FILE) -C $(PLAYCPPSDK_TARGET_DIR)/Android/x86_64 --strip-components=2 sdk/lib/libplay_cpp_sdk.a
-	tar xvf $(PLAYCPPSDK_CACHE_DIR)/iOS/arm64/$(IOS_FILE) -C $(PLAYCPPSDK_TARGET_DIR)/iOS/arm64 --strip-components=2 sdk/lib/libplay_cpp_sdk.a
+	tar xvf $(PLAYCPPSDK_CACHE_DIR)/iOS/arm64/$(IOS_FILE) -C $(PLAYCPPSDK_TARGET_DIR)/iOS --strip-components=2 sdk/lib/libplay_cpp_sdk.a
 
 
 # FIXME Build Android/IOS with RunUAT.sh
