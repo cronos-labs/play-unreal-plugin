@@ -24,7 +24,6 @@ jobs:
 
       - name: Prepare PlayCppSdk
         run: |
-          mv ./Source/ThirdParty/PlayCppSdkLibrary/PlayCppSdkLibrary.Build.cs.legacy ./Source/ThirdParty/PlayCppSdkLibrary/PlayCppSdkLibrary.Build.cs
           TARGET=4.27 make
           python change_version.py 4.27.0
           
@@ -59,7 +58,6 @@ jobs:
 
       - name: Prepare PlayCppSdk
         run: |
-          mv ./Source/ThirdParty/PlayCppSdkLibrary/PlayCppSdkLibrary.Build.cs.legacy ./Source/ThirdParty/PlayCppSdkLibrary/PlayCppSdkLibrary.Build.cs
           TARGET=5.0 make
           python change_version.py 5.0.0
           
@@ -94,7 +92,6 @@ jobs:
 
       - name: Prepare PlayCppSdk
         run: |
-          mv ./Source/ThirdParty/PlayCppSdkLibrary/PlayCppSdkLibrary.Build.cs.legacy ./Source/ThirdParty/PlayCppSdkLibrary/PlayCppSdkLibrary.Build.cs
           TARGET=5.1 make
           python change_version.py 5.1.0
           
@@ -129,7 +126,6 @@ jobs:
 
       - name: Prepare PlayCppSdk
         run: |
-          rm ./Source/ThirdParty/PlayCppSdkLibrary/PlayCppSdkLibrary.Build.cs.legacy
           TARGET=5.2 make
           python change_version.py 5.2.0
           

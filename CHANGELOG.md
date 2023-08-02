@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+## [v0.0.16-alpha] - 2023-8-8
+ - use universal library (x86_64 + arm64) for mac
+
 ## [v0.0.13-alpha] - 2023-6-15
 - Support apple arm64
 - Support Unreal Engine 5.2.0
