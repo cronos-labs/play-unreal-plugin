@@ -2,7 +2,7 @@ UNAME := $(shell uname)
 PWD = $(shell pwd)
 
 # Set the play cpp sdk version
-PLAYCPPSDK=v0.0.21-alpha
+PLAYCPPSDK=v0.0.23-alpha
 # Set the play-cpp-sdk cache path
 PLAYCPPSDK_CACHE_DIR=./install/$(PLAYCPPSDK)
 # Set the play-cpp-sdk target path
@@ -29,7 +29,6 @@ ifndef NDK_VERSION
 NDK_VERSION=25.1.8937393
 endif
 # Set names of play cpp sdk library files
-MAC_FILE=play_cpp_sdk_Darwin_x86_64.tar.gz
 MACARM64_FILE=play_cpp_sdk_Darwin_arm64.tar.gz
 WINDOWS_FILE=play_cpp_sdk_Windows_x86_64.zip
 LINUX_FILE=play_cpp_sdk_libc++_Linux_x86_64.tar.gz
@@ -47,8 +46,6 @@ ANDROID_ARMEABI_V7A_CHECKSUM_FILE=checksums-armv7-linux-androideabi-$(NDK_VERSIO
 ANDROID_X86_64_CHECKSUM_FILE=checksums-x86_64-linux-android-$(NDK_VERSION).txt
 IOS_CHECKSUM_FILE=checksums-aarch64-apple-ios.txt
 
-MAC_SRC=https://github.com/cronos-labs/play-cpp-sdk/releases/download/$(PLAYCPPSDK)/$(MAC_FILE)
-MAC_CHEKSUM_SRC=https://github.com/cronos-labs/play-cpp-sdk/releases/download/$(PLAYCPPSDK)/$(MAC_CHECKSUM_FILE)
 MACARM64_SRC=https://github.com/cronos-labs/play-cpp-sdk/releases/download/$(PLAYCPPSDK)/$(MACARM64_FILE)
 MACARM64_CHEKSUM_SRC=https://github.com/cronos-labs/play-cpp-sdk/releases/download/$(PLAYCPPSDK)/$(MACARM64_CHECKSUM_FILE)
 WINDOWS_SRC=https://github.com/cronos-labs/play-cpp-sdk/releases/download/$(PLAYCPPSDK)/$(WINDOWS_FILE)
@@ -71,8 +68,8 @@ CACHE_OS_LIST := Mac/x86_64 Mac/arm64 Win64 Linux Android/arm64-v8a Android/arme
 download:
 	for os in $(CACHE_OS_LIST); do	\
 		if [ "$$os" = "Mac/x86_64" ]; then \
-			cache_file=$(MAC_FILE); \
-			cache_src=$(MAC_SRC); \
+			cache_file=$(MACARM64_FILE); \
+			cache_src=$(MACARM6_SRC); \
 		elif [ "$$os" = "Mac/arm64" ]; then \
 			cache_file=$(MACARM64_FILE); \
 			cache_src=$(MACARM64_SRC); \
@@ -107,7 +104,6 @@ download:
 
 checkhash:
 ifeq ($(UNAME), Darwin)
-	cd $(PLAYCPPSDK_CACHE_DIR)/Mac/x86_64 && curl -s -L $(MAC_CHEKSUM_SRC) | shasum -a 256 -c -
 	cd $(PLAYCPPSDK_CACHE_DIR)/Mac/arm64 && curl -s -L $(MACARM64_CHEKSUM_SRC) | shasum -a 256 -c -
 	cd $(PLAYCPPSDK_CACHE_DIR)/Win64 &&  curl -s -L $(WINDOWS_CHECKSUM_SRC) | shasum -a 256 -c -
 	cd $(PLAYCPPSDK_CACHE_DIR)/Linux && curl -s -L $(LINUX_CHECKSUM_SRC) | shasum -a 256 -c -
@@ -116,7 +112,6 @@ ifeq ($(UNAME), Darwin)
 	cd $(PLAYCPPSDK_CACHE_DIR)/Android/x86_64 && curl -s -L $(ANDROID_X86_64_CHECKSUM_SRC) | shasum -a 256 -c -
 	cd $(PLAYCPPSDK_CACHE_DIR)/iOS/arm64 && curl -s -L $(IOS_CHEKSUM_SRC) | shasum -a 256 -c -
 else
-	cd $(PLAYCPPSDK_CACHE_DIR)/Mac/x86_64 && curl -s -L $(MAC_CHEKSUM_SRC) | sha256sum -c  -
 	cd $(PLAYCPPSDK_CACHE_DIR)/Mac/arm64 && curl -s -L $(MACARM64_CHEKSUM_SRC) | sha256sum -c  -
 	cd $(PLAYCPPSDK_CACHE_DIR)/Win64 &&  curl -s -L $(WINDOWS_CHECKSUM_SRC) | sha256sum -c  -
 	cd $(PLAYCPPSDK_CACHE_DIR)/Linux && curl -s -L $(LINUX_CHECKSUM_SRC) | sha256sum -c  -
@@ -127,24 +122,22 @@ else
 endif
 
 prepare:
-	mkdir -p $(PLAYCPPSDK_TARGET_DIR)/Mac/x86_64
-	mkdir -p $(PLAYCPPSDK_TARGET_DIR)/Mac/arm64
+	mkdir -p $(PLAYCPPSDK_TARGET_DIR)/Mac
 	mkdir -p $(PLAYCPPSDK_TARGET_DIR)/Win64
 	mkdir -p $(PLAYCPPSDK_TARGET_DIR)/Linux
 	mkdir -p $(PLAYCPPSDK_TARGET_DIR)/Android/arm64-v8a
 	mkdir -p $(PLAYCPPSDK_TARGET_DIR)/Android/armeabi-v7a
 	mkdir -p $(PLAYCPPSDK_TARGET_DIR)/Android/x86_64
-	mkdir -p $(PLAYCPPSDK_TARGET_DIR)/iOS/arm64
+	mkdir -p $(PLAYCPPSDK_TARGET_DIR)/iOS
 
 uncompress: prepare
-	tar xvf $(PLAYCPPSDK_CACHE_DIR)/Mac/x86_64/$(MAC_FILE) -C $(PLAYCPPSDK_TARGET_DIR)/Mac/x86_64 --strip-components=2 sdk/lib/libplay_cpp_sdk.a
-	tar xvf $(PLAYCPPSDK_CACHE_DIR)/Mac/arm64/$(MACARM64_FILE) -C $(PLAYCPPSDK_TARGET_DIR)/Mac/arm64 --strip-components=2 sdk/lib/libplay_cpp_sdk.a
+	tar xvf $(PLAYCPPSDK_CACHE_DIR)/Mac/arm64/$(MACARM64_FILE) -C $(PLAYCPPSDK_TARGET_DIR)/Mac --strip-components=2 sdk/lib/libplay_cpp_sdk_universal.a && mv $(PLAYCPPSDK_TARGET_DIR)/Mac/libplay_cpp_sdk_universal.a $(PLAYCPPSDK_TARGET_DIR)/Mac/libplay_cpp_sdk.a
 	unzip -j $(PLAYCPPSDK_CACHE_DIR)/Win64/$(WINDOWS_FILE) sdk/lib/play_cpp_sdk.lib -d $(PLAYCPPSDK_TARGET_DIR)/Win64
 	tar xvf $(PLAYCPPSDK_CACHE_DIR)/Linux/$(LINUX_FILE) -C $(PLAYCPPSDK_TARGET_DIR)/Linux --strip-components=2 sdk/lib/libplay_cpp_sdk.a
 	tar xvf $(PLAYCPPSDK_CACHE_DIR)/Android/arm64-v8a/$(ARM64_V8A_FILE) -C $(PLAYCPPSDK_TARGET_DIR)/Android/arm64-v8a --strip-components=2 sdk/lib/libplay_cpp_sdk.a
 	tar xvf $(PLAYCPPSDK_CACHE_DIR)/Android/armeabi-v7a/$(ARMEABI_V7A_FILE) -C $(PLAYCPPSDK_TARGET_DIR)/Android/armeabi-v7a --strip-components=2 sdk/lib/libplay_cpp_sdk.a
 	tar xvf $(PLAYCPPSDK_CACHE_DIR)/Android/x86_64/$(X86_64_FILE) -C $(PLAYCPPSDK_TARGET_DIR)/Android/x86_64 --strip-components=2 sdk/lib/libplay_cpp_sdk.a
-	tar xvf $(PLAYCPPSDK_CACHE_DIR)/iOS/arm64/$(IOS_FILE) -C $(PLAYCPPSDK_TARGET_DIR)/iOS/arm64 --strip-components=2 sdk/lib/libplay_cpp_sdk.a
+	tar xvf $(PLAYCPPSDK_CACHE_DIR)/iOS/arm64/$(IOS_FILE) -C $(PLAYCPPSDK_TARGET_DIR)/iOS --strip-components=2 sdk/lib/libplay_cpp_sdk.a
 
 
 # FIXME Build Android/IOS with RunUAT.sh
