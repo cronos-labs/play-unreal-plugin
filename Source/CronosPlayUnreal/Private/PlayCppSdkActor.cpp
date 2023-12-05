@@ -431,7 +431,8 @@ bool APlayCppSdkActor::BeginPolling(const FWalletconnectPollingDelegate &Out) {
                           });
 
             } // end of try
-            catch (const std::exception &e) {
+            catch (
+                const std::exception &) { // this is legimate exception, ignore
                 _pollingEvents = false;
                 AsyncTask(ENamedThreads::GameThread, [Out, userjsondata]() {
                     Out.ExecuteIfBound(userjsondata, TEXT("polling timeout"));

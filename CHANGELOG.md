@@ -1,7 +1,12 @@
 # Changelog
 
 ## [Unreleased]
-use one binary for mac
+
+## [v0.0.17-alpha] - 2023-8-10
+- fix windows build
+
+## [v0.0.16-alpha] - 2023-8-8
+- use one binary for mac
 
 ## [v0.0.13-alpha] - 2023-6-15
 - Support apple arm64
