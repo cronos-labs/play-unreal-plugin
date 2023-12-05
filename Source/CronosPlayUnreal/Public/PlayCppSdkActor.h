@@ -183,6 +183,9 @@ struct FWalletConnectTxEip155 {
     GENERATED_USTRUCT_BODY()
     /** hexstring, "0x..." */
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayCppSdk")
+    FString from;
+    /** hexstring, "0x..." */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayCppSdk")
     FString to;
     /** gas limit in decimal string */
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayCppSdk")

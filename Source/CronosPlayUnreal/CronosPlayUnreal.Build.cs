@@ -40,5 +40,13 @@ public class CronosPlayUnreal : ModuleRules {
                 "AndroidPlugin",
                 System.IO.Path.Combine(PluginPath, "Android.xml"));
         }
+        if (Target.Platform == UnrealTargetPlatform.Mac) {
+            // Add frameworks for macOS
+            PublicFrameworks.AddRange(new string[] {
+                "Security",
+                "CoreFoundation",
+                "SystemConfiguration"
+            });
+        }
     }
 }
