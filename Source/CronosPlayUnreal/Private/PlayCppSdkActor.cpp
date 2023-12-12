@@ -663,6 +663,7 @@ void APlayCppSdkActor::SendEip155Transaction(
             }
 
             WalletConnectTxEip155 myinfo;
+            myinfo.from = TCHAR_TO_UTF8(*info.from);
             myinfo.to = TCHAR_TO_UTF8(*info.to);
             myinfo.common.gas_limit = TCHAR_TO_UTF8(*info.gas);
             myinfo.common.gas_price = TCHAR_TO_UTF8(*info.gas_price);
