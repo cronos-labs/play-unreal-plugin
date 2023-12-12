@@ -42,11 +42,9 @@ public class CronosPlayUnreal : ModuleRules {
         }
         if (Target.Platform == UnrealTargetPlatform.Mac) {
             // Add frameworks for macOS
-            PublicFrameworks.AddRange(new string[] {
-                "Security",
-                "CoreFoundation",
-                "SystemConfiguration"
-            });
+            PublicFrameworks.AddRange(new string[] { "Security",
+                                                     "CoreFoundation",
+                                                     "SystemConfiguration" });
         }
     }
 }
