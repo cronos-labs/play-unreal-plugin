@@ -30,8 +30,8 @@ APlayCppSdkActor::APlayCppSdkActor() {
     _removeClient = false;
     _coreClient = NULL;
     PollingEventsEnabled = false;
-    EnsureSessionTimeoutMilliSeconds = 60000;   // in milli seconds
-    PollingEventsIntervalInMilliseconds = 2000; // in milli seconds
+    EnsureSessionTimeoutMilliSeconds = 60000;  // in milli seconds
+    PollingEventsIntervalInMilliseconds = 100; // in milli seconds
     DestroyClientWaitSeconds = 3.0f;
     EnableEipTx155Tx = false;
 
@@ -289,18 +289,31 @@ void APlayCppSdkActor::OnRestoreClientFinished(bool succeed, FString message) {
 
 void APlayCppSdkActor::EnsureSession(FEnsureSessionDelegate Out) {
 
-    AsyncTask(ENamedThreads::AnyHiPriThreadNormalTask, [this, Out]() {
+    TWeakObjectPtr<APlayCppSdkActor> WeakThis(this);
+    AsyncTask(ENamedThreads::AnyHiPriThreadNormalTask, [WeakThis, Out]() {
         FWalletConnectEnsureSessionResult output;
         FString result;
         UE_LOG(LogTemp, Display, TEXT("EnsureSession..."));
         try {
+            if (!WeakThis.IsValid()) {
+                // The object has been destroyed, handle accordingly
+                return;
+            }
 
             WalletConnect2EnsureSessionResult sessionresult;
-            if (_coreClient != NULL) {
+            if (WeakThis->_coreClient != NULL) {
                 UE_LOG(LogTemp, Display, TEXT("EnsureSession blocking..."));
-                sessionresult = _coreClient->ensure_session_blocking(
-                    EnsureSessionTimeoutMilliSeconds);
+                sessionresult = WeakThis->_coreClient->ensure_session_blocking(
+                    WeakThis->EnsureSessionTimeoutMilliSeconds);
                 UE_LOG(LogTemp, Display, TEXT("EnsureSession done..."));
+                if (!WeakThis.IsValid()) {
+                    // The object has been destroyed, handle accordingly
+                    return;
+                }
+                if (WeakThis->_coreClient == NULL) {
+                    UE_LOG(LogTemp, Display, TEXT("Blocking Canceled"));
+                    return;
+                }
                 output.addresses.Empty();
                 for (int i = 0; i < sessionresult.eip155.accounts.size(); i++) {
                     FWalletConnectAddress newaddress;
@@ -313,7 +326,7 @@ void APlayCppSdkActor::EnsureSession(FEnsureSessionDelegate Out) {
                     }
                     assert(20 == newaddress.address.Num());
                     output.addresses.Add(newaddress);
-                    _session_info.accounts.Add(
+                    WeakThis->_session_info.accounts.Add(
                         UUtlis::ToHex(newaddress.address));
 
                     if (i == 0)
@@ -323,15 +336,13 @@ void APlayCppSdkActor::EnsureSession(FEnsureSessionDelegate Out) {
                 assert(output.addresses.Num() ==
                        sessionresult.addresses.size());
 
-                _session_info.sessionstate =
+                WeakThis->_session_info.sessionstate =
                     EWalletconnectSessionState::StateRestored;
-                _session_info.connected = true;
-                _session_info.chain_id = FString::FromInt(output.chain_id);
+                WeakThis->_session_info.connected = true;
+                WeakThis->_session_info.chain_id =
+                    FString::FromInt(output.chain_id);
 
-                SetWalletConnectEnsureSessionResult(output);
-
-                // begin polling
-                BeginPolling(OnReceiveWalletconnectPollingDelegate);
+                WeakThis->SetWalletConnectEnsureSessionResult(output);
 
             } else {
                 result = FString::Printf(
@@ -396,8 +407,6 @@ void APlayCppSdkActor::OnReceiveWalletconnectPolling(FString jsonevent,
     if (result.IsEmpty()) {
         UE_LOG(LogTemp, Log, TEXT("ReceiveEvent= %s"), *jsonevent);
     }
-
-    BeginPolling(OnReceiveWalletconnectPollingDelegate);
 }
 
 bool APlayCppSdkActor::BeginPolling(const FWalletconnectPollingDelegate &Out) {
@@ -409,22 +418,41 @@ bool APlayCppSdkActor::BeginPolling(const FWalletconnectPollingDelegate &Out) {
     if (_pollingEvents) // already polling
         return false;
 
-    AsyncTask(ENamedThreads::AnyHiPriThreadNormalTask, [this, Out]() {
+    if (_coreClient == NULL) // if there is no client, exit
+        return false;
+
+    TWeakObjectPtr<APlayCppSdkActor> WeakThis(this);
+    AsyncTask(ENamedThreads::AnyHiPriThreadNormalTask, [WeakThis, Out]() {
+        if (!WeakThis.IsValid()) {
+            // The object has been destroyed, handle accordingly
+            return;
+        }
+
         FWalletConnectEnsureSessionResult output;
         FString userjsondata;
         FString result;
 
-        _pollingEvents = true;
-        if (_coreClient != NULL) {
+        WeakThis->_pollingEvents = true;
+        if (WeakThis->_coreClient != NULL) {
             try {
                 std::string jsondata =
-                    _coreClient
+                    WeakThis->_coreClient
                         ->poll_events_blocking(
-                            PollingEventsIntervalInMilliseconds)
-                        .c_str(); // 2000 milliseconds, 2 seconds
+                            WeakThis->PollingEventsIntervalInMilliseconds)
+                        .c_str();
+
+                if (!WeakThis.IsValid()) {
+                    // The object has been destroyed, handle accordingly
+                    return;
+                }
+
+                if (WeakThis->_coreClient == NULL) {
+                    UE_LOG(LogTemp, Display, TEXT("Blocking Canceled"));
+                    return;
+                }
                 userjsondata = UTF8_TO_TCHAR(jsondata.c_str());
 
-                _pollingEvents = false;
+                WeakThis->_pollingEvents = false;
                 AsyncTask(ENamedThreads::GameThread,
                           [Out, userjsondata, result]() {
                               Out.ExecuteIfBound(userjsondata, result);
@@ -433,14 +461,18 @@ bool APlayCppSdkActor::BeginPolling(const FWalletconnectPollingDelegate &Out) {
             } // end of try
             catch (
                 const std::exception &) { // this is legimate exception, ignore
-                _pollingEvents = false;
-                AsyncTask(ENamedThreads::GameThread, [Out, userjsondata]() {
-                    Out.ExecuteIfBound(userjsondata, TEXT("polling timeout"));
-                });
+                if (WeakThis.IsValid()) {
+                    WeakThis->_pollingEvents = false;
+                    AsyncTask(ENamedThreads::GameThread, [Out, userjsondata]() {
+                        Out.ExecuteIfBound(userjsondata,
+                                           TEXT("polling timeout"));
+                    });
 
-                // in case, somehow BeginPolling is called too frequenlty
-                FPlatformProcess::Sleep(0.1f); // 0.1 seconds
-            }                                  // end of catch
+                    // in case, somehow BeginPolling is called too frequenlty
+                    FPlatformProcess::Sleep(0.1f); // 0.1 seconds
+                }
+
+            } // end of catch
         }
     });
     return true;
@@ -475,6 +507,7 @@ void APlayCppSdkActor::GetConnectionString(FString &output, bool &success,
         }
         String qrcode = _coreClient->get_connection_string();
         output = UTF8_TO_TCHAR(qrcode.c_str());
+        UE_LOG(LogTemp, Log, TEXT("GetConnectionString: %s"), *output);
 
         success = true;
     } catch (const std::exception &e) {
@@ -550,8 +583,10 @@ void APlayCppSdkActor::SignPersonal(FString user_message,
     // if no address, return
     if (address.Num() == 0)
         return;
+
+    TWeakObjectPtr<APlayCppSdkActor> WeakThis(this);
     AsyncTask(ENamedThreads::AnyHiPriThreadNormalTask,
-              [Out, coreclient, user_message, address, this]() {
+              [Out, coreclient, user_message, address, WeakThis]() {
                   FWalletSignTXEip155Result output;
                   try {
 
@@ -560,8 +595,17 @@ void APlayCppSdkActor::SignPersonal(FString user_message,
                       for (int i = 0; i < address.Num(); i++) {
                           dstaddress[i] = address[i];
                       }
-                      Vec<uint8_t> sig1 = _coreClient->sign_personal_blocking(
-                          TCHAR_TO_UTF8(*user_message), dstaddress);
+                      Vec<uint8_t> sig1 =
+                          WeakThis->_coreClient->sign_personal_blocking(
+                              TCHAR_TO_UTF8(*user_message), dstaddress);
+                      if (!WeakThis.IsValid()) {
+                          // The object has been destroyed, handle accordingly
+                          return;
+                      }
+                      if (WeakThis->_coreClient == NULL) {
+                          UE_LOG(LogTemp, Display, TEXT("Blocking Canceled"));
+                          return;
+                      }
 
                       copyVecToTArray(sig1, output.signature);
                       assert(sig1.size() == output.Num());
@@ -589,9 +633,17 @@ void APlayCppSdkActor::SignEip155Transaction(
     // if no address, return
     if (address.Num() == 0 || chain_id == 0)
         return;
+
+    TWeakObjectPtr<APlayCppSdkActor> WeakThis(this);
+
     AsyncTask(ENamedThreads::AnyHiPriThreadNormalTask, [Out, coreclient,
                                                         address, chain_id, info,
-                                                        this]() {
+                                                        WeakThis]() {
+        if (!WeakThis.IsValid()) {
+            // The object has been destroyed, handle accordingly
+            return;
+        }
+
         FWalletSignTXEip155Result output;
 
         try {
@@ -611,13 +663,23 @@ void APlayCppSdkActor::SignEip155Transaction(
             myinfo.common.nonce = TCHAR_TO_UTF8(*info.nonce);
             // todo: chainid is included, wc 2.0 not work
             myinfo.common.chainid =
-                EnableEipTx155Tx ? myinfo.common.chainid : 0;
+                WeakThis->EnableEipTx155Tx ? myinfo.common.chainid : 0;
 
-            if (_coreClient != NULL) {
+            if (WeakThis->_coreClient != NULL) {
 
                 Vec<uint8_t> sig1 =
-                    _coreClient->sign_eip155_transaction_blocking(myinfo,
-                                                                  dstaddress);
+                    WeakThis->_coreClient->sign_eip155_transaction_blocking(
+                        myinfo, dstaddress);
+
+                if (!WeakThis.IsValid()) {
+                    // The object has been destroyed, handle accordingly
+                    return;
+                }
+
+                if (WeakThis->_coreClient == NULL) {
+                    UE_LOG(LogTemp, Display, TEXT("Blocking Canceled"));
+                    return;
+                }
 
                 copyVecToTArray(sig1, output.signature);
                 assert(sig1.size() == output.Num());
@@ -649,9 +711,16 @@ void APlayCppSdkActor::SendEip155Transaction(
     // if no address, return
     if (address.Num() == 0 || chain_id == 0)
         return;
+
+    TWeakObjectPtr<APlayCppSdkActor> WeakThis(this);
     AsyncTask(ENamedThreads::AnyHiPriThreadNormalTask, [Out, coreclient,
                                                         address, chain_id, info,
-                                                        this]() {
+                                                        WeakThis]() {
+        if (!WeakThis.IsValid()) {
+            // The object has been destroyed, handle accordingly
+            return;
+        }
+
         FWalletSendTXEip155Result output;
 
         try {
@@ -672,12 +741,21 @@ void APlayCppSdkActor::SendEip155Transaction(
             myinfo.common.nonce = TCHAR_TO_UTF8(*info.nonce);
             // todo: chainid is included, wc 2.0 not work
             myinfo.common.chainid =
-                EnableEipTx155Tx ? myinfo.common.chainid : 0;
-            if (_coreClient != NULL) {
+                WeakThis->EnableEipTx155Tx ? myinfo.common.chainid : 0;
+            if (WeakThis->_coreClient != NULL) {
 
                 Vec<uint8_t> tx_hash =
-                    _coreClient->send_eip155_transaction_blocking(myinfo,
-                                                                  dstaddress);
+                    WeakThis->_coreClient->send_eip155_transaction_blocking(
+                        myinfo, dstaddress);
+                if (!WeakThis.IsValid()) {
+                    // The object has been destroyed, handle accordingly
+                    return;
+                }
+
+                if (WeakThis->_coreClient == NULL) {
+                    UE_LOG(LogTemp, Display, TEXT("Blocking Canceled"));
+                    return;
+                }
 
                 copyVecToTArray(tx_hash, output.tx_hash);
                 assert(tx_hash.size() == output.Num());
@@ -699,23 +777,29 @@ void APlayCppSdkActor::SendEip155Transaction(
 
 void APlayCppSdkActor::destroyCoreClient() {
     _removeClient = true;
+    UE_LOG(LogTemp, Log, TEXT("PlayCppSdkActor destroyCoreClient Start"));
 
-    AsyncTask(ENamedThreads::AnyHiPriThreadNormalTask, [this]() {
-        // wait for DesroyClientWaitSeconds
-        FPlatformProcess::Sleep(DestroyClientWaitSeconds);
+    if (_coreClient != NULL) {
+        UE_LOG(LogTemp, Log, TEXT("PlayCppSdkActor destroyCoreClient"));
 
-        if (_coreClient != NULL) {
-            UE_LOG(LogTemp, Log, TEXT("PlayCppSdkActor destroyCoreClient"));
+        float waittime = (float)PollingEventsIntervalInMilliseconds / 1000.0f +
+                         DestroyClientWaitSeconds + 1.0f;
+        UE_LOG(LogTemp, Log,
+               TEXT("PlayCppSdkActor destroyCoreClient waittime: %f"),
+               waittime);
+        ::com::crypto::game_sdk::Walletconnect2Client *coreclient = _coreClient;
+        _coreClient = NULL;
 
-            // restored back, close tokio-runtime
-            // ue4 editor gracefully closed
-            // TODO crashed here? Likely to be fixed, but need to be careful
-            Box<Walletconnect2Client> tmpwallet =
-                Box<Walletconnect2Client>::from_raw(_coreClient);
-            _coreClient = NULL;
-            _removeClient = false;
-        }
-    });
+        FPlatformProcess::Sleep(waittime); // give time to finish asynctask
+
+        // restored back, close tokio-runtime
+        // ue4 editor gracefully closed
+        // TODO crashed here? Likely to be fixed, but need to be careful
+        Box<Walletconnect2Client> tmpwallet =
+            Box<Walletconnect2Client>::from_raw(coreclient);
+
+        _removeClient = false;
+    }
 }
 
 void StopWalletConnect() {}
