@@ -149,3 +149,37 @@ jobs:
             ${{ env.checksum_file }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  Unreal_Release_5_3:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          submodules: recursive
+
+      - name: Prepare PlayCppSdk
+        run: |
+          TARGET=5.3 make
+          python change_version.py 5.3.0
+          
+
+      - name: Package For Windows,Mac
+        run: |
+          FILENAME="CronosPlayForUnrealEngine5.3.zip"
+          zip -r ${FILENAME} Source Resources CronosPlayUnreal.uplugin
+          sha256sum ${FILENAME} > "checksums.txt"
+          echo "release_file=${FILENAME}" >> $GITHUB_ENV
+          echo "checksum_file=checksums.txt" >> $GITHUB_ENV
+
+
+      - name: Upload binaries and bindings to Release
+        uses: softprops/action-gh-release@v1
+        if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
+        with:
+          draft: true
+          files: |
+            ${{ env.release_file }}
+            ${{ env.checksum_file }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}          
