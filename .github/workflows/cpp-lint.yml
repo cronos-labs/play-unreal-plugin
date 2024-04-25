@@ -11,7 +11,7 @@ jobs:
   cpp-linter:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: true
 
@@ -30,7 +30,7 @@ jobs:
           registry: ghcr.io
           username: ${{ secrets.USER }}
           password: ${{ secrets.PAT }}
-          image: ghcr.io/epicgames/unreal-engine:dev-slim-5.1
+          image: ghcr.io/epicgames/unreal-engine:dev-slim-4.27.2
           options: -v ${{ github.workspace }}:/home/ue4/play-unreal-plugin -e HOME=/home/ue4
           run: |
             cd ~/play-unreal-plugin

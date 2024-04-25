@@ -1,6 +1,7 @@
 # Changelog
 
 ## [Unreleased]
+- Fix WC 2.0 for defiwallet
 
 ## [v0.0.18-alpha] - 2024-1-2
 - Support metamask send-tx for wallet-connect 2.0

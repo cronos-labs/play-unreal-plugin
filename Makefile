@@ -2,7 +2,7 @@ UNAME := $(shell uname)
 PWD = $(shell pwd)
 
 # Set the play cpp sdk version
-PLAYCPPSDK=v0.0.24-alpha
+PLAYCPPSDK=v0.0.26-alpha
 # Set the play-cpp-sdk cache path
 PLAYCPPSDK_CACHE_DIR=./install/$(PLAYCPPSDK)
 # Set the play-cpp-sdk target path
