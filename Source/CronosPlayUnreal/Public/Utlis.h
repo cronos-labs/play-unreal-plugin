@@ -1,7 +1,7 @@
 // Copyright 2022, Cronos Labs. All Rights Reserved
 
 #pragma once
-
+#include <array>
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "Utlis.generated.h"
@@ -23,7 +23,7 @@ class CRONOSPLAYUNREAL_API UUtlis : public UBlueprintFunctionLibrary {
     UFUNCTION(BlueprintCallable,
               meta = (DisplayName = "ToHex", Keywords = "PlayCppSdk"),
               Category = "Utils")
-    static FString ToHex(TArray<uint8> address);
+    static FString ToHex(const TArray<uint8>& address);
 
     /**
      * Convert TArray<uint8> to std::array<uint8_t, 20>
@@ -32,5 +32,5 @@ class CRONOSPLAYUNREAL_API UUtlis : public UBlueprintFunctionLibrary {
      * return all 0
      *
      */
-    static std::array<std::uint8_t, 20> ToArray(TArray<uint8> address);
+    static std::array<std::uint8_t, 20> ToArray(const TArray<uint8>& address);
 };

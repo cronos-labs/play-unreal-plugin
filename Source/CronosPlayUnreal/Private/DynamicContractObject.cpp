@@ -1,7 +1,11 @@
 // Copyright 2022, Cronos Labs. All Rights Reserved
-
 #include "DynamicContractObject.h"
+#include "DefiWalletCoreActor.h"
 
+using namespace org::defi_wallet_core;
+void convertCronosTXReceipt(
+    ::org::defi_wallet_core::CronosTransactionReceiptRaw &src,
+    FCronosTransactionReceiptRaw &dst);
 UDynamicContractObject::UDynamicContractObject() {
     defiWallet = NULL;
     _coreContract = NULL;
@@ -178,7 +182,7 @@ void UDynamicContractObject::NewSigningEthContract(FString contractaddress,
         }
 
         char hdpath[100];
-        snprintf(hdpath, sizeof(hdpath), "m/44'/%d'/0'/0/%d", EthCoinType,
+        snprintf(hdpath, sizeof(hdpath), "m/44'/%d'/0'/0/%d", 60,
                  walletindex);
         rust::cxxbridge1::Box<PrivateKey> privatekey =
             defiWallet->getCoreWallet()->get_key(hdpath);

@@ -5,6 +5,7 @@
 #include "Interfaces/IHttpRequest.h"
 #include "Interfaces/IHttpResponse.h"
 #include "Kismet/KismetRenderingLibrary.h"
+
 FString UPlayCppSdkDownloader::UserAgent =
     TEXT("CronosPlay-UnrealEngine-Agent");
 // ipfs:// -> https://ipfs.io/ipfs/
@@ -46,7 +47,7 @@ void UPlayCppSdkDownloader::GetJsonStringFromUri(FString tokenuriuser,
     }
 
     FString tokenuri = convert_ipfs_url(tokenuriuser);
-    assert(HttpModule != NULL);
+    check(HttpModule != NULL);
     TSharedRef<IHttpRequest, ESPMode::ThreadSafe> httprequest =
         HttpModule->CreateRequest();
     httprequest->SetVerb(TEXT("GET"));
@@ -96,7 +97,7 @@ void UPlayCppSdkDownloader::GetNftImageInfoFromUri(FString tokenuriuser,
     }
 
     FString tokenuri = convert_ipfs_url(tokenuriuser);
-    assert(HttpModule != NULL);
+    check(HttpModule != NULL);
     TSharedRef<IHttpRequest, ESPMode::ThreadSafe> httprequest =
         HttpModule->CreateRequest();
 
@@ -161,7 +162,7 @@ void UPlayCppSdkDownloader::GetNftImageFromUrl(FString imageurl, bool &success,
         return;
     }
 
-    assert(HttpModule != NULL);
+    check(HttpModule != NULL);
     TSharedRef<IHttpRequest, ESPMode::ThreadSafe> httprequest =
         HttpModule->CreateRequest();
     httprequest->SetVerb(TEXT("GET"));
