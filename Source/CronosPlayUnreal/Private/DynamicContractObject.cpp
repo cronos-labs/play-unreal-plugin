@@ -182,8 +182,7 @@ void UDynamicContractObject::NewSigningEthContract(FString contractaddress,
         }
 
         char hdpath[100];
-        snprintf(hdpath, sizeof(hdpath), "m/44'/%d'/0'/0/%d", 60,
-                 walletindex);
+        snprintf(hdpath, sizeof(hdpath), "m/44'/%d'/0'/0/%d", 60, walletindex);
         rust::cxxbridge1::Box<PrivateKey> privatekey =
             defiWallet->getCoreWallet()->get_key(hdpath);
 

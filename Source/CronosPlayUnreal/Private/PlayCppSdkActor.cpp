@@ -20,6 +20,7 @@
 using namespace std;
 using namespace rust;
 using namespace com::crypto::game_sdk;
+void from_hex(const std::string &s, unsigned char *data, int len);
 
 // Sets default values
 APlayCppSdkActor::APlayCppSdkActor() {
@@ -571,6 +572,53 @@ void copyVecToTArray(const Vec<uint8_t> &src, TArray<uint8> &dst) {
         dst.Add(src[i]);
     }
     assert(dst.Num() == src.size());
+}
+
+void APlayCppSdkActor::VerifyPersonal(FString user_message,
+                                      TArray<uint8> signature_bytes,
+                                      FString user_address, bool &success,
+                                      FString &output_message) {
+    if (NULL == _coreClient) {
+        success = false;
+        output_message = TEXT("Invalid Client");
+
+        return;
+    }
+
+    // Remove the "0x" prefix from user_address if it exists
+    if (user_address.StartsWith("0x")) {
+        user_address = user_address.RightChop(
+            2); // skip 2 bytes, get right side of the string
+    }
+
+    if (user_address.Len() != 40) {
+        success = false;
+        output_message = TEXT("Invalid address, address should be 20 bytes hex "
+                              "string without 0x prefix");
+        return;
+    }
+
+    Vec<uint8_t> signature;
+    copyTArrayToVec(signature_bytes,
+                    signature);         // convert unreal array to c++ vector
+    std::array<uint8_t, 20> dstaddress; // address is fixed 20 bytes
+    from_hex(TCHAR_TO_UTF8(*user_address), dstaddress.data(), 20);
+
+    try {
+        bool ret = _coreClient->verify_personal_blocking(
+            TCHAR_TO_UTF8(*user_message), signature, dstaddress);
+        if (ret) {
+            success = true;
+        } else {
+            success = false;
+            output_message = TEXT("Signature verification failed");
+        }
+    } catch (const std::exception &e) {
+        success = false;
+        output_message =
+            FString::Printf(TEXT("PlayCppSdk VerifyPersonal Error: %s"),
+                            UTF8_TO_TCHAR(e.what()));
+    }
 }
 
 void APlayCppSdkActor::SignPersonal(FString user_message,

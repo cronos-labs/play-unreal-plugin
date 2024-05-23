@@ -506,6 +506,21 @@ class CRONOSPLAYUNREAL_API APlayCppSdkActor : public AActor {
                       FWalletconnectSignPersonalDelegate Out);
 
     /**
+     * verify general message
+     * @param user_message user message to verify
+     * @param signature signature byte arrays
+     * @param user_address user address
+     * @return success or not
+     * @return output_message error message
+     */
+    UFUNCTION(BlueprintCallable,
+              meta = (DisplayName = "VerifyPersonal", Keywords = "PlayCppSdk"),
+              Category = "PlayCppSdk")
+    void VerifyPersonal(FString user_message, TArray<uint8> signature_bytes,
+                        FString user_address, bool &success,
+                        FString &output_message);
+
+    /**
      * sign EIP155 tx
      * @param info EIP 155 tx information
      * @param Out sign legacy tx result callback

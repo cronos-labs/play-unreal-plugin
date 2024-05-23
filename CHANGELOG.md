@@ -1,16 +1,17 @@
 # Changelog
 
 ## [Unreleased]
- 
+- Add verify signature for walletconnect 2.0
+
 ## [v0.0.19-alpha] - 2024-4-27
-- Fix WC 2.0 for defiwallet 
+- Fix WC 2.0 for defiwallet
 - Support UE 5.4
 
 
 ## [v0.0.18-alpha] - 2024-1-2
 - Support metamask send-tx for wallet-connect 2.0
 - Support Unreal Engine 5.3.0
-- Add weakptr checking for WalletConnect 2.0 
+- Add weakptr checking for WalletConnect 2.0
 
 
 ## [v0.0.17-alpha] - 2023-8-10
@@ -22,7 +23,7 @@
 ## [v0.0.13-alpha] - 2023-6-15
 - Support apple arm64
 - Support Unreal Engine 5.2.0
-- Update play-cpp-sdk headerfiles 
+- Update play-cpp-sdk headerfiles
 
 ## [v0.0.12-alpha] - 2023-5-04
 - Support sending transactions using Metamask and Crypto.com Defi Wallet
