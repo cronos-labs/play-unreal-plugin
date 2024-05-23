@@ -67,7 +67,7 @@ class CRONOSPLAYUNREAL_API UPlayCppSdkDownloader : public UObject {
     UPROPERTY(BlueprintAssignable)
     FPlayDownloadProgress PlayDownloadProgressCallback;
     void OnPlayDownloadProgressCallback(FHttpRequestPtr RequestPtr,
-                                        int32 SendBytes, int32 RecvBytes);
+                                        uint64 SendBytes, uint64 RecvBytes);
 
     /**
      * SetupIpfsConverting

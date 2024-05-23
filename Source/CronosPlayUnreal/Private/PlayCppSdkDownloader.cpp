@@ -27,9 +27,9 @@ UPlayCppSdkDownloader::UPlayCppSdkDownloader() {
 }
 
 void UPlayCppSdkDownloader::OnPlayDownloadProgressCallback(
-    FHttpRequestPtr RequestPtr, int32 SendBytes, int32 RecvBytes) {
+    FHttpRequestPtr RequestPtr, uint64 SendBytes, uint64 RecvBytes) {
 
-    int32 TotalSize = RequestPtr->GetResponse()->GetContentLength();
+    int64 TotalSize = RequestPtr->GetResponse()->GetContentLength();
     float Percent = (float)RecvBytes / TotalSize;
 
     PlayDownloadProgressCallback.Broadcast(RecvBytes, TotalSize, Percent);
@@ -56,7 +56,7 @@ void UPlayCppSdkDownloader::GetJsonStringFromUri(FString tokenuriuser,
                            TEXT("application/x-www-form-urlencoded"));
     httprequest->SetURL(tokenuri);
 
-    httprequest->OnRequestProgress().BindUObject(
+    httprequest->OnRequestProgress64().BindUObject(
         this, &UPlayCppSdkDownloader::OnPlayDownloadProgressCallback);
 
     httprequest->OnProcessRequestComplete().BindUObject(
@@ -76,8 +76,14 @@ void UPlayCppSdkDownloader::OnGetJsonStringFromUriCompleteCallback(
         result = TEXT("");
     } else {
         switch (httprequest->GetStatus()) {
-        case EHttpRequestStatus::Failed_ConnectionError:
-            result = TEXT("Connection failed.");
+        case EHttpRequestStatus::Failed:
+            if (httprequest->GetFailureReason() ==
+                EHttpFailureReason::ConnectionError) {
+                result = TEXT("Connection failed.");
+            } else {
+                result = TEXT("Request failed.");
+            }
+            break;
         default:
             result = TEXT("Request failed.");
         }
@@ -107,7 +113,7 @@ void UPlayCppSdkDownloader::GetNftImageInfoFromUri(FString tokenuriuser,
     httprequest->SetHeader(TEXT("User-Agent"), UserAgent);
     httprequest->SetURL(tokenuri);
 
-    httprequest->OnRequestProgress().BindUObject(
+    httprequest->OnRequestProgress64().BindUObject(
         this, &UPlayCppSdkDownloader::OnPlayDownloadProgressCallback);
 
     httprequest->OnProcessRequestComplete().BindUObject(
@@ -143,8 +149,14 @@ void UPlayCppSdkDownloader::OnGetNftImageInfoFromUriCompleteCallback(
         }
     } else {
         switch (httprequest->GetStatus()) {
-        case EHttpRequestStatus::Failed_ConnectionError:
-            result = TEXT("Connection failed.");
+        case EHttpRequestStatus::Failed:
+            if (httprequest->GetFailureReason() ==
+                EHttpFailureReason::ConnectionError) {
+                result = TEXT("Connection failed.");
+            } else {
+                result = TEXT("Request failed.");
+            }
+            break;
         default:
             result = TEXT("Request failed.");
         }
@@ -169,7 +181,7 @@ void UPlayCppSdkDownloader::GetNftImageFromUrl(FString imageurl, bool &success,
     httprequest->SetHeader(TEXT("User-Agent"), UserAgent);
     httprequest->SetURL(imageurl);
 
-    httprequest->OnRequestProgress().BindUObject(
+    httprequest->OnRequestProgress64().BindUObject(
         this, &UPlayCppSdkDownloader::OnPlayDownloadProgressCallback);
 
     httprequest->OnProcessRequestComplete().BindUObject(
@@ -194,8 +206,14 @@ void UPlayCppSdkDownloader::OnGetNftImageFromUrlCompleteCallback(
         }
     } else {
         switch (httprequest->GetStatus()) {
-        case EHttpRequestStatus::Failed_ConnectionError:
-            result = TEXT("Connection failed.");
+        case EHttpRequestStatus::Failed:
+            if (httprequest->GetFailureReason() ==
+                EHttpFailureReason::ConnectionError) {
+                result = TEXT("Connection failed.");
+            } else {
+                result = TEXT("Request failed.");
+            }
+            break;
         default:
             result = TEXT("Request failed.");
         }
