@@ -1,18 +1,18 @@
 # Changelog
 
 ## [Unreleased]
+
+## [v0.0.20-alpha] - 2024-5-24
 - Add verify signature for walletconnect 2.0
 
 ## [v0.0.19-alpha] - 2024-4-27
 - Fix WC 2.0 for defiwallet
 - Support UE 5.4
 
-
 ## [v0.0.18-alpha] - 2024-1-2
 - Support metamask send-tx for wallet-connect 2.0
 - Support Unreal Engine 5.3.0
 - Add weakptr checking for WalletConnect 2.0
-
 
 ## [v0.0.17-alpha] - 2023-8-10
 - fix windows build
