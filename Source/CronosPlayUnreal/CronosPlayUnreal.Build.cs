@@ -17,7 +17,7 @@ public class CronosPlayUnreal : ModuleRules {
         bEnableExceptions = true;
 
         PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
-        CppStandard = CppStandardVersion.Cpp17;
+        CppStandard = CppStandardVersion.Cpp20;
 
         PublicIncludePaths.AddRange(new string[] {});
         PrivateIncludePaths.AddRange(
@@ -28,7 +28,7 @@ public class CronosPlayUnreal : ModuleRules {
 
         PrivateDependencyModuleNames.AddRange(
             new string[] { "CoreUObject", "Engine", "Slate", "SlateCore",
-                           "Projects", "PlayCppSdkLibrary" });
+                           "Projects", "PlayCppSdkLibrary", "RenderCore", "RHI" });
 
         DynamicallyLoadedModuleNames.AddRange(new string[] {});
 
