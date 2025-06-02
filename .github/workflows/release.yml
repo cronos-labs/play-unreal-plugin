@@ -32,9 +32,9 @@ jobs:
         run: |
           FILENAME="CronosPlayForUnrealEngine4.27.zip"
           zip -r ${FILENAME} Source Resources CronosPlayUnreal.uplugin
-          sha256sum ${FILENAME} > "checksums.txt"
+          sha256sum ${FILENAME} > "CronosPlayForUnrealEngine4.27.zip.checksums.txt"
           echo "release_file=${FILENAME}" >> $GITHUB_ENV
-          echo "checksum_file=checksums.txt" >> $GITHUB_ENV
+          echo "checksum_file=CronosPlayForUnrealEngine4.27.zip.checksums.txt" >> $GITHUB_ENV
 
 
       - name: Upload binaries and bindings to Release
@@ -66,9 +66,9 @@ jobs:
         run: |
           FILENAME="CronosPlayForUnrealEngine5.0.zip"
           zip -r ${FILENAME} Source Resources CronosPlayUnreal.uplugin
-          sha256sum ${FILENAME} > "checksums.txt"
+          sha256sum ${FILENAME} > "CronosPlayForUnrealEngine5.0.zip.checksums.txt"
           echo "release_file=${FILENAME}" >> $GITHUB_ENV
-          echo "checksum_file=checksums.txt" >> $GITHUB_ENV
+          echo "checksum_file=CronosPlayForUnrealEngine5.0.zip.checksums.txt" >> $GITHUB_ENV
 
 
       - name: Upload binaries and bindings to Release
@@ -100,9 +100,9 @@ jobs:
         run: |
           FILENAME="CronosPlayForUnrealEngine5.1.zip"
           zip -r ${FILENAME} Source Resources CronosPlayUnreal.uplugin
-          sha256sum ${FILENAME} > "checksums.txt"
+          sha256sum ${FILENAME} > "CronosPlayForUnrealEngine5.1.zip.checksums.txt"
           echo "release_file=${FILENAME}" >> $GITHUB_ENV
-          echo "checksum_file=checksums.txt" >> $GITHUB_ENV
+          echo "checksum_file=CronosPlayForUnrealEngine5.1.zip.checksums.txt" >> $GITHUB_ENV
 
 
       - name: Upload binaries and bindings to Release
@@ -134,9 +134,9 @@ jobs:
         run: |
           FILENAME="CronosPlayForUnrealEngine5.2.zip"
           zip -r ${FILENAME} Source Resources CronosPlayUnreal.uplugin
-          sha256sum ${FILENAME} > "checksums.txt"
+          sha256sum ${FILENAME} > "CronosPlayForUnrealEngine5.2.zip.checksums.txt"
           echo "release_file=${FILENAME}" >> $GITHUB_ENV
-          echo "checksum_file=checksums.txt" >> $GITHUB_ENV
+          echo "checksum_file=CronosPlayForUnrealEngine5.2.zip.checksums.txt" >> $GITHUB_ENV
 
 
       - name: Upload binaries and bindings to Release
@@ -168,9 +168,9 @@ jobs:
         run: |
           FILENAME="CronosPlayForUnrealEngine5.3.zip"
           zip -r ${FILENAME} Source Resources CronosPlayUnreal.uplugin
-          sha256sum ${FILENAME} > "checksums.txt"
+          sha256sum ${FILENAME} > "CronosPlayForUnrealEngine5.3.zip.checksums.txt"
           echo "release_file=${FILENAME}" >> $GITHUB_ENV
-          echo "checksum_file=checksums.txt" >> $GITHUB_ENV
+          echo "checksum_file=CronosPlayForUnrealEngine5.3.zip.checksums.txt" >> $GITHUB_ENV
 
 
       - name: Upload binaries and bindings to Release
@@ -203,9 +203,43 @@ jobs:
         run: |
           FILENAME="CronosPlayForUnrealEngine5.4.zip"
           zip -r ${FILENAME} Source Resources CronosPlayUnreal.uplugin
-          sha256sum ${FILENAME} > "checksums.txt"
+          sha256sum ${FILENAME} > "CronosPlayForUnrealEngine5.4.zip.checksums.txt"
           echo "release_file=${FILENAME}" >> $GITHUB_ENV
-          echo "checksum_file=checksums.txt" >> $GITHUB_ENV
+          echo "checksum_file=CronosPlayForUnrealEngine5.4.zip.checksums.txt" >> $GITHUB_ENV
+
+
+      - name: Upload binaries and bindings to Release
+        uses: softprops/action-gh-release@v1
+        if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
+        with:
+          draft: true
+          files: |
+            ${{ env.release_file }}
+            ${{ env.checksum_file }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}                    
+
+  Unreal_Release_5_5:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          submodules: recursive
+
+      - name: Prepare PlayCppSdk
+        run: |
+          TARGET=5.5 make
+          python change_version.py 5.5.0
+          
+
+      - name: Package For Windows,Mac
+        run: |
+          FILENAME="CronosPlayForUnrealEngine5.5.zip"
+          zip -r ${FILENAME} Source Resources CronosPlayUnreal.uplugin
+          sha256sum ${FILENAME} > "CronosPlayForUnrealEngine5.5.zip.checksums.txt"
+          echo "release_file=${FILENAME}" >> $GITHUB_ENV
+          echo "checksum_file=CronosPlayForUnrealEngine5.5.zip.checksums.txt" >> $GITHUB_ENV
 
 
       - name: Upload binaries and bindings to Release

@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+## [v0.0.21-alpha] - 2025-06-02
+- Support Unreal Engine 5.5
+
 ## [v0.0.20-alpha] - 2024-5-24
 - Add verify signature for walletconnect 2.0
 

@@ -7,6 +7,7 @@
 #pragma once
 
 #include "Kismet/BlueprintFunctionLibrary.h"
+#include "Engine/Texture2D.h"
 #include "PlayCppSdkBPLibrary.generated.h"
 
 /// Token Query Options
