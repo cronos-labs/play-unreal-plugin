@@ -56,8 +56,9 @@ void UPlayCppSdkDownloader::GetJsonStringFromUri(FString tokenuriuser,
                            TEXT("application/x-www-form-urlencoded"));
     httprequest->SetURL(tokenuri);
 
-    httprequest->OnRequestProgress().BindUObject(
-        this, &UPlayCppSdkDownloader::OnPlayDownloadProgressCallback);
+    // OnRequestProgress was removed in UE 5.5 - commenting out for compatibility
+    // httprequest->OnRequestProgress().BindUObject(
+    //     this, &UPlayCppSdkDownloader::OnPlayDownloadProgressCallback);
 
     httprequest->OnProcessRequestComplete().BindUObject(
         this, &UPlayCppSdkDownloader::OnGetJsonStringFromUriCompleteCallback);
@@ -76,7 +77,7 @@ void UPlayCppSdkDownloader::OnGetJsonStringFromUriCompleteCallback(
         result = TEXT("");
     } else {
         switch (httprequest->GetStatus()) {
-        case EHttpRequestStatus::Failed_ConnectionError:
+        case EHttpRequestStatus::Failed:
             result = TEXT("Connection failed.");
         default:
             result = TEXT("Request failed.");
@@ -107,8 +108,9 @@ void UPlayCppSdkDownloader::GetNftImageInfoFromUri(FString tokenuriuser,
     httprequest->SetHeader(TEXT("User-Agent"), UserAgent);
     httprequest->SetURL(tokenuri);
 
-    httprequest->OnRequestProgress().BindUObject(
-        this, &UPlayCppSdkDownloader::OnPlayDownloadProgressCallback);
+    // OnRequestProgress was removed in UE 5.5 - commenting out for compatibility
+    // httprequest->OnRequestProgress().BindUObject(
+    //     this, &UPlayCppSdkDownloader::OnPlayDownloadProgressCallback);
 
     httprequest->OnProcessRequestComplete().BindUObject(
         this, &UPlayCppSdkDownloader::OnGetNftImageInfoFromUriCompleteCallback);
@@ -143,7 +145,7 @@ void UPlayCppSdkDownloader::OnGetNftImageInfoFromUriCompleteCallback(
         }
     } else {
         switch (httprequest->GetStatus()) {
-        case EHttpRequestStatus::Failed_ConnectionError:
+        case EHttpRequestStatus::Failed:
             result = TEXT("Connection failed.");
         default:
             result = TEXT("Request failed.");
@@ -169,8 +171,9 @@ void UPlayCppSdkDownloader::GetNftImageFromUrl(FString imageurl, bool &success,
     httprequest->SetHeader(TEXT("User-Agent"), UserAgent);
     httprequest->SetURL(imageurl);
 
-    httprequest->OnRequestProgress().BindUObject(
-        this, &UPlayCppSdkDownloader::OnPlayDownloadProgressCallback);
+    // OnRequestProgress was removed in UE 5.5 - commenting out for compatibility
+    // httprequest->OnRequestProgress().BindUObject(
+    //     this, &UPlayCppSdkDownloader::OnPlayDownloadProgressCallback);
 
     httprequest->OnProcessRequestComplete().BindUObject(
         this, &UPlayCppSdkDownloader::OnGetNftImageFromUrlCompleteCallback);
@@ -194,7 +197,7 @@ void UPlayCppSdkDownloader::OnGetNftImageFromUrlCompleteCallback(
         }
     } else {
         switch (httprequest->GetStatus()) {
-        case EHttpRequestStatus::Failed_ConnectionError:
+        case EHttpRequestStatus::Failed:
             result = TEXT("Connection failed.");
         default:
             result = TEXT("Request failed.");
